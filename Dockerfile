@@ -20,6 +20,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
+# Limitar paralelismo y desactivar LTO fat para evitar OOM en VPS pequeños.
+# Sin estos overrides, el linker final pide 6+ GB de RAM por el LTO=fat del
+# Cargo.toml. Con LTO=thin baja a ~2 GB; con jobs=2 el compilador paralelo
+# usa la mitad de cores. Trade-off: ~10-15% más slow al runtime y ~20% más
+# largo al build, pero estable en VPS de 4 GB con poco swap.
+#
+# Se setea vía env var (no editando Cargo.toml) para no invalidar la layer
+# cache del builder de Docker — sino cada deploy recompilaría las deps de
+# cero (~10 min extra).
+ENV CARGO_BUILD_JOBS=2
+ENV CARGO_PROFILE_RELEASE_LTO=thin
+
 WORKDIR /app
 
 # Caché de dependencias: copiamos solo manifests y compilamos con un main
