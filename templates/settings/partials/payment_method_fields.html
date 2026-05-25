@@ -1,0 +1,86 @@
+{# Campos específicos por rail. El POST handler solo lee los que aplican. #}
+
+{% if rail == "usdt_trc20" %}
+    <label>
+        <span>dirección TRON (TRC20)</span>
+        <input type="text" name="address" required maxlength="34" placeholder="T..." autocomplete="off">
+    </label>
+    <p class="muted small">34 chars empezando con T. Sin memo.</p>
+
+{% else if rail == "usdt_erc20" %}
+    <label>
+        <span>dirección Ethereum (ERC20)</span>
+        <input type="text" name="address" required maxlength="42" placeholder="0x..." autocomplete="off">
+    </label>
+
+{% else if rail == "btc" %}
+    <label>
+        <span>dirección Bitcoin</span>
+        <input type="text" name="address" required maxlength="62" placeholder="bc1... o 1... o 3..." autocomplete="off">
+    </label>
+    <label>
+        <span>memo (opcional)</span>
+        <input type="text" name="memo" maxlength="64">
+    </label>
+
+{% else if rail == "bank_usd" %}
+    <label>
+        <span>banco</span>
+        <input type="text" name="bank_name" required maxlength="80">
+    </label>
+    <label>
+        <span>número de cuenta</span>
+        <input type="text" name="account_number" required maxlength="40">
+    </label>
+    <label>
+        <span>routing / SWIFT</span>
+        <input type="text" name="routing_or_swift" required maxlength="20">
+    </label>
+    <label>
+        <span>titular</span>
+        <input type="text" name="holder_name" required maxlength="120">
+    </label>
+    <label>
+        <span>país (ISO-2)</span>
+        <input type="text" name="country_code" required maxlength="2" placeholder="US" style="text-transform:uppercase">
+    </label>
+
+{% else if rail == "bank_ves_sudeban" %}
+    <label>
+        <span>código del banco (4 dígitos)</span>
+        <input type="text" name="bank_code" required pattern="[0-9]{4}" maxlength="4" placeholder="0102">
+    </label>
+    <label>
+        <span>número de cuenta (20 dígitos)</span>
+        <input type="text" name="account_number" required pattern="[0-9]{20}" maxlength="20"
+               placeholder="01020000000000000001">
+    </label>
+    <label>
+        <span>titular</span>
+        <input type="text" name="holder_name" required maxlength="120">
+    </label>
+    <label>
+        <span>cédula o RIF</span>
+        <input type="text" name="holder_id" required maxlength="14" placeholder="V-12345678 o J-12345678-9">
+    </label>
+    <p class="muted small">la cuenta debe empezar con el código del banco.</p>
+
+{% else if rail == "paypal" %}
+    <label>
+        <span>email de PayPal</span>
+        <input type="email" name="email" required maxlength="120">
+    </label>
+
+{% else if rail == "binance_pay" %}
+    <label>
+        <span>Binance Pay ID</span>
+        <input type="text" name="handle" required pattern="[0-9]{6,16}" maxlength="16">
+    </label>
+
+{% else if rail == "zinli" %}
+    <label>
+        <span>handle Zinli</span>
+        <input type="text" name="handle" required maxlength="40">
+    </label>
+
+{% endif %}

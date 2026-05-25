@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company_name }} · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>{{ company_name }}</h1>
+            <p class="muted">{{ company_description }}</p>
+            {% if !company_website.is_empty() %}
+                <p class="muted small">{{ company_website }}</p>
+            {% endif %}
+            <p class="muted small">tu rol: <span class="badge">{{ role }}</span></p>
+        </div>
+        <div class="header-actions">
+            {% if can_manage %}
+                <a class="btn-primary" href="/companies/{{ company_slug }}/programs/new">+ nuevo programa</a>
+                <a class="btn-link" href="/manage/{{ company_slug }}/payouts">payouts →</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <h2>programas</h2>
+    {% if programs.is_empty() %}
+        <div class="empty">
+            <p>esta empresa todavía no tiene programas.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>nombre</th><th>visibilidad</th><th>estado</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for p in programs %}
+                <tr>
+                    <td>
+                        <a href="/manage/{{ company_slug }}/programs/{{ p.slug }}">{{ p.name }}</a>
+                        {% if !p.summary.is_empty() %}
+                            <div class="muted small">{{ p.summary }}</div>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge">{{ p.visibility }}</span></td>
+                    <td><span class="badge">{{ p.status }}</span></td>
+                    <td><a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ p.slug }}">abrir →</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/companies">← mis empresas</a></p>
+</section>
+{% endblock %}

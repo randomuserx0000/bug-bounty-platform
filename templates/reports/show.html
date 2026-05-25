@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}{{ public_id }} · {{ title }} · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page report">
+    <header class="page-head">
+        <div>
+            <small class="muted"><code>{{ public_id }}</code></small>
+            <h1>{{ title }}</h1>
+            <p>
+                <span class="badge state-{{ state }}">{{ state }}</span>
+                <span class="badge sev-{{ severity }}">severity: {{ severity }}</span>
+                {% if !cwe.is_empty() %}<span class="badge">{{ cwe }}</span>{% endif %}
+                {% if !bounty_usd.is_empty() %}<span class="badge badge-default">bounty {{ bounty_usd }}</span>{% endif %}
+            </p>
+            {% if !cvss_vector.is_empty() %}
+                <p class="muted small">CVSS: <code>{{ cvss_vector }}</code></p>
+            {% endif %}
+        </div>
+    </header>
+
+    <h2>descripción</h2>
+    <article class="policy">{{ description_html|safe }}</article>
+
+    {% if !impact_html.is_empty() %}
+        <h2>impacto</h2>
+        <article class="policy">{{ impact_html|safe }}</article>
+    {% endif %}
+
+    {% if !repro_html.is_empty() %}
+        <h2>reproducción</h2>
+        <article class="policy">{{ repro_html|safe }}</article>
+    {% endif %}
+
+    {# === Acciones del triager === #}
+    {% if is_triager %}
+        <h2>acciones de triage</h2>
+        <div class="triage-actions">
+            {% if !next_states.is_empty() %}
+                <form hx-post="/reports/{{ public_id }}/state" hx-swap="none" class="stack inline-form">
+                    <label>
+                        <span>cambiar estado a</span>
+                        <select name="target">
+                            {% for s in next_states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>nota (opcional)</span>
+                        <input type="text" name="comment" maxlength="200">
+                    </label>
+                    <button class="btn-primary" type="submit">aplicar</button>
+                </form>
+            {% endif %}
+
+            <form hx-post="/reports/{{ public_id }}/severity" hx-swap="none" class="stack inline-form">
+                <label>
+                    <span>severity</span>
+                    <select name="severity">
+                        <option value="none">none</option>
+                        <option value="low">low</option>
+                        <option value="medium">medium</option>
+                        <option value="high">high</option>
+                        <option value="critical">critical</option>
+                    </select>
+                </label>
+                <button class="btn-link" type="submit">cambiar severity</button>
+            </form>
+
+            <form hx-post="/reports/{{ public_id }}/bounty" hx-swap="none" class="stack inline-form">
+                <label>
+                    <span>bounty USD</span>
+                    <input type="number" name="amount_usd" min="0" required>
+                </label>
+                <button class="btn-link" type="submit">fijar bounty</button>
+            </form>
+        </div>
+    {% else if is_reporter && !next_states.is_empty() %}
+        <h2>tus acciones</h2>
+        <form hx-post="/reports/{{ public_id }}/state" hx-swap="none" class="stack inline-form">
+            <label>
+                <span>cambiar estado a</span>
+                <select name="target">
+                    {% for s in next_states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>nota</span>
+                <input type="text" name="comment" maxlength="200">
+            </label>
+            <button class="btn-link" type="submit">aplicar</button>
+        </form>
+    {% endif %}
+
+    {# === Attachments === #}
+    <h2>archivos ({{ attachments.len() }})</h2>
+    {% if attachments.is_empty() %}
+        <p class="muted small">sin archivos adjuntos.</p>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>archivo</th><th>tipo</th><th>tamaño</th><th>sha256</th><th></th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for a in attachments %}
+                <tr>
+                    <td><a href="/reports/{{ public_id }}/attachments/{{ a.id }}">{{ a.filename }}</a></td>
+                    <td><span class="badge">{{ a.kind }}</span> <small class="muted">{{ a.mime }}</small></td>
+                    <td>{{ a.size_human }}</td>
+                    <td><code>{{ a.sha256_short }}…</code></td>
+                    <td><a class="btn-link" href="/reports/{{ public_id }}/attachments/{{ a.id }}">descargar</a></td>
+                    <td>
+                        {% if a.can_delete %}
+                            <form hx-post="/reports/{{ public_id }}/attachments/{{ a.id }}/delete"
+                                  hx-confirm="¿eliminar {{ a.filename }}?"
+                                  hx-swap="none" class="inline">
+                                <button class="btn-link danger" type="submit">eliminar</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {# Form upload. multipart/form-data — IMPORTANTE para que HTMX no
+       serialice como x-www-form-urlencoded. #}
+    <form hx-post="/reports/{{ public_id }}/attachments"
+          hx-encoding="multipart/form-data"
+          hx-target="#att-feedback" hx-swap="innerHTML"
+          class="stack upload-form">
+        <label>
+            <span>añadir archivo (máx 50 MB)</span>
+            <input type="file" name="file" required>
+        </label>
+        <label>
+            <span>tipo</span>
+            <select name="kind">
+                <option value="poc">PoC</option>
+                <option value="firmware">firmware</option>
+                <option value="pcap">pcap</option>
+                <option value="schematic">esquemático</option>
+                <option value="sdr_iq">SDR (.iq)</option>
+                <option value="video">video</option>
+                <option value="other" selected>otro</option>
+            </select>
+        </label>
+        <div id="att-feedback" class="feedback"></div>
+        <button class="btn-link" type="submit">subir</button>
+    </form>
+
+    {# === Timeline === #}
+    <h2>actividad</h2>
+    <ol class="timeline">
+    {% for e in events %}
+        <li class="event evt-{{ e.event_type }}{% if e.is_internal %} internal{% endif %}">
+            <header>
+                <span class="badge">{{ e.event_type }}</span>
+                {% if e.is_internal %}<span class="badge badge-default">interno</span>{% endif %}
+                <small class="muted">{{ e.at }}</small>
+            </header>
+            {% if !e.body_html.is_empty() %}
+                <article class="event-body">{{ e.body_html|safe }}</article>
+            {% endif %}
+            {% if !e.metadata_text.is_empty() %}
+                <pre class="metadata">{{ e.metadata_text }}</pre>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ol>
+
+    {# === Form de comentario === #}
+    <h2>añadir comentario</h2>
+    <form hx-post="/reports/{{ public_id }}/comments"
+          hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+        <label>
+            <span>comentario (markdown)</span>
+            <textarea name="body_md" required rows="4" data-easymde></textarea>
+        </label>
+        {% if is_triager %}
+            <label class="inline">
+                <input type="checkbox" name="internal">
+                <span>comentario interno (no visible para el reporter)</span>
+            </label>
+        {% endif %}
+        <div id="form-feedback" class="feedback"></div>
+        <button type="submit" class="btn-primary">publicar</button>
+    </form>
+</section>
+{% endblock %}

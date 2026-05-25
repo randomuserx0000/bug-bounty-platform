@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}dashboard · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <h1>hola, {{ handle }}</h1>
+    <p class="muted">rol: {{ role }}</p>
+
+    <ul class="nav-list">
+        <li><a href="/companies">mis empresas</a></li>
+        <li><a href="/programs">programas públicos</a></li>
+        <li><a href="/reports">mis reports</a></li>
+        <li><a href="/payouts/mine">mis bounties</a></li>
+        <li><a href="/settings/payment-methods">métodos de pago</a></li>
+    </ul>
+
+    <form hx-post="/logout" hx-swap="none">
+        <button type="submit">cerrar sesión</button>
+    </form>
+</section>
+{% endblock %}

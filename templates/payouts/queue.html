@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}payouts · {{ company_name }} · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>payouts · {{ company_name }}</h1>
+            <p class="muted">escrow disponible: <strong>{{ escrow_usd }}</strong></p>
+        </div>
+        <a href="/companies/{{ company_slug }}" class="btn-link">← volver</a>
+    </header>
+
+    <section class="card-box">
+        <h3>depositar escrow (manual)</h3>
+        <p class="muted small">
+            simula un depósito de la company al saldo prefondeado. en prod
+            esto se dispara desde un evento on-chain o transferencia bancaria.
+        </p>
+        <form hx-post="/manage/{{ company_slug }}/escrow/deposit"
+              hx-target="#esc-feedback" hx-swap="innerHTML" class="stack">
+            <label>
+                <span>monto USD</span>
+                <input type="number" name="amount_usd" min="1" required>
+            </label>
+            <div id="esc-feedback" class="feedback"></div>
+            <button class="btn-link" type="submit">depositar</button>
+        </form>
+    </section>
+
+    <h2>cola</h2>
+    {% if payouts.is_empty() %}
+        <div class="empty"><p>sin payouts todavía.</p></div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>report</th>
+                    <th>reporter</th>
+                    <th>rail</th>
+                    <th>monto</th>
+                    <th>estado</th>
+                    <th>tx_ref / error</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in payouts %}
+                <tr>
+                    <td><a href="/reports/{{ p.report_public_id }}"><code>{{ p.report_public_id }}</code></a></td>
+                    <td>@{{ p.reporter_handle }}</td>
+                    <td>{{ p.rail }}</td>
+                    <td>{{ p.amount_usd }}</td>
+                    <td><span class="badge payout-{{ p.status }}">{{ p.status }}</span></td>
+                    <td>
+                        {% if !p.tx_ref.is_empty() %}<code>{{ p.tx_ref }}</code>{% endif %}
+                        {% if !p.error_message.is_empty() %}<span class="muted small">{{ p.error_message }}</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if p.status == "pending" || p.status == "processing" %}
+                            <form hx-post="/payouts/{{ p.id }}/mark-sent" hx-swap="none"
+                                  hx-target="#row-{{ p.id }}-fb" class="inline-form stack">
+                                <input type="text" name="tx_ref" placeholder="txid / referencia"
+                                       required maxlength="120" style="width:160px">
+                                <button class="btn-link" type="submit">marcar enviado</button>
+                            </form>
+                            <form hx-post="/payouts/{{ p.id }}/mark-failed" hx-swap="none"
+                                  hx-confirm="¿marcar como fallido y reembolsar escrow?" class="inline-form stack">
+                                <input type="text" name="reason" placeholder="razón" required maxlength="120" style="width:160px">
+                                <button class="btn-link danger" type="submit">fallar</button>
+                            </form>
+                        {% else if p.status == "failed" %}
+                            <form hx-post="/payouts/{{ p.id }}/retry" hx-swap="none" class="inline">
+                                <button class="btn-link" type="submit">reintentar</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</section>
+{% endblock %}

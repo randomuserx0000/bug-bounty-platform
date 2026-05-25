@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}programas públicos · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>programas públicos</h1>
+            <p class="muted">explora programas activos de bug bounty en Venezuela.</p>
+        </div>
+    </header>
+
+    {% if programs.is_empty() %}
+        <div class="empty">
+            <p>todavía no hay programas públicos.</p>
+        </div>
+    {% else %}
+        <div class="card-grid">
+        {% for p in programs %}
+            <a class="program-card" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}">
+                <header>
+                    <small class="muted">{{ p.company_name }}</small>
+                    <h3>{{ p.name }}</h3>
+                </header>
+                <p>{{ p.summary }}</p>
+                {% if !p.bounty_low.is_empty() || !p.bounty_critical.is_empty() %}
+                    <footer class="muted small">
+                        bounty: {{ p.bounty_low }} – {{ p.bounty_critical }}
+                    </footer>
+                {% endif %}
+            </a>
+        {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

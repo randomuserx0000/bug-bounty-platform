@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}nuevo método de pago · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nuevo método de pago</h1>
+    <p class="muted">los datos sensibles se cifran antes de guardarse.</p>
+
+    <form hx-post="/settings/payment-methods"
+          hx-target="#form-feedback"
+          hx-swap="innerHTML"
+          class="stack">
+
+        <label>
+            <span>tipo</span>
+            <select name="rail"
+                    hx-get="/settings/payment-methods/fields"
+                    hx-target="#rail-fields"
+                    hx-trigger="change"
+                    hx-include="this"
+                    hx-swap="innerHTML">
+                {% for r in rails %}
+                    <option value="{{ r.0 }}">{{ r.1 }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            <span>etiqueta (opcional)</span>
+            <input type="text" name="label" maxlength="60" placeholder="ej: mi wallet principal">
+        </label>
+
+        <div id="rail-fields">
+            {{ initial_fields|safe }}
+        </div>
+
+        <label class="inline">
+            <input type="checkbox" name="is_default">
+            <span>usar como predeterminado</span>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">guardar</button>
+        <a href="/settings/payment-methods" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}

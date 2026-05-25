@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}mis empresas · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>mis empresas</h1>
+            <p class="muted">empresas donde eres miembro, {{ handle }}.</p>
+        </div>
+        <a class="btn-primary" href="/companies/new">+ nueva empresa</a>
+    </header>
+
+    {% if memberships.is_empty() %}
+        <div class="empty">
+            <p>todavía no perteneces a ninguna empresa.</p>
+            <p class="muted">crea una para publicar programas de bug bounty.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>empresa</th><th>rol</th><th>estado</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for m in memberships %}
+                <tr>
+                    <td><a href="/companies/{{ m.slug }}">{{ m.display_name }}</a></td>
+                    <td><span class="badge">{{ m.role }}</span></td>
+                    <td>{{ m.status }}</td>
+                    <td><a class="btn-link" href="/companies/{{ m.slug }}">gestionar →</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/dashboard">← dashboard</a></p>
+</section>
+{% endblock %}

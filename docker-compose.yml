@@ -1,0 +1,64 @@
+# Stack local para desarrollo. Levanta con:
+#   docker-compose up -d
+#
+# - db (postgres 16): puerto 5432
+# - minio: API en 9000, consola en 9001 (http://localhost:9001)
+# - minio-init: corre una vez para crear el bucket bb-attachments y salir
+#
+# Persistencia en volúmenes nombrados; los datos sobreviven al `down`.
+
+services:
+  db:
+    image: docker.io/postgres:16-alpine
+    container_name: bugbounty_pg
+    environment:
+      POSTGRES_USER: bb
+      POSTGRES_PASSWORD: bb
+      POSTGRES_DB: bugbounty
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bb -d bugbounty"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: docker.io/minio/minio:latest
+    container_name: bugbounty_minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin-dev-only
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"   # API S3-compatible
+      - "9001:9001"   # consola web
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Container one-shot que crea el bucket bb-attachments al arrancar el stack.
+  # Sale después de hacer su trabajo.
+  minio-init:
+    image: docker.io/minio/mc:latest
+    container_name: bugbounty_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin-dev-only &&
+        mc mb --ignore-existing local/bb-attachments &&
+        echo 'bb-attachments ready'
+      "
+    restart: "no"
+
+volumes:
+  pgdata:
+  miniodata:

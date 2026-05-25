@@ -1,0 +1,96 @@
+[package]
+name = "bugbounty"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.78"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+opt-level = 3
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+
+[dependencies]
+# web
+axum = { version = "0.7", features = ["macros", "http2", "multipart"] }
+axum-extra = { version = "0.9", features = ["cookie", "cookie-private", "cookie-signed"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["compression-br", "compression-gzip", "trace", "set-header", "limit", "timeout", "fs"] }
+tower_governor = "0.4"
+hyper = "1"
+
+# templating
+askama = "0.12"
+askama_axum = "0.4"
+
+# db
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "time", "json", "macros", "migrate", "ipnetwork"] }
+
+# auth & crypto
+argon2 = "0.5"
+rand = "0.8"
+secrecy = { version = "0.10", features = ["serde"] }
+subtle = "2"
+sha2 = "0.10"
+hex = "0.4"
+# AEAD para cifrar payment_methods.details_enc (key de 32 bytes en .env)
+chacha20poly1305 = "0.10"
+# Base58Check para validar direcciones TRON (USDT TRC20)
+bs58 = { version = "0.5", features = ["check"] }
+
+# serde / data
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+time = { version = "0.3", features = ["serde", "macros"] }
+
+# observability & errors
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+thiserror = "2"
+anyhow = "1"
+async-trait = "0.1"
+
+# config
+dotenvy = "0.15"
+envy = "0.4"
+
+# object storage (MinIO en dev, S3/Hetzner en prod)
+aws-sdk-s3 = { version = "1", default-features = false, features = ["rt-tokio", "rustls"] }
+aws-config = { version = "1", default-features = false, features = ["rt-tokio", "rustls"] }
+aws-credential-types = "1"
+aws-smithy-types = "1"
+mime_guess = "2"
+bytes = "1"
+
+# validation & sanitization
+validator = { version = "0.18", features = ["derive"] }
+ammonia = "4"
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+regex = "1"
+once_cell = "1"
+urlencoding = "2"
+
+# OAuth 2.0 (Google Sign-In; preparado para añadir otros providers)
+oauth2 = { version = "4", default-features = false, features = ["reqwest", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# rate limit / utils
+governor = "0.7"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util"] }

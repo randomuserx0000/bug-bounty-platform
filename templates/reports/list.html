@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}mis reports · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>mis reports</h1>
+            <p class="muted">vulnerabilidades que has reportado, {{ handle }}.</p>
+        </div>
+    </header>
+
+    {% if reports.is_empty() %}
+        <div class="empty">
+            <p>todavía no has enviado reports.</p>
+            <p class="muted"><a href="/programs">explora programas públicos</a> para empezar.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>id</th><th>título</th><th>severity</th><th>estado</th></tr>
+            </thead>
+            <tbody>
+            {% for r in reports %}
+                <tr>
+                    <td><a href="/reports/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                    <td>{{ r.title }}</td>
+                    <td><span class="badge sev-{{ r.severity }}">{{ r.severity }}</span></td>
+                    <td><span class="badge state-{{ r.state }}">{{ r.state }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/dashboard">← dashboard</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ program_name }} · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <small class="muted">{{ company_name }}</small>
+            <h1>{{ program_name }}</h1>
+            <p class="muted">{{ summary }}</p>
+            <p>
+                <span class="badge">{{ visibility }}</span>
+                <span class="badge">{{ status }}</span>
+            </p>
+        </div>
+        <div class="header-actions">
+            {% if public_view %}
+                <a class="btn-primary" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">reportar bug</a>
+            {% else %}
+                <a class="btn-primary" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">+ nuevo report</a>
+            {% endif %}
+            {% if can_manage %}
+                <a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/new">+ asset</a>
+                <a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ program_slug }}/reports">triage →</a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if !bounty_low.is_empty() || !bounty_critical.is_empty() %}
+        <section class="bounty-grid">
+            <div><span class="muted small">low</span><strong>{{ bounty_low }}</strong></div>
+            <div><span class="muted small">medium</span><strong>{{ bounty_medium }}</strong></div>
+            <div><span class="muted small">high</span><strong>{{ bounty_high }}</strong></div>
+            <div><span class="muted small">critical</span><strong>{{ bounty_critical }}</strong></div>
+        </section>
+    {% endif %}
+
+    <h2>política</h2>
+    <article class="policy">{{ policy_html|safe }}</article>
+
+    <h2>scope ({{ assets.len() }})</h2>
+    {% if assets.is_empty() %}
+        <div class="empty">
+            <p>sin assets definidos todavía.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>tipo</th>
+                    <th>etiqueta</th>
+                    <th>target</th>
+                    <th>en scope</th>
+                    <th>severity cap</th>
+                    {% if can_manage %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in assets %}
+                <tr>
+                    <td><span class="badge">{{ a.type_label }}</span></td>
+                    <td>{{ a.label }}</td>
+                    <td><code>{{ a.target }}</code></td>
+                    <td>{% if a.in_scope %}sí{% else %}no{% endif %}</td>
+                    <td>{{ a.severity_cap }}</td>
+                    {% if can_manage %}
+                        <td>
+                            <form hx-post="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/{{ a.id }}/delete"
+                                  hx-confirm="¿eliminar este asset?"
+                                  hx-swap="none" class="inline">
+                                <button class="btn-link danger" type="submit">eliminar</button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small">
+        {% if public_view %}
+            <a href="/programs">← programas públicos</a>
+        {% else %}
+            <a href="/companies/{{ company_slug }}">← {{ company_name }}</a>
+        {% endif %}
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}métodos de pago · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>métodos de pago</h1>
+            <p class="muted">cómo recibirás los bounties que ganes, {{ handle }}.</p>
+        </div>
+        <a class="btn-primary" href="/settings/payment-methods/new">+ nuevo método</a>
+    </header>
+
+    {% if methods.is_empty() %}
+        <div class="empty">
+            <p>todavía no tienes métodos de pago configurados.</p>
+            <p class="muted">añade al menos uno antes de que se te apruebe un payout.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>rail</th>
+                    <th>destino</th>
+                    <th>etiqueta</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for m in methods %}
+                <tr>
+                    <td>
+                        <span class="badge rail-{{ m.rail_slug }}">{{ m.rail_label }}</span>
+                    </td>
+                    <td><code>{{ m.short_display }}</code></td>
+                    <td>{{ m.label }}</td>
+                    <td>
+                        {% if m.is_default %}
+                            <span class="badge badge-default">predeterminado</span>
+                        {% else %}
+                            <form hx-post="/settings/payment-methods/{{ m.id }}/default" hx-swap="none" class="inline">
+                                <button class="btn-link" type="submit">marcar como default</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form hx-post="/settings/payment-methods/{{ m.id }}/delete"
+                              hx-confirm="¿eliminar este método de pago?"
+                              hx-swap="none"
+                              class="inline">
+                            <button class="btn-link danger" type="submit">eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small">
+        <a href="/dashboard">← volver al dashboard</a>
+    </p>
+</section>
+{% endblock %}

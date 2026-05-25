@@ -1,0 +1,107 @@
+# =============================================================================
+# Stack de producción para Coolify (u otro orquestador docker-compose).
+#
+# Servicios:
+#   - app:        bugbounty-platform (Rust + Axum), construido desde Dockerfile
+#   - db:         Postgres 16
+#   - minio:      object storage S3-compatible para attachments
+#   - minio-init: one-shot, crea bucket bb-attachments al primer arranque
+#
+# En Coolify:
+#   1. New Resource → "Docker Compose" → este archivo
+#   2. Coolify maneja reverse proxy (Caddy/Traefik) + SSL automático al
+#      dominio que apuntes; sólo expone el puerto del servicio `app`
+#   3. Setea env vars desde la UI de Coolify (las críticas están abajo)
+#   4. Persistencia: los volúmenes pgdata/miniodata sobreviven redeploys
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      # --- requeridos ---
+      DATABASE_URL: postgres://bb:${POSTGRES_PASSWORD}@db:5432/bugbounty
+      PUBLIC_URL: ${PUBLIC_URL}                     # ej: https://bugbounty.ve
+      PAYMENT_METHODS_KEY_HEX: ${PAYMENT_METHODS_KEY_HEX}  # openssl rand -hex 32
+      COOKIE_KEY_HEX: ${COOKIE_KEY_HEX}             # openssl rand -hex 64
+
+      # --- object storage (apuntando al MinIO interno) ---
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: bb-attachments
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      S3_FORCE_PATH_STYLE: "true"
+
+      # --- opcionales (defaults razonables) ---
+      BIND_ADDR: 0.0.0.0:8080
+      DB_MAX_CONN: "20"
+      RUST_LOG: ${RUST_LOG:-info,bugbounty=info,sqlx=warn,tower_http=warn}
+
+      # --- Google OAuth (omitir si no querés Sign-In con Google todavía) ---
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    expose:
+      - "8080"
+    # Coolify enrutará tráfico aquí. Si lo levantás manualmente sin Coolify,
+    # descomentá el ports: ["8080:8080"] para acceder desde el host.
+    # ports:
+    #   - "8080:8080"
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: bugbounty
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bb -d bugbounty"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # No exponer puertos públicamente; el app habla por la red interna.
+    # Si querés acceder a la consola web de MinIO desde Coolify, podés
+    # publicar /minio:9001 como segundo servicio HTTP en Coolify.
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD} &&
+        mc mb --ignore-existing local/bb-attachments &&
+        echo 'bb-attachments ready'
+      "
+    restart: "no"
+
+volumes:
+  pgdata:
+  miniodata:

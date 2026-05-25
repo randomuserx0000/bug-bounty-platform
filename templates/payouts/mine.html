@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}mis bounties · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>mis bounties</h1>
+            <p class="muted">payouts de tus reports resueltos, {{ handle }}.</p>
+        </div>
+    </header>
+
+    {% if payouts.is_empty() %}
+        <div class="empty">
+            <p>todavía no has cobrado ningún bounty.</p>
+            <p class="muted small">cuando un report tuyo pase a <code>resolved</code> con bounty,
+            aparecerá aquí.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>rail</th>
+                    <th>monto</th>
+                    <th>estado</th>
+                    <th>tx_ref / error</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in payouts %}
+                <tr>
+                    <td>{{ p.rail }}</td>
+                    <td><strong>{{ p.amount_usd }}</strong></td>
+                    <td><span class="badge payout-{{ p.status }}">{{ p.status }}</span></td>
+                    <td>
+                        {% if !p.tx_ref.is_empty() %}<code>{{ p.tx_ref }}</code>{% endif %}
+                        {% if !p.error_message.is_empty() %}<span class="muted small">{{ p.error_message }}</span>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/dashboard">← dashboard</a></p>
+</section>
+{% endblock %}

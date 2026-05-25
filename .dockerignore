@@ -1,0 +1,25 @@
+# Lo que NO debe ir al build context (acelera builds y reduce ruido).
+
+target/
+.git/
+.gitignore
+.env
+.env.local
+.env.*.local
+*.swp
+*.log
+/tmp/
+
+# Docker artefactos
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Documentación (no se necesita en runtime)
+*.md
+DEPLOY.md

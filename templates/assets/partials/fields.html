@@ -1,0 +1,62 @@
+{# Campos por asset_type. Match en orden del enum AssetType. #}
+
+{% if asset_type == "web" %}
+    <label><span>URL</span><input type="text" name="url" required maxlength="200" placeholder="https://app.example.com"></label>
+    <label><span>scope (wildcard, opcional)</span><input type="text" name="scope" maxlength="120" placeholder="*.example.com"></label>
+
+{% else if asset_type == "api" %}
+    <label><span>base URL</span><input type="text" name="base_url" required maxlength="200"></label>
+    <label><span>OpenAPI spec URL (opcional)</span><input type="text" name="openapi" maxlength="200"></label>
+
+{% else if asset_type == "mobile_android" %}
+    <label><span>package</span><input type="text" name="package" required maxlength="120" placeholder="com.empresa.app"></label>
+    <label><span>min_version (opcional)</span><input type="text" name="min_version" maxlength="40"></label>
+    <label><span>sha256 (opcional)</span><input type="text" name="sha256" maxlength="64"></label>
+
+{% else if asset_type == "mobile_ios" %}
+    <label><span>bundle_id</span><input type="text" name="bundle_id" required maxlength="120"></label>
+    <label><span>min_version (opcional)</span><input type="text" name="min_version" maxlength="40"></label>
+
+{% else if asset_type == "infra_host" %}
+    <p class="muted small">indica fqdn o ipv4 (al menos uno).</p>
+    <label><span>FQDN</span><input type="text" name="fqdn" maxlength="200" placeholder="host.example.com"></label>
+    <label><span>IPv4</span><input type="text" name="ipv4" maxlength="40" placeholder="203.0.113.10"></label>
+
+{% else if asset_type == "infra_range" %}
+    <label><span>CIDR</span><input type="text" name="cidr" required maxlength="20" placeholder="203.0.113.0/24"></label>
+
+{% else if asset_type == "source_repo" %}
+    <label><span>URL repo</span><input type="text" name="repo_url" required maxlength="200" placeholder="https://github.com/..."></label>
+    <label><span>commit (opcional)</span><input type="text" name="commit" maxlength="64"></label>
+
+{% else if asset_type == "package" %}
+    <label><span>ecosystem</span><input type="text" name="ecosystem" required maxlength="40" placeholder="npm / pypi / cargo / ..."></label>
+    <label><span>nombre del paquete</span><input type="text" name="pkg_name" required maxlength="120"></label>
+    <label><span>versión (opcional)</span><input type="text" name="pkg_version" maxlength="40"></label>
+
+{% else if asset_type == "firmware" %}
+    <label><span>vendor</span><input type="text" name="vendor" required maxlength="80"></label>
+    <label><span>model</span><input type="text" name="model" required maxlength="80"></label>
+    <label><span>version</span><input type="text" name="version" required maxlength="40"></label>
+    <label><span>sha256 (opcional)</span><input type="text" name="sha256" maxlength="64"></label>
+
+{% else if asset_type == "hardware_device" %}
+    <label><span>vendor</span><input type="text" name="vendor" required maxlength="80"></label>
+    <label><span>model</span><input type="text" name="model" required maxlength="80"></label>
+    <label><span>hw_rev (opcional)</span><input type="text" name="hw_rev" maxlength="40"></label>
+    <label><span>interfaces (CSV)</span><input type="text" name="interfaces" maxlength="200" placeholder="uart, jtag, swd"></label>
+
+{% else if asset_type == "iot_endpoint" %}
+    <label><span>protocol</span><input type="text" name="protocol" required maxlength="40" placeholder="mqtt / coap / ..."></label>
+    <label><span>endpoint</span><input type="text" name="endpoint" required maxlength="200"></label>
+    <label><span>model (opcional)</span><input type="text" name="model" maxlength="80"></label>
+
+{% else if asset_type == "radio_signal" %}
+    <label><span>banda</span><input type="text" name="band" required maxlength="40" placeholder="ism_915 / lte_b7 / ..."></label>
+    <label><span>modulación</span><input type="text" name="modulation" required maxlength="40"></label>
+    <label><span>dispositivo (opcional)</span><input type="text" name="device" maxlength="80"></label>
+
+{% else if asset_type == "other" %}
+    <label><span>descripción</span><textarea name="description" required rows="3" maxlength="500"></textarea></label>
+
+{% endif %}

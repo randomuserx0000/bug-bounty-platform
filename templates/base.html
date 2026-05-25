@@ -1,0 +1,91 @@
+{# Layout base. Todo template "página completa" extiende este. #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#007a96">
+    <title>{% block title %}bugbounty.ve{% endblock %}</title>
+
+    {# Fuentes Inter + JetBrains Mono (estilo redseg). #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    {# HTMX desde CDN. Suficiente para MVP; en prod self-host con SRI. #}
+    <script src="https://unpkg.com/htmx.org@2.0.3"
+            integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+            crossorigin="anonymous"></script>
+
+    {# EasyMDE para los textareas[data-easymde]. #}
+    <link rel="stylesheet" href="https://unpkg.com/easymde@2.18.0/dist/easymde.min.css">
+    <script defer src="https://unpkg.com/easymde@2.18.0/dist/easymde.min.js"></script>
+
+    <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+    {# Top strip mini, estilo redseg #}
+    <div class="topstrip">
+        <div class="topstrip-inner">
+            <span><span class="live-dot"></span>&nbsp;&nbsp;Bug bounty para Venezuela · MVP</span>
+            <span class="hidden-mobile"><a href="/programs">programas públicos</a></span>
+        </div>
+    </div>
+
+    {# Sticky header #}
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="/" class="brand">
+                <span class="brand-dot"></span>
+                bugbounty.ve
+            </a>
+            <nav>
+                <a href="/programs">Programas</a>
+                <a href="/companies">Empresas</a>
+                <a href="/reports">Reports</a>
+                <a href="/payouts/mine">Bounties</a>
+            </nav>
+            <div class="topbar-actions">
+                <a href="/login" class="btn-link">Entrar</a>
+                <a href="/signup" class="btn-primary">Registrarme</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="foot">
+        <div>
+            <strong style="color: var(--ink);">bugbounty.ve</strong>
+            · plataforma regional de bug bounty para Venezuela y LATAM
+        </div>
+        <div style="margin-top: 6px;">
+            <small>© {{ year }}</small>
+        </div>
+    </footer>
+
+    <script>
+        // Inicializa EasyMDE sobre cualquier <textarea data-easymde>.
+        // Lo hacemos en DOMContentLoaded para que EasyMDE (defer) esté listo.
+        // Y también reaccionamos a htmx:afterSwap para textareas inyectados.
+        function bbInitEditors(scope) {
+            if (typeof EasyMDE === 'undefined') return;
+            (scope || document).querySelectorAll('textarea[data-easymde]:not(.easymde-init)').forEach(function(ta) {
+                ta.classList.add('easymde-init');
+                new EasyMDE({
+                    element: ta,
+                    spellChecker: false,
+                    autoDownloadFontAwesome: true,
+                    minHeight: '100px',
+                    status: false,
+                    toolbar: ['bold','italic','heading','|','code','quote','unordered-list','ordered-list','|','link','preview','|','guide'],
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
+        document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
+    </script>
+</body>
+</html>

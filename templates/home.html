@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}bugbounty.ve · ciberseguridad accesible para empresas venezolanas{% endblock %}
+
+{% block content %}
+
+{# ============================================================
+   HERO — audiencia principal: empresarios/CEOs
+   ============================================================ #}
+<section class="hero">
+    <div class="hero-inner">
+        <span class="kbd" style="display:inline-block; margin-bottom:18px;">
+            <span class="live-dot" style="vertical-align: middle; margin-right: 6px;"></span>
+            PARA EMPRESAS QUE NO QUIEREN GASTAR $30.000 EN UN PENTEST
+        </span>
+        <h1>
+            Tu ciberseguridad no debería costar<br>
+            <span class="accent">miles de dólares por adelantado.</span>
+        </h1>
+        <p>
+            En lugar de pagar un pentest cerrado de cinco cifras, abre un programa
+            de bug bounty: una comunidad de hackers éticos verificados busca
+            vulnerabilidades en tus sistemas, y <strong>solo pagas cuando alguien
+            encuentra algo real</strong>. Tú decides el monto por severidad.
+        </p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 12px;">
+            <a class="btn-primary" href="/companies/new">Quiero publicar un programa</a>
+            <a class="btn-link" href="/signup" style="padding: 10px 16px; border: 1px solid var(--line2); background: white;">Soy researcher →</a>
+        </div>
+
+        {# Stats de la red REDSEG: prueba social de respaldo #}
+        <div class="hero-stats">
+            <div>
+                <strong>+3.000</strong>
+                <span>hackers en LATAM</span>
+            </div>
+            <div>
+                <strong>+700</strong>
+                <span>empresas en la red</span>
+            </div>
+            <div>
+                <strong>0 USD</strong>
+                <span>hasta que reporten</span>
+            </div>
+            <div>
+                <strong>11</strong>
+                <span>países cubiertos</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   COMPARATIVA — el argumento económico, visualmente
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">EL ARGUMENTO</span>
+        <h2 style="margin-top: 12px;">Pentest tradicional vs. bug bounty</h2>
+        <p class="muted" style="max-width: 620px; margin: 8px auto 0;">
+            El pentest sigue teniendo sentido para cumplir normas o auditar antes de un lanzamiento.
+            Pero para descubrimiento continuo de vulnerabilidades, el modelo bounty paga solo por resultados.
+        </p>
+    </div>
+
+    <div class="compare-grid">
+        <div class="compare-card compare-old">
+            <header>
+                <span class="compare-tag">CONSULTORÍA CERRADA</span>
+                <h3>Pentest tradicional</h3>
+            </header>
+            <ul>
+                <li><span class="x">×</span> Inversión inicial $5.000 – $50.000 USD <em>por engagement</em></li>
+                <li><span class="x">×</span> Equipo fijo de 1–3 consultores · talento limitado</li>
+                <li><span class="x">×</span> Ventana de 2–6 semanas, fin definido</li>
+                <li><span class="x">×</span> Pagas el tiempo, encuentren o no</li>
+                <li><span class="x">×</span> Re-evaluar cada año cuesta otro engagement completo</li>
+            </ul>
+        </div>
+
+        <div class="compare-card compare-new">
+            <header>
+                <span class="compare-tag">PAY-PER-VULN</span>
+                <h3>Bug bounty con bugbounty.ve</h3>
+            </header>
+            <ul>
+                <li><span class="check">✓</span> <strong>$0 hasta que alguien encuentre algo</strong></li>
+                <li><span class="check">✓</span> Cientos de researchers compiten · talento ilimitado</li>
+                <li><span class="check">✓</span> Programa <strong>siempre activo</strong>, 24/7/365</li>
+                <li><span class="check">✓</span> Pagas solo por hallazgo válido · tú fijas el monto por severidad</li>
+                <li><span class="check">✓</span> Cubre web, mobile, infra, firmware, hardware y radio</li>
+            </ul>
+            <footer>
+                <span class="muted small">Ejemplo realista: low $100 · medium $500 · high $1.500 · critical $5.000.</span>
+            </footer>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   CÓMO FUNCIONA — pasos cortos
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">3 PASOS</span>
+        <h2 style="margin-top: 12px;">Cómo arrancar como empresa</h2>
+    </div>
+    <div class="card-grid">
+        <div class="card-box">
+            <span class="kbd">01</span>
+            <h3 style="margin-top:10px;">Publicas tu programa</h3>
+            <p class="muted">Defines qué sistemas están en scope (URLs, APIs, apps móviles, firmware), las reglas y los montos máximos por severidad. En markdown, sin abogados.</p>
+        </div>
+        <div class="card-box">
+            <span class="kbd">02</span>
+            <h3 style="margin-top:10px;">La comunidad busca</h3>
+            <p class="muted">Researchers verificados de la red REDSEG analizan tu superficie de ataque. Reportan vía la plataforma con PoC, impacto y pasos de reproducción.</p>
+        </div>
+        <div class="card-box">
+            <span class="kbd">03</span>
+            <h3 style="margin-top:10px;">Triage y pago directo</h3>
+            <p class="muted">Validas el reporte, fijas el bounty, y el dinero sale de tu escrow prefondeado al método que elija el researcher (USDT, banco USD o VES, PayPal).</p>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   ALIADOS — prueba social: marquee con logos reales
+   ============================================================ #}
+<section class="allies-section">
+    <p class="allies-label">Respaldados por la red REDSEG · aliados oficiales</p>
+    <div class="marquee">
+        <div class="marquee-track">
+            {% for n in ally_ids %}
+                <a href="https://www.redseg.org" target="_blank" rel="noopener" class="ally-logo">
+                    <img src="https://www.redseg.org/images/s{{ n }}.jpg" alt="aliado oficial" loading="lazy">
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <p class="allies-foot">
+        DIGITALX · UNEXPO · FUNDIUP · EBS · SEGURED · Security Magazine ·
+        DIGITALX Academia · JIC Consultores · DEFCON · Maderos &amp; Herrera ·
+        TECNAVIX · Monitoreo.com · SEC2CRIME y más.
+    </p>
+</section>
+
+{# ============================================================
+   PROGRAMAS ACTIVOS — data real de esta instancia
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+        <div>
+            <span class="kbd">EMPRESAS QUE YA ENTENDIERON</span>
+            <h2 style="margin: 8px 0 0;">Programas activos</h2>
+        </div>
+        {% if !programs.is_empty() %}
+            <a href="/programs" class="btn-link">ver todos →</a>
+        {% endif %}
+    </div>
+
+    {% if programs.is_empty() %}
+        <div class="empty">
+            <p>Esta plataforma acaba de arrancar.</p>
+            <p class="muted">Sé la primera empresa en abrir un programa. <a href="/companies/new">Empezar ahora →</a></p>
+        </div>
+    {% else %}
+        <div class="card-grid">
+        {% for p in programs %}
+            <a class="program-card" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}">
+                <header>
+                    <small>{{ p.company_name }}</small>
+                    <h3>{{ p.name }}</h3>
+                </header>
+                <p>{{ p.summary }}</p>
+                {% if !p.bounty_low.is_empty() || !p.bounty_critical.is_empty() %}
+                    <footer>
+                        bounty: {{ p.bounty_low }} – {{ p.bounty_critical }}
+                    </footer>
+                {% endif %}
+            </a>
+        {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+{# ============================================================
+   COBERTURA LATAM
+   ============================================================ #}
+<section style="margin-top: 80px;">
+    <div style="text-align: center; margin-bottom: 28px;">
+        <span class="kbd">COBERTURA</span>
+        <h2 style="margin-top: 12px;">Comunidad de hackers en 11 países</h2>
+        <p class="muted" style="max-width: 580px; margin: 8px auto 0;">
+            No es una bolsa local de talento limitado. Es una comunidad regional de researchers
+            certificados que compiten por encontrar vulnerabilidades en tu superficie de ataque.
+        </p>
+    </div>
+
+    <div class="country-grid">
+        <div class="country-card hub"><span class="cc">MX</span><div><strong>México</strong><small>3 aliados · hub</small></div></div>
+        <div class="country-card"><span class="cc">CO</span><div><strong>Colombia</strong><small>2 aliados</small></div></div>
+        <div class="country-card hub"><span class="cc">PE</span><div><strong>Perú</strong><small>4 aliados · hub</small></div></div>
+        <div class="country-card hub"><span class="cc">BR</span><div><strong>Brasil</strong><small>2 aliados · hub</small></div></div>
+        <div class="country-card"><span class="cc">CL</span><div><strong>Chile</strong><small>1 aliado</small></div></div>
+        <div class="country-card"><span class="cc">AR</span><div><strong>Argentina</strong><small>2 aliados</small></div></div>
+        <div class="country-card"><span class="cc">EC</span><div><strong>Ecuador</strong><small>1 aliado</small></div></div>
+        <div class="country-card focus"><span class="cc">VE</span><div><strong>Venezuela</strong><small>esta vertical</small></div></div>
+        <div class="country-card mute"><span class="cc">+3</span><div><strong>Más países</strong><small>BO · PY · UY</small></div></div>
+    </div>
+</section>
+
+{# ============================================================
+   CTA FINAL
+   ============================================================ #}
+<section style="margin-top: 80px; text-align: center;">
+    <div class="cta-final">
+        <h2 style="margin-top: 0;">¿Cuánto te costaría no enterarte?</h2>
+        <p class="muted" style="max-width: 580px; margin: 8px auto 24px;">
+            Una vulnerabilidad explotada cuesta mucho más que el bounty que pagarías por descubrirla a tiempo.
+            Abre tu programa hoy. No te cobramos nada hasta que tengas un reporte que validar.
+        </p>
+        <a class="btn-primary" href="/companies/new" style="font-size: 1rem; padding: 12px 22px;">
+            Publicar mi programa →
+        </a>
+    </div>
+</section>
+
+{% endblock %}

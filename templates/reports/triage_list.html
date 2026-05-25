@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}triage · {{ program_name }} · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>triage</h1>
+            <p class="muted">reports a revisar en <strong>{{ program_name }}</strong></p>
+        </div>
+        <a href="/manage/{{ company_slug }}/programs/{{ program_slug }}" class="btn-link">← volver al programa</a>
+    </header>
+
+    {% if reports.is_empty() %}
+        <div class="empty"><p>sin reports todavía.</p></div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>id</th><th>título</th><th>severity</th><th>estado</th></tr>
+            </thead>
+            <tbody>
+            {% for r in reports %}
+                <tr>
+                    <td><a href="/reports/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                    <td>{{ r.title }}</td>
+                    <td><span class="badge sev-{{ r.severity }}">{{ r.severity }}</span></td>
+                    <td><span class="badge state-{{ r.state }}">{{ r.state }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</section>
+{% endblock %}

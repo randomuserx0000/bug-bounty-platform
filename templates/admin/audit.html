@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}audit log · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>audit log</h1>
+            <p class="muted">acciones sensibles registradas, append-only.</p>
+        </div>
+    </header>
+
+    <form method="get" action="/admin/audit" class="stack inline-form">
+        <label>
+            <span>action prefix (ej: <code>payout.</code>)</span>
+            <input type="text" name="action_prefix" value="{{ action_prefix }}" maxlength="40">
+        </label>
+        <label>
+            <span>target_type</span>
+            <input type="text" name="target_type" value="{{ target_type }}" maxlength="40">
+        </label>
+        <label>
+            <span>target_id</span>
+            <input type="text" name="target_id" value="{{ target_id }}" maxlength="120">
+        </label>
+        <button class="btn-link" type="submit">filtrar</button>
+        <a href="/admin/audit" class="muted small">limpiar</a>
+    </form>
+
+    {% if rows.is_empty() %}
+        <div class="empty"><p>sin entradas que coincidan.</p></div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>cuándo</th>
+                    <th>actor</th>
+                    <th>ip</th>
+                    <th>action</th>
+                    <th>target</th>
+                    <th>metadata</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td><code>{{ r.id }}</code></td>
+                    <td class="small">{{ r.at }}</td>
+                    <td class="small">{% if !r.actor.is_empty() %}<code>{{ r.actor }}</code>{% else %}<span class="muted">—</span>{% endif %}</td>
+                    <td class="small">{{ r.actor_ip }}</td>
+                    <td><span class="badge">{{ r.action }}</span></td>
+                    <td>
+                        {% if !r.target_type.is_empty() %}
+                            {{ r.target_type }}/<code>{{ r.target_id }}</code>
+                        {% endif %}
+                    </td>
+                    <td><pre class="metadata">{{ r.metadata }}</pre></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</section>
+{% endblock %}

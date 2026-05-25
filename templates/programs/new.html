@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}nuevo programa · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nuevo programa</h1>
+    <p class="muted">en <strong>{{ company_name }}</strong></p>
+
+    <form hx-post="/companies/{{ company_slug }}/programs"
+          hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+
+        <label>
+            <span>slug</span>
+            <input type="text" name="slug" required minlength="3" maxlength="40"
+                   pattern="[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?" placeholder="api-publica">
+        </label>
+        <label>
+            <span>nombre</span>
+            <input type="text" name="name" required maxlength="120">
+        </label>
+        <label>
+            <span>resumen corto (opcional)</span>
+            <input type="text" name="summary" maxlength="200">
+        </label>
+        <label>
+            <span>política (markdown)</span>
+            <textarea name="policy_md" required rows="10" placeholder="## Scope&#10;## Reglas&#10;## Safe harbor"></textarea>
+        </label>
+
+        <div class="grid-2">
+            <label>
+                <span>visibilidad</span>
+                <select name="visibility">
+                    <option value="private">private</option>
+                    <option value="invite_only">invite_only</option>
+                    <option value="public">public</option>
+                </select>
+            </label>
+            <label>
+                <span>estado</span>
+                <select name="status">
+                    <option value="draft">draft</option>
+                    <option value="private">private</option>
+                    <option value="public">public</option>
+                    <option value="paused">paused</option>
+                </select>
+            </label>
+        </div>
+
+        <fieldset>
+            <legend class="muted small">bounty en USD (opcional, deja vacío si no aplica)</legend>
+            <div class="grid-4">
+                <label><span>low</span><input type="number" name="bounty_low" min="0"></label>
+                <label><span>medium</span><input type="number" name="bounty_medium" min="0"></label>
+                <label><span>high</span><input type="number" name="bounty_high" min="0"></label>
+                <label><span>critical</span><input type="number" name="bounty_critical" min="0"></label>
+            </div>
+        </fieldset>
+
+        <label class="inline">
+            <input type="checkbox" name="allows_redteam">
+            <span>permite red-team</span>
+        </label>
+        <label class="inline">
+            <input type="checkbox" name="allows_hardware">
+            <span>permite hardware</span>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">crear</button>
+        <a href="/companies/{{ company_slug }}" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}

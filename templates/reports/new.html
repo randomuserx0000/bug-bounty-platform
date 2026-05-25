@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}reportar vulnerabilidad · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nuevo report</h1>
+    <p class="muted">programa: <strong>{{ program_name }}</strong> ({{ company_name }})</p>
+
+    <form hx-post="/programs/{{ company_slug }}/{{ program_slug }}/reports"
+          hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+
+        <label>
+            <span>título</span>
+            <input type="text" name="title" required maxlength="160" placeholder="ej: SSRF en endpoint /image-proxy">
+        </label>
+
+        <label>
+            <span>asset afectado (opcional)</span>
+            <select name="asset_id">
+                <option value="">— no aplica a un asset específico —</option>
+                {% for a in assets %}
+                    <option value="{{ a.0 }}">{{ a.1 }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="grid-2">
+            <label>
+                <span>severity propuesta</span>
+                <select name="severity">
+                    <option value="none">sin clasificar</option>
+                    <option value="low">low</option>
+                    <option value="medium" selected>medium</option>
+                    <option value="high">high</option>
+                    <option value="critical">critical</option>
+                </select>
+            </label>
+            <label>
+                <span>CWE (opcional)</span>
+                <input type="text" name="cwe" maxlength="20" placeholder="CWE-79">
+            </label>
+        </div>
+
+        <label>
+            <span>CVSS vector (opcional)</span>
+            <input type="text" name="cvss_vector" maxlength="120" placeholder="CVSS:3.1/AV:N/AC:L/...">
+        </label>
+
+        <label>
+            <span>descripción <small class="muted">(markdown, mín 30 chars)</small></span>
+            <textarea name="description_md" required rows="8" data-easymde></textarea>
+        </label>
+
+        <label>
+            <span>impacto (opcional)</span>
+            <textarea name="impact_md" rows="4" data-easymde></textarea>
+        </label>
+
+        <label>
+            <span>pasos de reproducción (opcional)</span>
+            <textarea name="repro_md" rows="6" data-easymde></textarea>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">enviar report</button>
+        <a href="/programs/{{ company_slug }}/{{ program_slug }}" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}

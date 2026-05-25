@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}nuevo asset · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nuevo asset</h1>
+    <p class="muted">en <strong>{{ program_name }}</strong></p>
+
+    <form hx-post="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets"
+          hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+
+        <label>
+            <span>tipo</span>
+            <select name="asset_type"
+                    hx-get="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/fields"
+                    hx-target="#asset-fields"
+                    hx-trigger="change"
+                    hx-include="this"
+                    hx-swap="innerHTML">
+                {% for t in types %}
+                    <option value="{{ t.0 }}">{{ t.1 }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            <span>etiqueta</span>
+            <input type="text" name="label" required maxlength="120" placeholder="ej: portal cliente">
+        </label>
+
+        <div id="asset-fields">
+            {{ initial_fields|safe }}
+        </div>
+
+        <div class="grid-2">
+            <label>
+                <span>severity cap</span>
+                <select name="severity_cap">
+                    <option value="none">sin cap</option>
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="critical">critical</option>
+                </select>
+            </label>
+            <label class="inline">
+                <input type="checkbox" name="in_scope" checked>
+                <span>en scope</span>
+            </label>
+        </div>
+
+        <label>
+            <span>notas (markdown, opcional)</span>
+            <textarea name="notes_md" rows="3"></textarea>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">añadir asset</button>
+        <a href="/manage/{{ company_slug }}/programs/{{ program_slug }}" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}

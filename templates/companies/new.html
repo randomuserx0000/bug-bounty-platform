@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}nueva empresa · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nueva empresa</h1>
+    <p class="muted">quedarás como <strong>owner</strong>. podrás invitar miembros después.</p>
+
+    <form hx-post="/companies" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+        <label>
+            <span>slug (URL)</span>
+            <input type="text" name="slug" required minlength="3" maxlength="40"
+                   pattern="[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?" placeholder="mi-empresa">
+        </label>
+        <label>
+            <span>nombre legal</span>
+            <input type="text" name="legal_name" required maxlength="120">
+        </label>
+        <label>
+            <span>nombre público</span>
+            <input type="text" name="display_name" required maxlength="80">
+        </label>
+        <label>
+            <span>país (ISO-2, opcional)</span>
+            <input type="text" name="country_code" maxlength="2" placeholder="VE" style="text-transform:uppercase">
+        </label>
+        <label>
+            <span>sitio web (opcional)</span>
+            <input type="text" name="website" maxlength="200" placeholder="https://...">
+        </label>
+        <label>
+            <span>descripción (opcional)</span>
+            <input type="text" name="description" maxlength="200">
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">crear</button>
+        <a href="/companies" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}
