@@ -27,6 +27,12 @@ services:
       minio-init:
         condition: service_completed_successfully
     environment:
+      # --- Coolify: este servicio es el público principal en `/` ---
+      # Coolify lee SERVICE_FQDN_<SERVICE>_<PORT> y enruta el dominio
+      # configurado en la UI a este puerto. Sin esto, Coolify puede asignar
+      # el dominio a cualquier otro servicio que exponga puertos (ej: MinIO).
+      SERVICE_FQDN_APP_8080: /
+
       # --- requeridos ---
       DATABASE_URL: postgres://bb:${POSTGRES_PASSWORD}@db:5432/bugbounty
       PUBLIC_URL: ${PUBLIC_URL}                     # ej: https://bugbounty.ve
