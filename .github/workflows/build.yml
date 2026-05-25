@@ -1,0 +1,66 @@
+name: build-and-push
+
+# Builda la imagen del app en runners de GitHub (16 GB RAM, sin pelear con
+# memoria del VPS) y la pushea a GHCR. Coolify deja de compilar — solo
+# hace `docker pull` cuando vea un tag nuevo.
+#
+# Tags publicados por push:
+#   - latest       (siempre que sea main)
+#   - main         (nombre del branch)
+#   - sha-<short>  (commit corto, útil para rollback)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login a GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calcular metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Cache de capas en el storage de GHA (gratis, persiste entre runs).
+          # Hace que rebuilds incrementales tarden 1-2 min en lugar de 15.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Build args necesarios al builder de Rust (algunos crates leen env
+          # vars; en este proyecto los overrides ya están en el Dockerfile).
+          provenance: false

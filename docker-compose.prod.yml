@@ -17,9 +17,12 @@
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # La imagen la construye GitHub Actions (.github/workflows/build.yml)
+    # y la publica en GHCR. Coolify solo hace `docker pull` — no compila.
+    # Para forzar refresh, `pull_policy: always` chequea contra el registry
+    # en cada deploy.
+    image: ghcr.io/randomuserx0000/bug-bounty-platform:latest
+    pull_policy: always
     restart: unless-stopped
     depends_on:
       db:
