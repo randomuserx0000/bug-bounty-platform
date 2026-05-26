@@ -40,6 +40,7 @@
                 bugbounty.ve
             </a>
             <nav>
+                <a href="/dashboard">Dashboard</a>
                 <a href="/programs">Programas</a>
                 <a href="/companies">Empresas</a>
                 <a href="/reports">Reports</a>
@@ -74,6 +75,11 @@
             if (typeof EasyMDE === 'undefined') return;
             (scope || document).querySelectorAll('textarea[data-easymde]:not(.easymde-init)').forEach(function(ta) {
                 ta.classList.add('easymde-init');
+                // EasyMDE oculta el <textarea> original; un atributo `required`
+                // sobre un campo no-focusable bloquea el submit del form
+                // (la validación HTML5 falla en silencio). El backend valida
+                // los mínimos igualmente, así que lo quitamos acá.
+                ta.removeAttribute('required');
                 new EasyMDE({
                     element: ta,
                     spellChecker: false,

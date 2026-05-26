@@ -75,6 +75,7 @@ pub const USER_SIGNUP: &str = "user.signup";
 pub const USER_LOGIN: &str = "user.login";
 pub const USER_LOGIN_FAILED: &str = "user.login_failed";
 pub const USER_LOGOUT: &str = "user.logout";
+pub const USER_UPDATE_HANDLE: &str = "user.update_handle";
 
 // Companies / programs / assets
 pub const COMPANY_CREATE: &str = "company.create";

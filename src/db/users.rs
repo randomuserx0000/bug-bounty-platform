@@ -129,6 +129,21 @@ pub async fn link_oauth(
     Ok(())
 }
 
+/// Actualiza solo el handle (nick) del usuario. Falla con
+/// `sqlx::Error::Database` si el nuevo handle ya está tomado (unique).
+pub async fn update_handle(
+    pool: &PgPool,
+    id: Uuid,
+    new_handle: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE users SET handle = $2, updated_at = now() WHERE id = $1")
+        .bind(id)
+        .bind(new_handle)
+        .execute(pool)
+        .await?;
+    Ok(())
+}
+
 pub async fn touch_last_login(pool: &PgPool, id: Uuid) -> Result<(), sqlx::Error> {
     sqlx::query("UPDATE users SET last_login_at = now() WHERE id = $1")
         .bind(id)

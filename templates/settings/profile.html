@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}perfil · bugbounty.ve{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>perfil</h1>
+    <p class="muted">tu identidad pública en la plataforma.</p>
+
+    <form hx-post="/settings/profile" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+        <label>
+            <span>nick (handle)</span>
+            <input type="text" name="handle" value="{{ handle }}" required
+                   minlength="3" maxlength="32" pattern="[a-zA-Z0-9_]+"
+                   autocomplete="off">
+            <small class="muted">3-32 caracteres, solo letras, números y guion bajo.</small>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">guardar cambios</button>
+        <a href="/dashboard" class="muted small">← volver al dashboard</a>
+    </form>
+</section>
+{% endblock %}

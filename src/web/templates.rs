@@ -49,6 +49,13 @@ pub struct PaymentMethodView {
 }
 
 #[derive(Template)]
+#[template(path = "settings/profile.html")]
+pub struct ProfileTemplate {
+    pub year: i32,
+    pub handle: String,
+}
+
+#[derive(Template)]
 #[template(path = "settings/payment_methods.html")]
 pub struct PaymentMethodsTemplate {
     pub year: i32,

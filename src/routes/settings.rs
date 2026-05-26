@@ -24,16 +24,77 @@ use crate::payments::{PaymentRail, RailError};
 use crate::state::AppState;
 use crate::web::templates::{
     FormErrorPartial, PaymentMethodFieldsPartial, PaymentMethodView, PaymentMethodsNewTemplate,
-    PaymentMethodsTemplate,
+    PaymentMethodsTemplate, ProfileTemplate,
 };
 
 pub fn router() -> Router<AppState> {
     Router::new()
+        .route("/settings", get(profile_form).post(profile_update))
+        .route("/settings/profile", get(profile_form).post(profile_update))
         .route("/settings/payment-methods", get(list).post(create))
         .route("/settings/payment-methods/new", get(new_form))
         .route("/settings/payment-methods/fields", get(fields_partial))
         .route("/settings/payment-methods/:id/delete", post(delete))
         .route("/settings/payment-methods/:id/default", post(set_default))
+}
+
+// ----------------------------------------------------------------------------
+// PROFILE (cambiar nick)
+// ----------------------------------------------------------------------------
+
+async fn profile_form(current: CurrentUser) -> AppResult<impl IntoResponse> {
+    Ok(ProfileTemplate {
+        year: current_year(),
+        handle: current.user.handle,
+    })
+}
+
+#[derive(Debug, Deserialize)]
+struct ProfileUpdateForm {
+    handle: String,
+}
+
+static HANDLE_RE: once_cell::sync::Lazy<regex::Regex> = once_cell::sync::Lazy::new(|| {
+    regex::Regex::new(r"^[a-zA-Z0-9_]+$").expect("regex válido")
+});
+
+async fn profile_update(
+    State(state): State<AppState>,
+    current: CurrentUser,
+    Form(form): Form<ProfileUpdateForm>,
+) -> AppResult<axum::response::Response> {
+    let new_handle = form.handle.trim();
+    if new_handle.len() < 3 || new_handle.len() > 32 {
+        return Ok(error_fragment("el nick debe tener 3-32 caracteres"));
+    }
+    if !HANDLE_RE.is_match(new_handle) {
+        return Ok(error_fragment("solo letras, números y guion bajo"));
+    }
+    if new_handle == current.user.handle {
+        return Ok(htmx_redirect("/settings/profile"));
+    }
+
+    match db::users::update_handle(&state.db, current.user.id, new_handle).await {
+        Ok(()) => {}
+        Err(sqlx::Error::Database(e)) if e.is_unique_violation() => {
+            return Ok(error_fragment("ese nick ya está en uso"));
+        }
+        Err(e) => return Err(e.into()),
+    }
+
+    crate::audit::log(
+        &state.db,
+        crate::audit::AuditEntry::new(crate::audit::USER_UPDATE_HANDLE)
+            .actor(current.user.id)
+            .target("user", current.user.id)
+            .metadata(serde_json::json!({
+                "old_handle": current.user.handle,
+                "new_handle": new_handle,
+            })),
+    )
+    .await;
+
+    Ok(htmx_redirect("/settings/profile"))
 }
 
 // ----------------------------------------------------------------------------
