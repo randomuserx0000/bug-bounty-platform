@@ -80,7 +80,7 @@
                 // (la validación HTML5 falla en silencio). El backend valida
                 // los mínimos igualmente, así que lo quitamos acá.
                 ta.removeAttribute('required');
-                new EasyMDE({
+                var editor = new EasyMDE({
                     element: ta,
                     spellChecker: false,
                     autoDownloadFontAwesome: true,
@@ -88,10 +88,25 @@
                     status: false,
                     toolbar: ['bold','italic','heading','|','code','quote','unordered-list','ordered-list','|','link','preview','|','guide'],
                 });
+                // Guardamos el editor en el propio textarea para poder forzar
+                // sync antes de cada submit HTMX.
+                ta._easymde = editor;
             });
         }
         document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
         document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
+        // Antes de que HTMX serialice el formulario, sincronizamos el valor
+        // del CodeMirror al <textarea> y al payload que va a enviar.
+        document.addEventListener('htmx:configRequest', function(e) {
+            document.querySelectorAll('textarea[data-easymde]').forEach(function(ta) {
+                if (!ta._easymde) return;
+                var v = ta._easymde.value();
+                ta.value = v;
+                if (e.detail && e.detail.parameters && ta.name) {
+                    e.detail.parameters[ta.name] = v;
+                }
+            });
+        });
     </script>
 </body>
 </html>
