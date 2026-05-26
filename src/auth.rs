@@ -122,16 +122,37 @@ impl FromRequestParts<AppState> for CurrentUser {
             &parts.headers,
             state.cookie_key.clone(),
         );
+        let path = parts.uri.path().to_string();
+        let has_raw_cookie = parts
+            .headers
+            .get(axum::http::header::COOKIE)
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.contains(SESSION_COOKIE))
+            .unwrap_or(false);
+
         let token = match jar.get(SESSION_COOKIE) {
             Some(t) => t,
-            None => return Err(login_redirect(parts)),
+            None => {
+                tracing::info!(
+                    path = %path,
+                    has_raw_cookie,
+                    "auth: no signed session cookie (jar miss)"
+                );
+                return Err(login_redirect(parts));
+            }
         };
         let token_value = token.value().to_string();
         let token_hash = hash_token(&token_value);
 
         let session = match crate::db::sessions::find_active_by_token_hash(&state.db, &token_hash).await {
             Ok(Some(s)) => s,
-            Ok(None) => return Err(login_redirect(parts)),
+            Ok(None) => {
+                tracing::info!(
+                    path = %path,
+                    "auth: cookie present but no active session row"
+                );
+                return Err(login_redirect(parts));
+            }
             Err(e) => return Err(AppError::Db(e).into_response()),
         };
 
