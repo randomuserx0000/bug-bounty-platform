@@ -40,16 +40,38 @@
                 bugbounty.ve
             </a>
             <nav>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/programs">Programas</a>
-                <a href="/companies">Empresas</a>
-                <a href="/reports">Reports</a>
-                <a href="/payouts/mine">Bounties</a>
-                <a href="/settings/profile">Perfil</a>
+                {% if handle.is_empty() %}
+                    <a href="/programs">Programas</a>
+                {% else %}
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/programs">Programas</a>
+                    <a href="/companies">Empresas</a>
+                    <a href="/reports">Reports</a>
+                    <a href="/payouts/mine">Bounties</a>
+                {% endif %}
             </nav>
             <div class="topbar-actions">
-                <a href="/login" class="btn-link">Entrar</a>
-                <a href="/signup" class="btn-primary">Registrarme</a>
+                {% if handle.is_empty() %}
+                    <a href="/login" class="btn-link">Entrar</a>
+                    <a href="/signup" class="btn-primary">Registrarme</a>
+                {% else %}
+                    <div class="user-menu">
+                        <button type="button" class="user-menu-trigger" onclick="bbToggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+                            <span class="user-avatar" aria-hidden="true">{{ handle }}</span>
+                            <span class="user-handle">{{ handle }}</span>
+                            <span class="user-caret" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="user-menu-panel" hidden>
+                            <a href="/dashboard">Dashboard</a>
+                            <a href="/settings/profile">Perfil</a>
+                            <a href="/settings/payment-methods">Métodos de pago</a>
+                            <hr>
+                            <form action="/logout" method="post" class="inline">
+                                <button type="submit" class="user-menu-logout">Cerrar sesión</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </header>
@@ -96,6 +118,32 @@
         }
         document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
         document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
+
+        // Dropdown del menú de usuario en el topbar.
+        function bbToggleUserMenu(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            var btn = ev.currentTarget;
+            var panel = btn.parentElement.querySelector('.user-menu-panel');
+            if (!panel) return;
+            var isOpen = !panel.hasAttribute('hidden');
+            if (isOpen) {
+                panel.setAttribute('hidden', '');
+                btn.setAttribute('aria-expanded', 'false');
+            } else {
+                panel.removeAttribute('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        }
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.user-menu-panel:not([hidden])').forEach(function(panel) {
+                if (!panel.parentElement.contains(e.target)) {
+                    panel.setAttribute('hidden', '');
+                    var trig = panel.parentElement.querySelector('.user-menu-trigger');
+                    if (trig) trig.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
         // Antes de que HTMX serialice el formulario, sincronizamos el valor
         // del CodeMirror al <textarea> y al payload que va a enviar.
         document.addEventListener('htmx:configRequest', function(e) {

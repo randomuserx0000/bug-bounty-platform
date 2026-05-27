@@ -12,7 +12,7 @@ use axum::{Form, Router};
 use serde::Deserialize;
 
 use crate::audit;
-use crate::auth::CurrentUser;
+use crate::auth::{CurrentUser, MaybeUser};
 use crate::db;
 use crate::db::programs::NewProgram;
 use crate::domain::asset::summarize_target;
@@ -48,7 +48,10 @@ pub fn router() -> Router<AppState> {
 // Lista pública (sin auth)
 // ----------------------------------------------------------------------------
 
-async fn public_index(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
+async fn public_index(
+    State(state): State<AppState>,
+    MaybeUser(user): MaybeUser,
+) -> AppResult<impl IntoResponse> {
     let rows = db::programs::list_public(&state.db).await?;
     let cards = rows
         .into_iter()
@@ -65,11 +68,13 @@ async fn public_index(State(state): State<AppState>) -> AppResult<impl IntoRespo
     Ok(ProgramsPublicTemplate {
         year: current_year(),
         programs: cards,
+        handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
 
 async fn public_show(
     State(state): State<AppState>,
+    MaybeUser(user): MaybeUser,
     Path((company_slug, program_slug)): Path<(String, String)>,
 ) -> AppResult<impl IntoResponse> {
     let company = db::companies::find_by_slug(&state.db, &company_slug)
@@ -117,6 +122,7 @@ async fn public_show(
         bounty_high: program.bounty_high_cents.map(usd).unwrap_or_default(),
         bounty_critical: program.bounty_critical_cents.map(usd).unwrap_or_default(),
         assets: asset_rows,
+        handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
 
@@ -171,6 +177,7 @@ async fn manage_show(
         bounty_high: program.bounty_high_cents.map(usd).unwrap_or_default(),
         bounty_critical: program.bounty_critical_cents.map(usd).unwrap_or_default(),
         assets: asset_rows,
+        handle: current.user.handle,
     })
 }
 

@@ -170,6 +170,37 @@ impl FromRequestParts<AppState> for CurrentUser {
     }
 }
 
+/// Versión "soft" del extractor: nunca falla, devuelve `Some` si hay sesión
+/// válida y `None` si no. Lo usan los handlers de páginas públicas (home,
+/// listado de programas, etc.) para poder renderizar el topbar con el menú
+/// de usuario cuando aplica.
+pub struct MaybeUser(pub Option<UserRecord>);
+
+#[async_trait]
+impl FromRequestParts<AppState> for MaybeUser {
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+        let jar = SignedCookieJar::<axum_extra::extract::cookie::Key>::from_headers(
+            &parts.headers,
+            state.cookie_key.clone(),
+        );
+        let Some(token) = jar.get(SESSION_COOKIE) else {
+            return Ok(MaybeUser(None));
+        };
+        let token_hash = hash_token(token.value());
+        let session = match crate::db::sessions::find_active_by_token_hash(&state.db, &token_hash).await {
+            Ok(Some(s)) => s,
+            _ => return Ok(MaybeUser(None)),
+        };
+        let user = match crate::db::users::find_by_id(&state.db, session.user_id).await {
+            Ok(Some(u)) if u.status == "active" => u,
+            _ => return Ok(MaybeUser(None)),
+        };
+        Ok(MaybeUser(Some(user)))
+    }
+}
+
 /// Construye la respuesta de "no autenticado": HX-Redirect si vino por HTMX,
 /// 303 Location a `/login?next=<original_path>` si fue navegación directa.
 fn login_redirect(parts: &Parts) -> axum::response::Response {

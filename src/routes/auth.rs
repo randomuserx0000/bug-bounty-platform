@@ -39,6 +39,7 @@ struct LoginQuery {
 
 async fn login_form(
     State(state): State<AppState>,
+    crate::auth::MaybeUser(user): crate::auth::MaybeUser,
     axum::extract::Query(q): axum::extract::Query<LoginQuery>,
 ) -> AppResult<impl IntoResponse> {
     let next = sanitize_next(q.next.as_deref()).unwrap_or_default();
@@ -46,6 +47,7 @@ async fn login_form(
         year: current_year(),
         next,
         google_enabled: state.cfg.google_oauth_enabled(),
+        handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
 
@@ -114,10 +116,14 @@ fn sanitize_next(n: Option<&str>) -> Option<String> {
 
 // ---------- signup ----------
 
-async fn signup_form(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
+async fn signup_form(
+    State(state): State<AppState>,
+    crate::auth::MaybeUser(user): crate::auth::MaybeUser,
+) -> AppResult<impl IntoResponse> {
     Ok(SignupTemplate {
         year: current_year(),
         google_enabled: state.cfg.google_oauth_enabled(),
+        handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
 

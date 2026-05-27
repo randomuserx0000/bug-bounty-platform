@@ -13,6 +13,9 @@ pub struct LoginTemplate {
     pub next: String,
     /// Si la app tiene credenciales de Google configuradas, mostrar el botón.
     pub google_enabled: bool,
+    /// Handle del usuario logueado (vacío = no logueado). Usado por base.html
+    /// para decidir si pintar el menú de usuario o los CTA Entrar/Registrarme.
+    pub handle: String,
 }
 
 #[derive(Template)]
@@ -28,6 +31,7 @@ pub struct DashboardTemplate {
 pub struct SignupTemplate {
     pub year: i32,
     pub google_enabled: bool,
+    pub handle: String,
 }
 
 /// Fragmento de error de formulario. Lo inyecta HTMX en `#form-feedback`.
@@ -141,6 +145,7 @@ pub struct ProgramPublicCardView {
 pub struct ProgramsPublicTemplate {
     pub year: i32,
     pub programs: Vec<ProgramPublicCardView>,
+    pub handle: String,
 }
 
 #[derive(Template)]
@@ -151,6 +156,7 @@ pub struct HomeTemplate {
     /// IDs de logo aliado (1..=17, sin 14 que no existe en redseg.org).
     /// Duplicados para que el marquee CSS haga loop continuo.
     pub ally_ids: Vec<i32>,
+    pub handle: String,
 }
 
 #[derive(Template)]
@@ -191,6 +197,7 @@ pub struct ProgramShowTemplate {
     pub bounty_high: String,
     pub bounty_critical: String,
     pub assets: Vec<AssetRowView>,
+    pub handle: String,
 }
 
 // ---------- assets ----------

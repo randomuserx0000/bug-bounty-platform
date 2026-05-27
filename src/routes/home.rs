@@ -4,13 +4,17 @@
 use axum::extract::State;
 use axum::response::IntoResponse;
 
+use crate::auth::MaybeUser;
 use crate::db;
 use crate::error::AppResult;
 use crate::state::AppState;
 use crate::web::shared::current_year;
 use crate::web::templates::{HomeTemplate, ProgramPublicCardView};
 
-pub async fn index(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
+pub async fn index(
+    State(state): State<AppState>,
+    MaybeUser(user): MaybeUser,
+) -> AppResult<impl IntoResponse> {
     let rows = db::programs::list_public(&state.db).await?;
     let cards: Vec<ProgramPublicCardView> = rows
         .into_iter()
@@ -35,6 +39,7 @@ pub async fn index(State(state): State<AppState>) -> AppResult<impl IntoResponse
         year: current_year(),
         programs: cards,
         ally_ids,
+        handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
 
