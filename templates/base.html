@@ -57,7 +57,7 @@
                 {% else %}
                     <div class="user-menu">
                         <button type="button" class="user-menu-trigger" onclick="bbToggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
-                            <span class="user-avatar" aria-hidden="true">{{ handle }}</span>
+                            <span class="user-avatar" aria-hidden="true">{{ handle.chars().next().unwrap_or('?') }}</span>
                             <span class="user-handle">{{ handle }}</span>
                             <span class="user-caret" aria-hidden="true">▾</span>
                         </button>

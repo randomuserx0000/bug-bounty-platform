@@ -129,6 +129,99 @@ code, pre {
     .topbar nav { display: none; }
 }
 
+/* ---------- USER MENU (dropdown del topbar) ---------- */
+.user-menu { position: relative; }
+.user-menu-trigger {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent;
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    padding: 6px 10px 6px 6px;
+    cursor: pointer;
+    font: inherit;
+    color: var(--ink);
+    transition: border-color .15s ease, background .15s ease;
+}
+.user-menu-trigger:hover {
+    border-color: var(--brand-500);
+    background: var(--brand-50);
+}
+.user-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+    color: white;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
+    overflow: hidden;
+    /* Mostrar solo la primera letra del handle */
+    text-indent: 0;
+    letter-spacing: 0;
+    line-height: 1;
+}
+.user-avatar::first-letter { font-size: 0.78rem; }
+.user-handle {
+    font-size: 0.88rem;
+    font-weight: 600;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.user-caret { color: var(--slate2); font-size: 0.7rem; }
+
+.user-menu-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: white;
+    border: 1px solid var(--line2);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 100;
+}
+.user-menu-panel[hidden] { display: none; }
+.user-menu-panel a,
+.user-menu-panel .user-menu-logout {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    background: none;
+    border: 0;
+    width: 100%;
+    cursor: pointer;
+    font-family: inherit;
+}
+.user-menu-panel a:hover {
+    background: var(--brand-50);
+    color: var(--brand-700);
+    text-decoration: none;
+}
+.user-menu-panel hr {
+    border: 0;
+    border-top: 1px solid var(--line2);
+    margin: 4px 2px;
+}
+.user-menu-panel .user-menu-logout {
+    color: var(--accent-500);
+    box-shadow: none;
+}
+.user-menu-panel .user-menu-logout:hover {
+    background: #fef2f2;
+    color: var(--accent-600);
+}
+
 /* ============================================================
    LAYOUT
    ============================================================ */
