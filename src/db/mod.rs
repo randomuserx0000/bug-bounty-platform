@@ -14,6 +14,7 @@ use crate::config::Config;
 pub mod assets;
 pub mod attachments;
 pub mod companies;
+pub mod dashboard;
 pub mod payment_methods;
 pub mod payouts;
 pub mod programs;

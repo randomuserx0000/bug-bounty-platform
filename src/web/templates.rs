@@ -24,6 +24,48 @@ pub struct DashboardTemplate {
     pub year: i32,
     pub handle: String,
     pub role: String,
+    // KPIs (todos pre-formateados como string para no calcular en el template)
+    pub kpi_reports_total: i64,
+    pub kpi_reports_valid: i64,
+    pub kpi_valid_rate: String,        // "62%" o "—"
+    pub kpi_bounties_total_usd: String, // "$1,234.00"
+    pub kpi_bounties_90d_usd: String,
+    pub kpi_reputation: i32,
+    pub kpi_rank_label: String,        // "Top 5%" o "—"
+    // Action items / feed / lists
+    pub action_items: Vec<DashboardAction>,
+    pub recent_reports: Vec<DashboardReportRow>,
+    pub recent_payouts: Vec<DashboardPayoutRow>,
+    pub featured_programs: Vec<DashboardProgramCard>,
+}
+
+pub struct DashboardAction {
+    pub kind: String,
+    pub message: String,
+    pub href: String,
+}
+
+pub struct DashboardReportRow {
+    pub public_id: String,
+    pub title: String,
+    pub state: String,
+    pub severity: String,
+    pub date: String,
+}
+
+pub struct DashboardPayoutRow {
+    pub amount_usd: String,
+    pub rail: String,
+    pub status: String,
+    pub report_public_id: String,
+    pub date: String,
+}
+
+pub struct DashboardProgramCard {
+    pub href: String,
+    pub name: String,
+    pub company_name: String,
+    pub bounty_max_usd: String,
 }
 
 #[derive(Template)]

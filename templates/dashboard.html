@@ -3,21 +3,145 @@
 {% block title %}dashboard · bugbounty.ve{% endblock %}
 
 {% block content %}
-<section class="auth-card">
-    <h1>hola, {{ handle }}</h1>
-    <p class="muted">rol: {{ role }}</p>
+<section class="page dashboard">
+    <header class="page-head">
+        <div>
+            <h1>welcome back, {{ handle }}</h1>
+            <p class="muted">rol: {{ role }} · resumen de tu actividad en bugbounty.ve</p>
+        </div>
+        <div class="header-actions">
+            <a href="/programs" class="btn-link">Explorar programas</a>
+            <a href="/reports" class="btn-primary">Mis reports</a>
+        </div>
+    </header>
 
-    <ul class="nav-list">
-        <li><a href="/companies">mis empresas</a></li>
-        <li><a href="/programs">programas públicos</a></li>
-        <li><a href="/reports">mis reports</a></li>
-        <li><a href="/payouts/mine">mis bounties</a></li>
-        <li><a href="/settings/profile">editar mi nick</a></li>
-        <li><a href="/settings/payment-methods">métodos de pago</a></li>
-    </ul>
+    {# ---------- KPIs ---------- #}
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <span class="kpi-label">Reports enviados</span>
+            <span class="kpi-value">{{ kpi_reports_total }}</span>
+            <span class="kpi-foot muted small">{{ kpi_reports_valid }} válidos · {{ kpi_valid_rate }}</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Bounties · últimos 90d</span>
+            <span class="kpi-value">{{ kpi_bounties_90d_usd }}</span>
+            <span class="kpi-foot muted small">total histórico: {{ kpi_bounties_total_usd }}</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Reputación</span>
+            <span class="kpi-value">{{ kpi_reputation }}</span>
+            <span class="kpi-foot muted small">puntos acumulados</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Ranking</span>
+            <span class="kpi-value">{{ kpi_rank_label }}</span>
+            <span class="kpi-foot muted small">researchers activos</span>
+        </div>
+    </div>
 
-    <form hx-post="/logout" hx-swap="none">
-        <button type="submit">cerrar sesión</button>
-    </form>
+    {# ---------- ACTION ITEMS ---------- #}
+    {% if !action_items.is_empty() %}
+    <section class="dash-section">
+        <h2>tasks</h2>
+        <ul class="action-list">
+            {% for a in action_items %}
+            <li class="action-item action-{{ a.kind }}">
+                <span class="action-msg">{{ a.message }}</span>
+                <a href="{{ a.href }}" class="btn-link">Resolver →</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <div class="dash-cols">
+        {# ---------- RECENT REPORTS ---------- #}
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2>activity · reports recientes</h2>
+                <a href="/reports" class="btn-link">ver todos</a>
+            </div>
+            {% if recent_reports.is_empty() %}
+                <div class="empty">
+                    <p>todavía no has enviado reports.</p>
+                    <p class="muted"><a href="/programs">explora programas</a> para empezar.</p>
+                </div>
+            {% else %}
+                <table class="data-table">
+                    <thead>
+                        <tr><th>id</th><th>título</th><th>severity</th><th>estado</th><th>fecha</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for r in recent_reports %}
+                        <tr>
+                            <td><a href="/reports/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                            <td class="cell-title">{{ r.title }}</td>
+                            <td><span class="badge sev-{{ r.severity }}">{{ r.severity }}</span></td>
+                            <td><span class="badge state-{{ r.state }}">{{ r.state }}</span></td>
+                            <td class="muted small">{{ r.date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+
+        {# ---------- RECENT PAYOUTS ---------- #}
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2>rewards · payouts recientes</h2>
+                <a href="/payouts/mine" class="btn-link">ver todos</a>
+            </div>
+            {% if recent_payouts.is_empty() %}
+                <div class="empty">
+                    <p>todavía no tienes bounties.</p>
+                    <p class="muted">cuando un report sea aceptado y pagado aparecerá aquí.</p>
+                </div>
+            {% else %}
+                <table class="data-table">
+                    <thead>
+                        <tr><th>monto</th><th>rail</th><th>report</th><th>estado</th><th>fecha</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for p in recent_payouts %}
+                        <tr>
+                            <td><strong>{{ p.amount_usd }}</strong></td>
+                            <td>{{ p.rail }}</td>
+                            <td><a href="/reports/{{ p.report_public_id }}"><code>{{ p.report_public_id }}</code></a></td>
+                            <td><span class="badge state-{{ p.status }}">{{ p.status }}</span></td>
+                            <td class="muted small">{{ p.date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+    </div>
+
+    {# ---------- ENGAGEMENTS / FEATURED PROGRAMS ---------- #}
+    <section class="dash-section">
+        <div class="dash-section-head">
+            <h2>engagements · programas públicos</h2>
+            <a href="/programs" class="btn-link">ver todos</a>
+        </div>
+        {% if featured_programs.is_empty() %}
+            <div class="empty">
+                <p>aún no hay programas públicos activos.</p>
+            </div>
+        {% else %}
+            <div class="program-grid">
+            {% for p in featured_programs %}
+                <a href="{{ p.href }}" class="program-card">
+                    <span class="program-company muted small">{{ p.company_name }}</span>
+                    <span class="program-name">{{ p.name }}</span>
+                    <span class="program-bounty">
+                        <span class="muted small">max bounty</span>
+                        <strong>{{ p.bounty_max_usd }}</strong>
+                    </span>
+                </a>
+            {% endfor %}
+            </div>
+        {% endif %}
+    </section>
 </section>
 {% endblock %}
