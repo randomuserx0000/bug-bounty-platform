@@ -1728,10 +1728,17 @@ form.inline { display: inline; margin: 0; }
 }
 
 [data-theme="dark"] .btn-link {
-    border-color: var(--line2);
+    border-color: rgba(255,255,255,0.25);
     color: var(--ink);
 }
 [data-theme="dark"] .btn-link:hover { background: var(--mist); }
+
+[data-theme="dark"] .hero-stats {
+    background: rgba(13,17,23,0.75);
+    border-color: var(--line2);
+}
+[data-theme="dark"] .hero-stats strong { color: var(--brand-500); }
+[data-theme="dark"] .hero-stats span { color: var(--slate2); }
 
 [data-theme="dark"] .EasyMDEContainer .CodeMirror,
 [data-theme="dark"] .EasyMDEContainer .editor-preview {
