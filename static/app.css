@@ -1708,6 +1708,24 @@ form.inline { display: inline; margin: 0; }
     border-color: var(--brand-700);
 }
 
+[data-theme="dark"] .cta-final {
+    background:
+        radial-gradient(600px circle at 50% 0%, rgba(0,188,228,.08), transparent 60%),
+        linear-gradient(180deg, #111827, #0d1117);
+    border-color: var(--brand-700);
+}
+[data-theme="dark"] .cta-final h2 { color: var(--ink); }
+
+[data-theme="dark"] .country-card {
+    background: linear-gradient(180deg, #1e293b, #161d27);
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .triage-actions {
+    background: #111827;
+    border-color: var(--line2);
+}
+
 [data-theme="dark"] .allies-section { background: var(--bg); border-color: var(--line2); }
 
 [data-theme="dark"] .hero {
