@@ -3,176 +3,206 @@
 {% block title %}perfil · bugbounty.ve{% endblock %}
 
 {% block content %}
-<section class="page" style="max-width:900px;">
+<section class="pf-page">
 
-  {# ── PROFILE HERO ── #}
-  <div class="profile-hero">
-    <div class="profile-avatar-xl">{{ handle.chars().next().unwrap_or('?') }}</div>
-    <div class="profile-identity">
-      <h1>{{ handle }}</h1>
-      <span class="profile-role">researcher · bugbounty.ve</span>
+  {# ── HERO ── #}
+  <div class="pf-hero">
+    <div class="pf-avatar">{{ handle.chars().next().unwrap_or('?') }}</div>
+    <div class="pf-identity">
+      <h1 class="pf-handle">@{{ handle }}</h1>
+      <span class="pf-role">Researcher · bugbounty.ve</span>
     </div>
-    <div class="profile-kpis">
-      <div class="pkpi">
-        <span>reports</span>
+    <div class="pf-stats-row">
+      <div class="pf-stat">
         <strong>{{ reports_total }}</strong>
+        <span>reports</span>
       </div>
-      <div class="pkpi">
-        <span>válidos</span>
+      <div class="pf-stat">
         <strong>{{ reports_valid }}</strong>
+        <span>válidos</span>
       </div>
-      <div class="pkpi">
-        <span>reputación</span>
+      <div class="pf-stat">
         <strong>{{ reputation }}</strong>
+        <span>reputación</span>
       </div>
-      <div class="pkpi">
-        <span>ranking</span>
+      <div class="pf-stat">
         <strong>{{ rank_label }}</strong>
+        <span>ranking</span>
       </div>
     </div>
   </div>
 
-  <div class="profile-grid">
+  <div class="pf-grid">
 
     {# ── COLUMNA IZQUIERDA ── #}
-    <div style="display:flex; flex-direction:column; gap:20px;">
+    <div class="pf-col">
 
       {# Completar perfil #}
-      <div class="profile-section">
-        <h2>completar perfil</h2>
-        <div class="completion-pct">{{ completion_pct }}% completo</div>
-        <div class="completion-bar">
-          <div class="completion-fill" style="width:{{ completion_pct }}%"></div>
+      <div class="pf-card">
+        <div class="pf-card-header">
+          <h2>Completar perfil</h2>
+          <span class="pf-pct-badge">{{ completion_pct }}%</span>
         </div>
-        <div class="completion-item">
-          <span class="ci-icon">✅</span>
-          <span>Cuenta creada</span>
+        <div class="pf-progress">
+          <div class="pf-progress-fill" style="width:{{ completion_pct }}%"></div>
         </div>
-        <div class="completion-item">
-          <span class="ci-icon">✅</span>
-          <span>Nick configurado</span>
-        </div>
-        <div class="completion-item">
+        <div class="pf-steps">
+          <div class="pf-step pf-step--done">
+            <div class="pf-step-icon">✓</div>
+            <div class="pf-step-text">
+              <strong>Cuenta creada</strong>
+              <small>Registro completado</small>
+            </div>
+          </div>
+          <div class="pf-step pf-step--done">
+            <div class="pf-step-icon">✓</div>
+            <div class="pf-step-text">
+              <strong>Nick configurado</strong>
+              <small>@{{ handle }}</small>
+            </div>
+          </div>
           {% if has_payment_method %}
-            <span class="ci-icon">✅</span>
-            <span>Método de pago</span>
+          <div class="pf-step pf-step--done">
+            <div class="pf-step-icon">✓</div>
+            <div class="pf-step-text">
+              <strong>Método de pago</strong>
+            </div>
+          </div>
           {% else %}
-            <span class="ci-icon">⬜</span>
-            <span>Método de pago</span>
-            <a href="/settings/payment-methods">Agregar →</a>
+          <div class="pf-step pf-step--pending">
+            <div class="pf-step-icon">○</div>
+            <div class="pf-step-text">
+              <strong>Método de pago</strong>
+              <small><a href="/settings/payment-methods">Agregar →</a></small>
+            </div>
+          </div>
           {% endif %}
-        </div>
-        <div class="completion-item">
           {% if reports_total >= 1 %}
-            <span class="ci-icon">✅</span>
-            <span>Primer reporte enviado</span>
+          <div class="pf-step pf-step--done">
+            <div class="pf-step-icon">✓</div>
+            <div class="pf-step-text">
+              <strong>Primer reporte enviado</strong>
+            </div>
+          </div>
           {% else %}
-            <span class="ci-icon">⬜</span>
-            <span>Primer reporte enviado</span>
-            <a href="/programs">Explorar →</a>
+          <div class="pf-step pf-step--pending">
+            <div class="pf-step-icon">○</div>
+            <div class="pf-step-text">
+              <strong>Primer reporte enviado</strong>
+              <small><a href="/programs">Explorar programas →</a></small>
+            </div>
+          </div>
           {% endif %}
         </div>
       </div>
 
       {# Editar nick #}
-      <div class="profile-section">
-        <h2>editar nick</h2>
+      <div class="pf-card">
+        <h2>Editar handle</h2>
         <form hx-post="/settings/profile" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
           <label>
-            <span>handle</span>
+            <span>Handle</span>
             <input type="text" name="handle" value="{{ handle }}" required
                    minlength="3" maxlength="32" pattern="[a-zA-Z0-9_]+"
                    autocomplete="off">
-            <small class="muted">3–32 caracteres · solo letras, números y _</small>
+            <small class="muted">3–32 caracteres · letras, números y _</small>
           </label>
           <div id="form-feedback" class="feedback"></div>
-          <button type="submit" class="btn-primary" style="width:100%;">guardar cambios</button>
+          <button type="submit" class="btn-primary" style="width:100%;">Guardar cambios</button>
         </form>
       </div>
 
     </div>
 
     {# ── COLUMNA DERECHA ── #}
-    <div style="display:flex; flex-direction:column; gap:20px;">
+    <div class="pf-col">
 
       {# Achievements #}
-      <div class="profile-section">
-        <h2>achievements</h2>
-        <div class="achievement-grid">
+      <div class="pf-card">
+        <h2>Achievements</h2>
+        <div class="ach-list">
 
-          {# Bronze Finder — 1 valid report #}
-          <div class="achievement-card {% if reports_valid >= 1 %}earned{% endif %}">
-            <div class="achievement-icon">🥉</div>
-            <div class="achievement-info">
-              <strong>Bronze Finder</strong>
-              <small>{{ reports_valid.min(1) }}/1 reporte válido</small>
-              <div class="achievement-progress">
-                <div class="achievement-progress-fill" style="width:{{ (reports_valid * 100).min(100) }}%"></div>
+          <div class="ach-item {% if reports_valid >= 1 %}ach-item--earned{% endif %}">
+            <div class="ach-medal">🥉</div>
+            <div class="ach-body">
+              <div class="ach-top">
+                <strong>Bronze Finder</strong>
+                {% if reports_valid >= 1 %}<span class="ach-badge">Desbloqueado</span>{% endif %}
               </div>
+              <div class="ach-bar">
+                <div class="ach-fill" style="width:{{ (reports_valid * 100).min(100) }}%"></div>
+              </div>
+              <small>{{ reports_valid.min(1) }} / 1 reporte válido</small>
             </div>
           </div>
 
-          {# Silver Finder — 5 valid reports #}
-          <div class="achievement-card {% if reports_valid >= 5 %}earned{% endif %}">
-            <div class="achievement-icon">🥈</div>
-            <div class="achievement-info">
-              <strong>Silver Finder</strong>
-              <small>{{ reports_valid.min(5) }}/5 reportes válidos</small>
-              <div class="achievement-progress">
-                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 5).min(100) }}%"></div>
+          <div class="ach-item {% if reports_valid >= 5 %}ach-item--earned{% endif %}">
+            <div class="ach-medal">🥈</div>
+            <div class="ach-body">
+              <div class="ach-top">
+                <strong>Silver Finder</strong>
+                {% if reports_valid >= 5 %}<span class="ach-badge">Desbloqueado</span>{% endif %}
               </div>
+              <div class="ach-bar">
+                <div class="ach-fill" style="width:{{ ((reports_valid * 100) / 5).min(100) }}%"></div>
+              </div>
+              <small>{{ reports_valid.min(5) }} / 5 reportes válidos</small>
             </div>
           </div>
 
-          {# Gold Finder — 10 valid reports #}
-          <div class="achievement-card {% if reports_valid >= 10 %}earned{% endif %}">
-            <div class="achievement-icon">🥇</div>
-            <div class="achievement-info">
-              <strong>Gold Finder</strong>
-              <small>{{ reports_valid.min(10) }}/10 reportes válidos</small>
-              <div class="achievement-progress">
-                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 10).min(100) }}%"></div>
+          <div class="ach-item {% if reports_valid >= 10 %}ach-item--earned{% endif %}">
+            <div class="ach-medal">🥇</div>
+            <div class="ach-body">
+              <div class="ach-top">
+                <strong>Gold Finder</strong>
+                {% if reports_valid >= 10 %}<span class="ach-badge">Desbloqueado</span>{% endif %}
               </div>
+              <div class="ach-bar">
+                <div class="ach-fill" style="width:{{ ((reports_valid * 100) / 10).min(100) }}%"></div>
+              </div>
+              <small>{{ reports_valid.min(10) }} / 10 reportes válidos</small>
             </div>
           </div>
 
-          {# Platinum Finder — 25 valid reports #}
-          <div class="achievement-card {% if reports_valid >= 25 %}earned{% endif %}">
-            <div class="achievement-icon">💎</div>
-            <div class="achievement-info">
-              <strong>Platinum Finder</strong>
-              <small>{{ reports_valid.min(25) }}/25 reportes válidos</small>
-              <div class="achievement-progress">
-                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 25).min(100) }}%"></div>
+          <div class="ach-item {% if reports_valid >= 25 %}ach-item--earned{% endif %}">
+            <div class="ach-medal">💎</div>
+            <div class="ach-body">
+              <div class="ach-top">
+                <strong>Platinum Finder</strong>
+                {% if reports_valid >= 25 %}<span class="ach-badge">Desbloqueado</span>{% endif %}
               </div>
+              <div class="ach-bar">
+                <div class="ach-fill" style="width:{{ ((reports_valid * 100) / 25).min(100) }}%"></div>
+              </div>
+              <small>{{ reports_valid.min(25) }} / 25 reportes válidos</small>
             </div>
           </div>
 
         </div>
       </div>
 
-      {# Tema #}
-      <div class="profile-section">
-        <h2>tema</h2>
-        <div class="theme-selector">
-          <button class="theme-btn" data-theme-val="light" onclick="bbSetTheme('light')">
-            <span class="theme-preview light"></span>
-            Light
+      {# Apariencia #}
+      <div class="pf-card">
+        <h2>Apariencia</h2>
+        <div class="theme-grid">
+          <button type="button" class="theme-opt" data-theme-val="light" onclick="bbSetTheme('light')">
+            <div class="theme-opt-preview theme-opt-light"></div>
+            <span>Claro</span>
           </button>
-          <button class="theme-btn" data-theme-val="dark" onclick="bbSetTheme('dark')">
-            <span class="theme-preview dark"></span>
-            Dark
+          <button type="button" class="theme-opt" data-theme-val="dark" onclick="bbSetTheme('dark')">
+            <div class="theme-opt-preview theme-opt-dark"></div>
+            <span>Oscuro</span>
           </button>
-          <button class="theme-btn" data-theme-val="system" onclick="bbSetTheme('system')">
-            <span class="theme-preview system"></span>
-            Sistema
+          <button type="button" class="theme-opt" data-theme-val="system" onclick="bbSetTheme('system')">
+            <div class="theme-opt-preview theme-opt-system"></div>
+            <span>Sistema</span>
           </button>
         </div>
         <script>
           (function() {
             var cur = localStorage.getItem('bb-theme') || 'light';
-            document.querySelectorAll('.theme-btn').forEach(function(btn) {
-              btn.classList.toggle('active', btn.dataset.themeVal === cur);
+            document.querySelectorAll('[data-theme-val]').forEach(function(btn) {
+              if (btn.dataset.themeVal === cur) btn.classList.add('theme-opt--active');
             });
           })();
         </script>

@@ -128,7 +128,6 @@
         document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
         document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
 
-        // Dark mode toggle — persiste en localStorage.
         function bbSetTheme(t) {
             if (t === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
@@ -144,8 +143,8 @@
                     document.documentElement.removeAttribute('data-theme');
                 }
             }
-            document.querySelectorAll('.theme-btn').forEach(function(btn) {
-                btn.classList.toggle('active', btn.dataset.themeVal === t);
+            document.querySelectorAll('[data-theme-val]').forEach(function(btn) {
+                btn.classList.toggle('theme-opt--active', btn.dataset.themeVal === t);
             });
         }
 
