@@ -1757,8 +1757,11 @@ form.inline { display: inline; margin: 0; }
 [data-theme="dark"] .btn-link:hover { background: var(--mist); }
 
 [data-theme="dark"] .hero-stats {
-    background: rgba(13,17,23,0.75);
-    border-color: var(--line2);
+    background: #111827;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 1px rgba(0,188,228,0.08);
 }
 [data-theme="dark"] .hero-stats strong { color: var(--brand-500); }
 [data-theme="dark"] .hero-stats span { color: var(--slate2); }
