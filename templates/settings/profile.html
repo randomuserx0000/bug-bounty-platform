@@ -3,23 +3,183 @@
 {% block title %}perfil · bugbounty.ve{% endblock %}
 
 {% block content %}
-<section class="page narrow">
-    <h1>perfil</h1>
-    <p class="muted">tu identidad pública en la plataforma.</p>
+<section class="page" style="max-width:900px;">
 
-    <form hx-post="/settings/profile" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
-        <label>
-            <span>nick (handle)</span>
+  {# ── PROFILE HERO ── #}
+  <div class="profile-hero">
+    <div class="profile-avatar-xl">{{ handle.chars().next().unwrap_or('?') }}</div>
+    <div class="profile-identity">
+      <h1>{{ handle }}</h1>
+      <span class="profile-role">researcher · bugbounty.ve</span>
+    </div>
+    <div class="profile-kpis">
+      <div class="pkpi">
+        <span>reports</span>
+        <strong>{{ reports_total }}</strong>
+      </div>
+      <div class="pkpi">
+        <span>válidos</span>
+        <strong>{{ reports_valid }}</strong>
+      </div>
+      <div class="pkpi">
+        <span>reputación</span>
+        <strong>{{ reputation }}</strong>
+      </div>
+      <div class="pkpi">
+        <span>ranking</span>
+        <strong>{{ rank_label }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+
+    {# ── COLUMNA IZQUIERDA ── #}
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      {# Completar perfil #}
+      <div class="profile-section">
+        <h2>completar perfil</h2>
+        <div class="completion-pct">{{ completion_pct }}% completo</div>
+        <div class="completion-bar">
+          <div class="completion-fill" style="width:{{ completion_pct }}%"></div>
+        </div>
+        <div class="completion-item">
+          <span class="ci-icon">✅</span>
+          <span>Cuenta creada</span>
+        </div>
+        <div class="completion-item">
+          <span class="ci-icon">✅</span>
+          <span>Nick configurado</span>
+        </div>
+        <div class="completion-item">
+          {% if has_payment_method %}
+            <span class="ci-icon">✅</span>
+            <span>Método de pago</span>
+          {% else %}
+            <span class="ci-icon">⬜</span>
+            <span>Método de pago</span>
+            <a href="/settings/payment-methods">Agregar →</a>
+          {% endif %}
+        </div>
+        <div class="completion-item">
+          {% if reports_total >= 1 %}
+            <span class="ci-icon">✅</span>
+            <span>Primer reporte enviado</span>
+          {% else %}
+            <span class="ci-icon">⬜</span>
+            <span>Primer reporte enviado</span>
+            <a href="/programs">Explorar →</a>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Editar nick #}
+      <div class="profile-section">
+        <h2>editar nick</h2>
+        <form hx-post="/settings/profile" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+          <label>
+            <span>handle</span>
             <input type="text" name="handle" value="{{ handle }}" required
                    minlength="3" maxlength="32" pattern="[a-zA-Z0-9_]+"
                    autocomplete="off">
-            <small class="muted">3-32 caracteres, solo letras, números y guion bajo.</small>
-        </label>
+            <small class="muted">3–32 caracteres · solo letras, números y _</small>
+          </label>
+          <div id="form-feedback" class="feedback"></div>
+          <button type="submit" class="btn-primary" style="width:100%;">guardar cambios</button>
+        </form>
+      </div>
 
-        <div id="form-feedback" class="feedback"></div>
+    </div>
 
-        <button type="submit" class="btn-primary">guardar cambios</button>
-        <a href="/dashboard" class="muted small">← volver al dashboard</a>
-    </form>
+    {# ── COLUMNA DERECHA ── #}
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      {# Achievements #}
+      <div class="profile-section">
+        <h2>achievements</h2>
+        <div class="achievement-grid">
+
+          {# Bronze Finder — 1 valid report #}
+          <div class="achievement-card {% if reports_valid >= 1 %}earned{% endif %}">
+            <div class="achievement-icon">🥉</div>
+            <div class="achievement-info">
+              <strong>Bronze Finder</strong>
+              <small>{{ reports_valid.min(1) }}/1 reporte válido</small>
+              <div class="achievement-progress">
+                <div class="achievement-progress-fill" style="width:{{ (reports_valid * 100).min(100) }}%"></div>
+              </div>
+            </div>
+          </div>
+
+          {# Silver Finder — 5 valid reports #}
+          <div class="achievement-card {% if reports_valid >= 5 %}earned{% endif %}">
+            <div class="achievement-icon">🥈</div>
+            <div class="achievement-info">
+              <strong>Silver Finder</strong>
+              <small>{{ reports_valid.min(5) }}/5 reportes válidos</small>
+              <div class="achievement-progress">
+                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 5).min(100) }}%"></div>
+              </div>
+            </div>
+          </div>
+
+          {# Gold Finder — 10 valid reports #}
+          <div class="achievement-card {% if reports_valid >= 10 %}earned{% endif %}">
+            <div class="achievement-icon">🥇</div>
+            <div class="achievement-info">
+              <strong>Gold Finder</strong>
+              <small>{{ reports_valid.min(10) }}/10 reportes válidos</small>
+              <div class="achievement-progress">
+                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 10).min(100) }}%"></div>
+              </div>
+            </div>
+          </div>
+
+          {# Platinum Finder — 25 valid reports #}
+          <div class="achievement-card {% if reports_valid >= 25 %}earned{% endif %}">
+            <div class="achievement-icon">💎</div>
+            <div class="achievement-info">
+              <strong>Platinum Finder</strong>
+              <small>{{ reports_valid.min(25) }}/25 reportes válidos</small>
+              <div class="achievement-progress">
+                <div class="achievement-progress-fill" style="width:{{ ((reports_valid * 100) / 25).min(100) }}%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {# Tema #}
+      <div class="profile-section">
+        <h2>tema</h2>
+        <div class="theme-selector">
+          <button class="theme-btn" data-theme-val="light" onclick="bbSetTheme('light')">
+            <span class="theme-preview light"></span>
+            Light
+          </button>
+          <button class="theme-btn" data-theme-val="dark" onclick="bbSetTheme('dark')">
+            <span class="theme-preview dark"></span>
+            Dark
+          </button>
+          <button class="theme-btn" data-theme-val="system" onclick="bbSetTheme('system')">
+            <span class="theme-preview system"></span>
+            Sistema
+          </button>
+        </div>
+        <script>
+          (function() {
+            var cur = localStorage.getItem('bb-theme') || 'light';
+            document.querySelectorAll('.theme-btn').forEach(function(btn) {
+              btn.classList.toggle('active', btn.dataset.themeVal === cur);
+            });
+          })();
+        </script>
+      </div>
+
+    </div>
+  </div>
+
 </section>
 {% endblock %}

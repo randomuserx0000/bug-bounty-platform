@@ -62,6 +62,10 @@ pub struct FeaturedProgram {
     pub bounty_max_usd: String,
 }
 
+pub async fn researcher_kpi(pool: &PgPool, user_id: UserId) -> Result<ResearcherKpi, sqlx::Error> {
+    load_kpi(pool, user_id).await
+}
+
 pub async fn load_for_researcher(
     pool: &PgPool,
     user_id: UserId,

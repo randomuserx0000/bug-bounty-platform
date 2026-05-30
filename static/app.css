@@ -1265,3 +1265,431 @@ form.inline { display: inline; margin: 0; }
     color: var(--brand-700);
     font-size: 1.05rem;
 }
+
+/* ============================================================
+   PROGRAM CARD — estilo enriquecido (Intigriti-inspired)
+   ============================================================ */
+
+.pc-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.pc-logo-placeholder {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+    color: white;
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.pc-head { flex: 1; min-width: 0; }
+.pc-company {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--brand-600);
+    font-weight: 700;
+}
+.pc-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pc-badge {
+    flex-shrink: 0;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    align-self: flex-start;
+}
+.pc-badge-public {
+    background: var(--brand-50);
+    color: var(--brand-700);
+    border: 1px solid var(--brand-200, #99e7f6);
+}
+.pc-summary {
+    font-size: 0.82rem;
+    color: var(--slate2);
+    margin: 0 0 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.45;
+}
+.pc-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+    padding: 10px 0;
+    border-top: 1px dashed var(--line2);
+    border-bottom: 1px dashed var(--line2);
+    margin-bottom: 10px;
+}
+.pc-meta > div { display: flex; flex-direction: column; gap: 1px; }
+.pc-meta span {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate2);
+}
+.pc-meta strong {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: var(--font-mono);
+}
+.pc-bounty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.pc-bounty span {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate2);
+}
+.pc-bounty strong {
+    font-family: var(--font-mono);
+    color: var(--brand-700);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* ============================================================
+   PROFILE PAGE — estilo Intigriti
+   ============================================================ */
+
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, var(--brand-50), white 80%);
+    border: 1px solid var(--brand-100, #c0f0fa);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.profile-avatar-xl {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+.profile-identity { flex: 1; min-width: 140px; }
+.profile-identity h1 { margin: 0; font-size: 1.6rem; font-weight: 800; line-height: 1.2; }
+.profile-role {
+    font-size: 0.78rem;
+    color: var(--slate2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+.profile-kpis {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+.pkpi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 56px;
+}
+.pkpi span {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--slate2);
+    font-weight: 600;
+}
+.pkpi strong {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    font-family: var(--font-mono);
+}
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 680px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-kpis { gap: 16px; }
+    .profile-hero { padding: 20px; }
+}
+.profile-section {
+    background: white;
+    border: 1px solid var(--line2);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: var(--shadow-soft);
+}
+.profile-section h2 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--slate2);
+    margin: 0 0 16px;
+}
+
+/* Profile completion */
+.completion-pct {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--brand-700);
+    margin-bottom: 6px;
+}
+.completion-bar {
+    height: 7px;
+    border-radius: 4px;
+    background: var(--line2);
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+.completion-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--brand-500), var(--brand-700));
+}
+.completion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--line2);
+}
+.completion-item:last-child { border-bottom: none; }
+.completion-item .ci-icon { font-size: 1rem; flex-shrink: 0; }
+.completion-item a { margin-left: auto; font-size: 0.78rem; color: var(--brand-600); }
+
+/* Achievement badges */
+.achievement-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line2);
+    border-radius: 10px;
+    background: var(--mist);
+    transition: border-color .15s ease;
+}
+.achievement-card.earned {
+    border-color: var(--brand-300, #66d8f0);
+    background: var(--brand-50);
+}
+.achievement-icon { font-size: 1.8rem; flex-shrink: 0; filter: grayscale(1) opacity(0.4); }
+.achievement-card.earned .achievement-icon { filter: none; }
+.achievement-info { flex: 1; min-width: 0; }
+.achievement-info strong { display: block; font-size: 0.82rem; font-weight: 700; }
+.achievement-info small { font-size: 0.7rem; color: var(--slate2); }
+.achievement-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line2);
+    margin-top: 5px;
+    overflow: hidden;
+}
+.achievement-progress-fill { height: 100%; background: var(--brand-500); border-radius: 2px; }
+
+/* Theme selector */
+.theme-selector { display: flex; gap: 10px; }
+.theme-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 6px;
+    border: 2px solid var(--line2);
+    border-radius: 12px;
+    background: var(--mist);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: border-color .15s ease, background .15s ease;
+}
+.theme-btn:hover { border-color: var(--brand-300, #66d8f0); }
+.theme-btn.active {
+    border-color: var(--brand-500);
+    background: var(--brand-50);
+    color: var(--brand-700);
+}
+.theme-preview {
+    width: 100%;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--line2);
+}
+.theme-preview.light { background: linear-gradient(135deg, #ffffff 50%, #f5f8fc 50%); }
+.theme-preview.dark  { background: linear-gradient(135deg, #0d1117 50%, #1e293b 50%); }
+.theme-preview.system { background: linear-gradient(135deg, #ffffff 50%, #0d1117 50%); }
+
+/* ============================================================
+   DARK MODE — activado con data-theme="dark" en <html>
+   ============================================================ */
+
+[data-theme="dark"] {
+    --bg:     #0d1117;
+    --ink:    #e2e8f0;
+    --slate2: #94a3b8;
+    --line2:  #1e293b;
+    --mist:   #161d27;
+    --brand-50: #062530;
+    --brand-100: #0a3547;
+}
+
+[data-theme="dark"] body { background: var(--bg); color: var(--ink); }
+
+[data-theme="dark"] .topbar {
+    background: rgba(13,17,23,0.96);
+    border-bottom-color: var(--line2);
+}
+[data-theme="dark"] .topstrip { background: var(--brand-800); }
+
+[data-theme="dark"] .user-menu-panel { background: #111827; border-color: var(--line2); }
+[data-theme="dark"] .user-menu-panel a,
+[data-theme="dark"] .user-menu-panel .user-menu-logout { color: var(--ink); }
+[data-theme="dark"] .user-menu-panel a:hover,
+[data-theme="dark"] .user-menu-panel .user-menu-logout:hover {
+    background: var(--line2);
+    color: var(--brand-500);
+}
+
+[data-theme="dark"] .program-card {
+    background: #111827;
+    border-color: var(--line2);
+}
+[data-theme="dark"] .program-card:hover { border-color: var(--brand-500); }
+[data-theme="dark"] .pc-name { color: var(--ink); }
+
+[data-theme="dark"] .profile-hero {
+    background: linear-gradient(135deg, var(--brand-50), #0d1117 80%);
+    border-color: var(--brand-700);
+}
+[data-theme="dark"] .profile-section {
+    background: #111827;
+    border-color: var(--line2);
+}
+[data-theme="dark"] .achievement-card { background: #1e293b; }
+[data-theme="dark"] .achievement-card.earned { background: var(--brand-50); }
+[data-theme="dark"] .theme-btn { background: #1e293b; color: var(--ink); }
+[data-theme="dark"] .theme-btn.active { background: var(--brand-50); }
+
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .card-box {
+    background: #111827;
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .stack input,
+[data-theme="dark"] .stack select,
+[data-theme="dark"] .stack textarea,
+[data-theme="dark"] .auth-card input,
+[data-theme="dark"] .auth-card select,
+[data-theme="dark"] .auth-card textarea {
+    background: #1e293b;
+    border-color: var(--line2);
+    color: var(--ink);
+}
+
+[data-theme="dark"] .compare-old {
+    background: #1a1a2e;
+    border-color: #2a2a4a;
+}
+[data-theme="dark"] .compare-new {
+    background: #062530;
+    border-color: var(--brand-700);
+}
+
+[data-theme="dark"] .allies-section { background: var(--bg); border-color: var(--line2); }
+
+[data-theme="dark"] .hero {
+    background:
+        radial-gradient(800px circle at 85% 10%, rgba(0,188,228,.06), transparent 55%),
+        linear-gradient(180deg, #111827, #0d1117);
+    border-bottom-color: var(--line2);
+}
+
+[data-theme="dark"] .kpi-card { background: #111827; border-color: var(--line2); }
+
+[data-theme="dark"] .policy {
+    background: #111827;
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .foot {
+    background: #0d1117;
+    border-top-color: var(--line2);
+}
+
+[data-theme="dark"] .nav-list a {
+    background: #111827;
+    border-color: var(--line2);
+    color: var(--ink);
+}
+
+[data-theme="dark"] .empty {
+    background: #111827;
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .bounty-grid {
+    background: linear-gradient(135deg, var(--brand-50), #111827);
+    border-color: var(--brand-700);
+}
+
+[data-theme="dark"] .action-item {
+    background: #111827;
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .btn-link {
+    border-color: var(--line2);
+    color: var(--ink);
+}
+[data-theme="dark"] .btn-link:hover { background: var(--mist); }
+
+[data-theme="dark"] .EasyMDEContainer .CodeMirror,
+[data-theme="dark"] .EasyMDEContainer .editor-preview {
+    background: #1e293b;
+    color: var(--ink);
+    border-color: var(--line2);
+}
+[data-theme="dark"] .EasyMDEContainer .editor-toolbar {
+    background: #111827;
+    border-color: var(--line2);
+}
+[data-theme="dark"] .EasyMDEContainer .editor-toolbar button { color: var(--slate2); }
+

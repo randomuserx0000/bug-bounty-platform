@@ -99,6 +99,12 @@ pub struct PaymentMethodView {
 pub struct ProfileTemplate {
     pub year: i32,
     pub handle: String,
+    pub reports_total: i64,
+    pub reports_valid: i64,
+    pub reputation: i32,
+    pub rank_label: String,
+    pub has_payment_method: bool,
+    pub completion_pct: i32,
 }
 
 #[derive(Template)]

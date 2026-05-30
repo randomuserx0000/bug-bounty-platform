@@ -11,6 +11,8 @@ use axum::{Form, Router};
 use serde::Deserialize;
 use uuid::Uuid;
 
+use sqlx;
+
 use crate::auth::CurrentUser;
 use crate::db;
 use crate::db::payment_methods::{NewPaymentMethod, PaymentMethodRow};
@@ -42,10 +44,39 @@ pub fn router() -> Router<AppState> {
 // PROFILE (cambiar nick)
 // ----------------------------------------------------------------------------
 
-async fn profile_form(current: CurrentUser) -> AppResult<impl IntoResponse> {
+async fn profile_form(
+    State(state): State<AppState>,
+    current: CurrentUser,
+) -> AppResult<impl IntoResponse> {
+    let user_id = UserId::from(current.user.id);
+    let kpi = db::dashboard::researcher_kpi(&state.db, user_id).await?;
+
+    let rank_label = match kpi.rank_pct {
+        Some(p) if p > 0.0 => format!("Top {:.0}%", p),
+        _ => "—".into(),
+    };
+
+    let pm_count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*)::BIGINT FROM payment_methods WHERE user_id = $1",
+    )
+    .bind(user_id)
+    .fetch_one(&state.db)
+    .await?;
+    let has_payment_method = pm_count.0 > 0;
+
+    let completion_pct = 50
+        + if has_payment_method { 25 } else { 0 }
+        + if kpi.reports_total >= 1 { 25 } else { 0 };
+
     Ok(ProfileTemplate {
         year: current_year(),
         handle: current.user.handle,
+        reports_total: kpi.reports_total,
+        reports_valid: kpi.reports_valid,
+        reputation: kpi.reputation,
+        rank_label,
+        has_payment_method,
+        completion_pct,
     })
 }
 

@@ -19,15 +19,28 @@
         <div class="card-grid">
         {% for p in programs %}
             <a class="program-card" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}">
-                <header>
-                    <small class="muted">{{ p.company_name }}</small>
-                    <h3>{{ p.name }}</h3>
-                </header>
-                <p>{{ p.summary }}</p>
+                <div class="pc-top">
+                    <div class="pc-logo-wrap">
+                        <div class="pc-logo-placeholder">{{ p.company_name.chars().next().unwrap_or('?') }}</div>
+                    </div>
+                    <div class="pc-head">
+                        <div class="pc-company">{{ p.company_name }}</div>
+                        <div class="pc-name">{{ p.name }}</div>
+                    </div>
+                    <span class="pc-badge pc-badge-public">Público</span>
+                </div>
+                <p class="pc-summary">{{ p.summary }}</p>
+                <div class="pc-meta">
+                    <div><span>avg paid</span><strong>—</strong></div>
+                    <div><span>1ª respuesta</span><strong>—</strong></div>
+                    <div><span>aceptados</span><strong>—</strong></div>
+                    <div><span>researchers</span><strong>—</strong></div>
+                </div>
                 {% if !p.bounty_low.is_empty() || !p.bounty_critical.is_empty() %}
-                    <footer class="muted small">
-                        bounty: {{ p.bounty_low }} – {{ p.bounty_critical }}
-                    </footer>
+                <div class="pc-bounty">
+                    <span>bounty range</span>
+                    <strong>{{ p.bounty_low }} – {{ p.bounty_critical }}</strong>
+                </div>
                 {% endif %}
             </a>
         {% endfor %}

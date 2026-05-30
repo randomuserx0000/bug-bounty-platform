@@ -14,6 +14,26 @@ templates Askama con HTMX, sin frameworks de JS frontend.
 - **Audit log** append-only de cada acción sensible (auth, mutaciones, dinero).
 - **Listado público** de programas en `/` sin necesidad de registro.
 
+## UI / UX (estado actual)
+
+### Dashboard del researcher
+Rediseño al estilo HackerOne/Intigriti/Bugcrowd: KPIs reales (reports totales, válidos, bounties 90d, reputación, ranking), action items, activity feed, payouts recientes y programas destacados.
+
+### Perfil (`/settings/profile`)
+- **Stats** en header: reports, válidos, reputación, ranking (datos reales de BD).
+- **Completion bar**: progreso de 4 checkpoints (cuenta creada, nick, método de pago, primer reporte).
+- **Achievements**: Bronze/Silver/Gold/Platinum Finder con progress bars reales según `reports_valid`.
+- **Theme selector**: Light / Dark / Sistema — persistido en `localStorage`, sin columna en BD.
+
+### Dark mode
+Activado con `data-theme="dark"` en `<html>`. Script inline en `<head>` aplica el tema antes del primer paint para evitar flash. `bbSetTheme(t)` disponible globalmente para cualquier toggle. El CSS en `app.css` cubre topbar, cards, forms, hero, footer, EasyMDE y todos los componentes relevantes.
+
+### Program cards
+Cards estilo Intigriti: logo placeholder con inicial de empresa, badge público/privado, stats grid (avg paid, primera respuesta, aceptados, researchers — placeholders por ahora), bounty range al pie.
+
+### Aliados
+Marquee en home con logos de la red REDSEG + **SentinelOne** (autorización comercial). Logo SVG en `static/s1.svg`.
+
 ## Desarrollo local
 
 Requiere Rust stable + podman (o docker) + docker-compose.

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 64" width="210" height="64">
+  <!-- Shield icon -->
+  <path d="M28,4 L50,12 L50,34 C50,47,40,54,28,58 C16,54,6,47,6,34 L6,12 Z" fill="#6B21A8"/>
+  <!-- Eye shape inside shield -->
+  <ellipse cx="28" cy="33" rx="11" ry="7" fill="none" stroke="white" stroke-width="2.2"/>
+  <circle cx="28" cy="33" r="4.5" fill="white"/>
+  <circle cx="28" cy="33" r="2.5" fill="#6B21A8"/>
+  <!-- Wordmark -->
+  <text x="62" y="40" font-family="system-ui,-apple-system,Arial,sans-serif" font-size="18" font-weight="700" fill="#1e1b4b" letter-spacing="-0.4">Sentinel</text>
+  <text x="145" y="40" font-family="system-ui,-apple-system,Arial,sans-serif" font-size="18" font-weight="300" fill="#7B2FBE" letter-spacing="-0.4">One</text>
+</svg>
