@@ -1676,12 +1676,35 @@ form.inline { display: inline; margin: 0; }
     color: var(--ink);
 }
 
+[data-theme="dark"] .kbd,
+[data-theme="dark"] code.kbd {
+    background: linear-gradient(180deg, #1e293b, #161d27);
+    color: var(--brand-500);
+    border-color: var(--line2);
+}
+
+[data-theme="dark"] .compare-card {
+    background: #111827;
+    border-color: var(--line2);
+}
+[data-theme="dark"] .compare-card li { border-bottom-color: var(--line2); }
+[data-theme="dark"] .compare-card footer { border-top-color: var(--line2); }
+[data-theme="dark"] .compare-tag {
+    background: #1e293b;
+    border-color: var(--line2);
+    color: var(--slate2);
+}
+[data-theme="dark"] .compare-new .compare-tag {
+    background: var(--brand-50);
+    border-color: var(--brand-700);
+    color: var(--brand-500);
+}
 [data-theme="dark"] .compare-old {
-    background: #1a1a2e;
-    border-color: #2a2a4a;
+    background: #161b27;
+    border-color: #252d40;
 }
 [data-theme="dark"] .compare-new {
-    background: #062530;
+    background: linear-gradient(180deg, #0d1f2d, #062530);
     border-color: var(--brand-700);
 }
 
