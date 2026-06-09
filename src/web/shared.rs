@@ -8,10 +8,25 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use time::OffsetDateTime;
 
-use super::templates::FormErrorPartial;
+use super::templates::{FormErrorPartial, PriceTierView};
 
 pub fn current_year() -> i32 {
     OffsetDateTime::now_utc().year()
+}
+
+/// Construye las filas de precio por severidad desde `domain::pricing`.
+/// Reutilizado por la home y el form de programa.
+pub fn severity_tier_views() -> Vec<PriceTierView> {
+    crate::domain::pricing::SEVERITY_TIERS
+        .iter()
+        .map(|t| PriceTierView {
+            emoji: t.emoji.into(),
+            label: t.label.into(),
+            range: t.range_usd(),
+            default_usd: t.min_usd(),
+            key: t.key.into(),
+        })
+        .collect()
 }
 
 /// 200 + `HX-Redirect`. HTMX lo intercepta y navega.

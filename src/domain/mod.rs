@@ -7,7 +7,9 @@
 pub mod asset;
 pub mod company;
 pub mod ids;
+pub mod osint;
 pub mod payout;
+pub mod pricing;
 pub mod program;
 pub mod report;
 // pub mod user;

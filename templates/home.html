@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}bugbounty.ve · ciberseguridad accesible para empresas venezolanas{% endblock %}
+{% block title %}Escudo Digital · ciberseguridad accesible para empresas venezolanas{% endblock %}
 
 {% block content %}
 
@@ -81,7 +81,7 @@
         <div class="compare-card compare-new">
             <header>
                 <span class="compare-tag">PAY-PER-VULN</span>
-                <h3>Bug bounty con bugbounty.ve</h3>
+                <h3>Bug bounty con Escudo Digital</h3>
             </header>
             <ul>
                 <li><span class="check">✓</span> <strong>$0 hasta que alguien encuentre algo</strong></li>
@@ -91,10 +91,48 @@
                 <li><span class="check">✓</span> Cubre web, mobile, infra, firmware, hardware y radio</li>
             </ul>
             <footer>
-                <span class="muted small">Ejemplo realista: low $100 · medium $500 · high $1.500 · critical $5.000.</span>
+                <span class="muted small">Tú fijas el monto; abajo tienes nuestros precios base de referencia.</span>
             </footer>
         </div>
     </div>
+</section>
+
+{# ============================================================
+   PRECIOS BASE — referencia de montos por severidad + OSINT
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">PRECIOS BASE</span>
+        <h2 style="margin-top: 12px;">Cuánto vale cada hallazgo</h2>
+        <p class="muted" style="max-width: 640px; margin: 8px auto 0;">
+            Precios de referencia con los precios más bajos del mercado. Las empresas
+            pagan por vulnerabilidad validada; los investigadores también pueden vendernos
+            <strong>informes OSINT</strong> sobre empresas y nosotros los revendemos para
+            remediarlos.
+        </p>
+    </div>
+
+    <div class="price-grid">
+        <div class="price-card price-osint">
+            <span class="price-emoji">⚫</span>
+            <div class="price-label">Informe OSINT</div>
+            <div class="price-range">${{ osint_base_usd }}</div>
+            <div class="price-note">inteligencia sobre empresas · precio base</div>
+        </div>
+        {% for t in pricing %}
+        <div class="price-card">
+            <span class="price-emoji">{{ t.emoji }}</span>
+            <div class="price-label">{{ t.label }}</div>
+            <div class="price-range">{{ t.range }}</div>
+            <div class="price-note">por vulnerabilidad validada</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p class="muted small" style="text-align:center; margin-top:16px;">
+        ¿Empiezas en OSINT? Te formamos desde Escudo Digital y sus aliados, y luego
+        trabajas en la plataforma vendiendo tus hallazgos.
+    </p>
 </section>
 
 {# ============================================================

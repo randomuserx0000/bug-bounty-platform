@@ -40,3 +40,4 @@ typed_id!(PayoutId);
 typed_id!(PaymentMethodId);
 typed_id!(SessionId);
 typed_id!(ReportEventId);
+typed_id!(OsintReportId);

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}vender informe OSINT · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page narrow">
+    <h1>nuevo informe OSINT</h1>
+    <p class="muted">
+        Vende tu investigación OSINT sobre una empresa. Si la aceptamos, cobrarás
+        <strong>${{ osint_base_usd }}</strong> (precio base) cuando la empresa lo adquiera.
+    </p>
+
+    <form hx-post="/osint" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+
+        <label>
+            <span>empresa objetivo</span>
+            <input type="text" name="subject_name" required maxlength="160"
+                   placeholder="ej: Banco Ejemplo C.A.">
+        </label>
+
+        <label>
+            <span>slug de empresa registrada (opcional)</span>
+            <input type="text" name="subject_company_slug" maxlength="40"
+                   placeholder="banco-ejemplo">
+            <small class="muted">si la empresa está en la plataforma, la enlazamos para ofrecerle la compra.</small>
+        </label>
+
+        <label>
+            <span>título</span>
+            <input type="text" name="title" required maxlength="160"
+                   placeholder="ej: credenciales corporativas filtradas en brecha de terceros">
+        </label>
+
+        <div class="grid-2">
+            <label>
+                <span>categoría</span>
+                <select name="category">
+                    {% for c in categories %}
+                        <option value="{{ c.0 }}">{{ c.1 }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>criticidad</span>
+                <select name="criticality">
+                    {% for s in severities %}
+                        <option value="{{ s.0 }}"{% if s.0 == "medium" %} selected{% endif %}>{{ s.1 }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <label>
+            <span>resumen público <small class="muted">(teaser visible antes de comprar, mín 20 chars)</small></span>
+            <textarea name="summary" required rows="3"
+                      placeholder="Qué encontraste, sin revelar los detalles sensibles."></textarea>
+        </label>
+
+        <label>
+            <span>informe completo <small class="muted">(markdown, gated tras compra, mín 50 chars)</small></span>
+            <textarea name="body_md" required rows="10" data-easymde></textarea>
+        </label>
+
+        <div id="form-feedback" class="feedback"></div>
+
+        <button type="submit" class="btn-primary">enviar informe</button>
+        <a href="/osint/mine" class="muted small">cancelar</a>
+    </form>
+</section>
+{% endblock %}
