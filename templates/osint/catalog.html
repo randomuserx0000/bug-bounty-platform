@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}catálogo OSINT · {{ company_name }} · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>inteligencia OSINT sobre {{ company_name }}</h1>
+            <p class="muted">
+                informes que investigadores recopilaron sobre tu organización. Cómpralos
+                para remediarlos antes de que sean explotados.
+            </p>
+        </div>
+        <div class="kpi-mini">
+            <span class="muted small">escrow disponible</span>
+            <strong>{{ escrow_usd }}</strong>
+        </div>
+    </header>
+
+    {% if rows.is_empty() %}
+        <div class="empty">
+            <p>no hay informes OSINT disponibles sobre tu empresa por ahora.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>id</th><th>título</th><th>categoría</th><th>criticidad</th><th>estado</th><th>precio</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td><a href="/osint/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                    <td>{{ r.title }}</td>
+                    <td>{{ r.category_label }}</td>
+                    <td><span class="badge sev-{{ r.criticality }}">{{ r.criticality }}</span></td>
+                    <td><span class="badge state-{{ r.status }}">{{ r.status_label }}</span></td>
+                    <td>{{ r.resale_usd }}</td>
+                    <td><a href="/osint/{{ r.public_id }}" class="btn-link">ver</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/companies/{{ company_slug }}">← {{ company_name }}</a></p>
+</section>
+{% endblock %}

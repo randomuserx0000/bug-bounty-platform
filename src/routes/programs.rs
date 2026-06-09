@@ -20,7 +20,7 @@ use crate::domain::ids::UserId;
 use crate::domain::program::{ProgramStatus, ProgramVisibility};
 use crate::error::{AppError, AppResult};
 use crate::state::AppState;
-use crate::web::shared::{current_year, error_fragment, htmx_redirect_owned, slug_re};
+use crate::web::shared::{current_year, error_fragment, htmx_redirect_owned, severity_tier_views, slug_re};
 use crate::web::templates::{
     AssetRowView, ProgramNewTemplate, ProgramPublicCardView, ProgramShowTemplate,
     ProgramsPublicTemplate,
@@ -205,6 +205,7 @@ async fn new_form(
         handle: current.user.handle,
         company_slug: company.slug,
         company_name: company.display_name,
+        tiers: severity_tier_views(),
     })
 }
 

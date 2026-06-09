@@ -99,6 +99,12 @@ pub const PM_CREATE: &str = "payment_method.create";
 pub const PM_DELETE: &str = "payment_method.delete";
 pub const PM_SET_DEFAULT: &str = "payment_method.set_default";
 
+// OSINT (producto: venta de inteligencia)
+pub const OSINT_CREATE: &str = "osint.create";
+pub const OSINT_ACCEPT: &str = "osint.accept";
+pub const OSINT_REJECT: &str = "osint.reject";
+pub const OSINT_PURCHASE: &str = "osint.purchase";
+
 // Payouts / escrow (el flujo de dinero — los más críticos para auditar)
 pub const PAYOUT_CREATED_PENDING: &str = "payout.created_pending";
 pub const PAYOUT_CREATED_FAILED: &str = "payout.created_failed";

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}mis informes OSINT · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>mis informes OSINT</h1>
+            <p class="muted">inteligencia que has vendido a Escudo Digital, {{ handle }}.</p>
+        </div>
+        <a href="/osint/new" class="btn-primary">vender informe</a>
+    </header>
+
+    {% if rows.is_empty() %}
+        <div class="empty">
+            <p>todavía no has enviado informes OSINT.</p>
+            <p class="muted"><a href="/osint/new">envía tu primer informe</a> y empieza a monetizar tu investigación.</p>
+        </div>
+    {% else %}
+        <table class="data-table">
+            <thead>
+                <tr><th>id</th><th>título</th><th>empresa</th><th>categoría</th><th>criticidad</th><th>estado</th><th>tu pago</th></tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td><a href="/osint/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                    <td>{{ r.title }}</td>
+                    <td>{{ r.subject_name }}</td>
+                    <td>{{ r.category_label }}</td>
+                    <td><span class="badge sev-{{ r.criticality }}">{{ r.criticality }}</span></td>
+                    <td><span class="badge state-{{ r.status }}">{{ r.status_label }}</span></td>
+                    <td>{{ r.price_usd }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p class="muted small"><a href="/dashboard">← dashboard</a></p>
+</section>
+{% endblock %}

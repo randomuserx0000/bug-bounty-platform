@@ -196,6 +196,20 @@ pub struct ProgramsPublicTemplate {
     pub handle: String,
 }
 
+/// Una fila de la tabla de precios base de referencia. Reutilizada por la home
+/// (display) y el form de programa (defaults + hint). Derivada de
+/// `domain::pricing`.
+pub struct PriceTierView {
+    pub emoji: String,
+    pub label: String,
+    /// Rango formateado, p.ej. "$100 – $300".
+    pub range: String,
+    /// Valor por defecto en USD (extremo inferior) para pre-rellenar el form.
+    pub default_usd: i32,
+    /// Clave estable (low/medium/high/critical).
+    pub key: String,
+}
+
 #[derive(Template)]
 #[template(path = "home.html")]
 pub struct HomeTemplate {
@@ -205,6 +219,10 @@ pub struct HomeTemplate {
     /// Duplicados para que el marquee CSS haga loop continuo.
     pub ally_ids: Vec<i32>,
     pub handle: String,
+    /// Tramos de precio por severidad (tabla de referencia).
+    pub pricing: Vec<PriceTierView>,
+    /// Precio base de un informe OSINT en USD ($50).
+    pub osint_base_usd: i32,
 }
 
 #[derive(Template)]
@@ -214,6 +232,8 @@ pub struct ProgramNewTemplate {
     pub handle: String,
     pub company_slug: String,
     pub company_name: String,
+    /// Tramos de precio recomendados, para pre-rellenar y guiar los montos.
+    pub tiers: Vec<PriceTierView>,
 }
 
 pub struct AssetRowView {
@@ -385,6 +405,85 @@ pub struct AdminAuditTemplate {
     pub action_prefix: String,
     pub target_type: String,
     pub target_id: String,
+}
+
+// ---------- osint ----------
+
+/// Fila de un informe OSINT en listados (mine / review / catálogo).
+pub struct OsintRowView {
+    pub public_id: String,
+    pub title: String,
+    pub subject_name: String,
+    pub category_label: String,
+    pub criticality: String,
+    pub status: String,
+    pub status_label: String,
+    /// Lo que gana el investigador ($50 base).
+    pub price_usd: String,
+    /// Lo que paga la empresa (vacío hasta que el admin lo fija).
+    pub resale_usd: String,
+    pub created: String,
+}
+
+#[derive(Template)]
+#[template(path = "osint/new.html")]
+pub struct OsintNewTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub categories: Vec<(String, String)>,
+    pub severities: Vec<(String, String)>,
+    pub osint_base_usd: i32,
+}
+
+#[derive(Template)]
+#[template(path = "osint/mine.html")]
+pub struct OsintMineTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub rows: Vec<OsintRowView>,
+}
+
+#[derive(Template)]
+#[template(path = "osint/review.html")]
+pub struct OsintReviewTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub rows: Vec<OsintRowView>,
+}
+
+#[derive(Template)]
+#[template(path = "osint/catalog.html")]
+pub struct OsintCatalogTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub company_slug: String,
+    pub company_name: String,
+    pub escrow_usd: String,
+    pub rows: Vec<OsintRowView>,
+}
+
+#[derive(Template)]
+#[template(path = "osint/show.html")]
+pub struct OsintShowTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub public_id: String,
+    pub title: String,
+    pub subject_name: String,
+    pub category_label: String,
+    pub criticality: String,
+    pub status: String,
+    pub status_label: String,
+    pub summary_html: String,
+    pub body_html: String,
+    pub can_see_body: bool,
+    pub price_usd: String,
+    pub resale_usd: String,
+    /// Admin de la plataforma: puede aceptar/rechazar.
+    pub can_review: bool,
+    /// Miembro de la empresa-objetivo: puede comprar.
+    pub can_buy: bool,
+    pub created: String,
 }
 
 #[derive(Template)]

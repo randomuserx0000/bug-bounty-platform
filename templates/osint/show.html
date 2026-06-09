@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ public_id }} · {{ title }} · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <p class="muted small"><code>{{ public_id }}</code> · informe OSINT</p>
+            <h1>{{ title }}</h1>
+            <p class="muted">
+                empresa objetivo: <strong>{{ subject_name }}</strong> ·
+                categoría: {{ category_label }} ·
+                criticidad: <span class="badge sev-{{ criticality }}">{{ criticality }}</span> ·
+                estado: <span class="badge state-{{ status }}">{{ status_label }}</span>
+            </p>
+        </div>
+    </header>
+
+    <div class="osint-detail">
+        <h3>resumen</h3>
+        <div class="prose">{{ summary_html|safe }}</div>
+
+        {% if can_see_body %}
+            <h3>informe completo</h3>
+            <div class="prose">{{ body_html|safe }}</div>
+        {% else %}
+            <div class="locked">
+                <p>🔒 El informe completo está disponible tras la compra.</p>
+                {% if !resale_usd.is_empty() %}
+                    <p class="muted">precio: <strong>{{ resale_usd }}</strong> · pago al investigador: {{ price_usd }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# ---------- acciones ---------- #}
+    {% if can_review %}
+        <div class="action-panel">
+            <h3>revisión (admin)</h3>
+            <form hx-post="/osint/{{ public_id }}/accept" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+                <label>
+                    <span>precio de reventa a la empresa (USD)</span>
+                    <input type="number" name="resale_usd" min="1" required placeholder="200">
+                    <small class="muted">el investigador cobra {{ price_usd }}; el margen es ingreso de la plataforma.</small>
+                </label>
+                <button type="submit" class="btn-primary">aceptar y publicar</button>
+            </form>
+            <form hx-post="/osint/{{ public_id }}/reject" hx-target="#form-feedback" hx-swap="innerHTML" class="inline" style="margin-top:8px;">
+                <button type="submit" class="btn-link">rechazar</button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if can_buy %}
+        <div class="action-panel">
+            <h3>comprar este informe</h3>
+            <p class="muted">precio: <strong>{{ resale_usd }}</strong>. Se debitará del escrow de tu empresa.</p>
+            <form hx-post="/osint/{{ public_id }}/buy" hx-target="#form-feedback" hx-swap="innerHTML" class="inline">
+                <button type="submit" class="btn-primary">comprar y desbloquear</button>
+            </form>
+        </div>
+    {% endif %}
+
+    <div id="form-feedback" class="feedback"></div>
+
+    <p class="muted small"><a href="/osint/mine">← mis informes</a></p>
+</section>
+{% endblock %}

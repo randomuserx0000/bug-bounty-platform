@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}nuevo programa · bugbounty.ve{% endblock %}
+{% block title %}nuevo programa · Escudo Digital{% endblock %}
 
 {% block content %}
 <section class="page narrow">
@@ -49,12 +49,15 @@
         </div>
 
         <fieldset>
-            <legend class="muted small">bounty en USD (opcional, deja vacío si no aplica)</legend>
+            <legend class="muted small">bounty en USD — precios base sugeridos (puedes ajustarlos o dejar vacío)</legend>
             <div class="grid-4">
-                <label><span>low</span><input type="number" name="bounty_low" min="0"></label>
-                <label><span>medium</span><input type="number" name="bounty_medium" min="0"></label>
-                <label><span>high</span><input type="number" name="bounty_high" min="0"></label>
-                <label><span>critical</span><input type="number" name="bounty_critical" min="0"></label>
+                {% for t in tiers %}
+                <label>
+                    <span>{{ t.emoji }} {{ t.label }}</span>
+                    <input type="number" name="bounty_{{ t.key }}" min="0" value="{{ t.default_usd }}">
+                    <small class="muted">rango {{ t.range }}</small>
+                </label>
+                {% endfor %}
             </div>
         </fieldset>
 

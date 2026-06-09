@@ -558,6 +558,60 @@ form.inline { display: inline; margin: 0; }
 }
 .card-box h3 { margin-top: 0; }
 
+/* Precios base de referencia (home) */
+.price-grid {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    margin-top: 8px;
+}
+.price-card {
+    background: linear-gradient(180deg, #fff, #fafcfe);
+    border: 1px solid var(--line2);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+}
+.price-card.price-osint {
+    border-color: var(--brand);
+    background: linear-gradient(180deg, #fff, #f3fbfe);
+}
+.price-emoji { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+.price-label {
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; font-size: .8rem; color: var(--slate2);
+}
+.price-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem; font-weight: 600; color: var(--ink);
+    margin: 6px 0 4px;
+}
+.price-note { font-size: .72rem; color: var(--slate2); }
+
+/* Detalle OSINT */
+.osint-detail { margin: 20px 0; }
+.osint-detail h3 { margin: 22px 0 8px; }
+.prose { line-height: 1.6; }
+.prose :first-child { margin-top: 0; }
+.prose code { font-family: 'JetBrains Mono', monospace; font-size: .9em; }
+.locked {
+    border: 1px dashed var(--line2);
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+    background: var(--mist);
+}
+.action-panel {
+    border: 1px solid var(--line2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    background: linear-gradient(180deg, #fff, #fafcfe);
+}
+.action-panel h3 { margin-top: 0; }
+.kpi-mini { text-align: right; }
+.kpi-mini strong { display: block; font-size: 1.25rem; }
+
 /* Card grid (programas públicos) */
 .card-grid {
     display: grid; gap: 18px;
@@ -1643,6 +1697,14 @@ form.inline { display: inline; margin: 0; }
 [data-theme="dark"] .user-menu-panel .user-menu-logout:hover {
     background: var(--line2);
     color: var(--brand-500);
+}
+
+[data-theme="dark"] .price-card { background: #111827; border-color: var(--line2); }
+[data-theme="dark"] .action-panel { background: #111827; border-color: var(--line2); }
+[data-theme="dark"] .locked { background: #111827; border-color: var(--line2); }
+[data-theme="dark"] .price-card.price-osint {
+    border-color: var(--brand-500);
+    background: #0f1d24;
 }
 
 [data-theme="dark"] .program-card {

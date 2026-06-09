@@ -1,7 +1,10 @@
-# bugbounty-platform
+# Escudo Digital
 
-Plataforma regional de **bug bounty** para Venezuela y LATAM, vertical de la
-red [REDSEG](https://www.redseg.org). Stack: **Rust + Axum + Postgres + MinIO**,
+**Escudo Digital** — plataforma regional de **bug bounty** e **inteligencia OSINT**
+para Venezuela y LATAM, vertical de la red [REDSEG](https://www.redseg.org).
+No solo recibe reportes de vulnerabilidades: opera además un marketplace donde
+investigadores venden informes OSINT sobre empresas y la plataforma los revende a
+las empresas afiliadas para remediarlos. Stack: **Rust + Axum + Postgres + MinIO**,
 templates Askama con HTMX, sin frameworks de JS frontend.
 
 ## Qué incluye el MVP
@@ -13,6 +16,25 @@ templates Askama con HTMX, sin frameworks de JS frontend.
 - **Payouts** con escrow prefondeado: hook automático en `resolved`, débito en `pending`, marcado manual con `tx_ref`, reembolso si falla.
 - **Audit log** append-only de cada acción sensible (auth, mutaciones, dinero).
 - **Listado público** de programas en `/` sin necesidad de registro.
+- **Producto OSINT** (entidad separada): investigadores venden informes OSINT
+  sobre empresas (precio base **$50**); un admin los revisa y fija el precio de
+  reventa; la empresa-objetivo los compra desde su catálogo (`/manage/:slug/osint`),
+  debitando su escrow. El margen (reventa − base) es ingreso de la plataforma.
+- **Precios base de referencia** (`src/domain/pricing.rs`): OSINT $50 ·
+  low $100–300 · medium $400–600 · high $700–900 · critical $1.000–2.000.
+  Se muestran en la home y pre-rellenan el form de programa.
+
+### Producto OSINT — estado y límites (v1)
+
+- Flujo completo: enviar (`/osint/new`) → revisar (`/osint/review`, admin) →
+  aceptar/rechazar → comprar (empresa). Gating del cuerpo: solo autor, admin o
+  la empresa que compró ven el informe completo.
+- **Límite v1**: el pago al investigador se registra en `osint_reports`
+  (`price_cents`) y se notifica por email; el desembolso real se gestiona
+  operativamente. La tabla `payouts` ya está preparada (columna `osint_report_id`)
+  para integrarlo en una 2ª iteración.
+- **Formación (OSINT Academy)**: diseñada en [docs/osint-academy.md](docs/osint-academy.md),
+  aún no implementada.
 
 ## UI / UX (estado actual)
 
