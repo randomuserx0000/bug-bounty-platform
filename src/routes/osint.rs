@@ -228,10 +228,12 @@ async fn show(
 
     // Solo el autor, un admin, o la empresa que compró pueden leer el cuerpo.
     let can_see_body = is_author || is_admin || (r.status.is_sold() && manages_buyer);
-    // Si no es ninguno de los anteriores ni gestiona la empresa-objetivo, y el
-    // informe no está aceptado/vendido, ocultamos su existencia.
+    // La empresa-objetivo solo ve el informe (resumen + CTA comprar) cuando ya
+    // está LISTADO (accepted/sold). Antes de eso (submitted/in_review/rejected)
+    // no debe siquiera enterarse de que existe inteligencia pendiente sobre ella.
     let is_listed = matches!(r.status, OsintStatus::Accepted | OsintStatus::Sold);
-    if !can_see_body && !manages_subject && !(is_listed && is_admin) {
+    let subject_can_view = manages_subject && is_listed;
+    if !can_see_body && !subject_can_view {
         return Err(AppError::NotFound);
     }
 
