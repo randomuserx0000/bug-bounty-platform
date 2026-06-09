@@ -55,7 +55,6 @@
    ============================================================ #}
 <section style="margin-top: 64px;">
     <div style="text-align: center; margin-bottom: 24px;">
-        <span class="kbd">EL ARGUMENTO</span>
         <h2 style="margin-top: 12px;">Pentest tradicional vs. bug bounty</h2>
         <p class="muted" style="max-width: 620px; margin: 8px auto 0;">
             El pentest sigue teniendo sentido para cumplir normas o auditar antes de un lanzamiento.
@@ -91,48 +90,10 @@
                 <li><span class="check">✓</span> Cubre web, mobile, infra, firmware, hardware y radio</li>
             </ul>
             <footer>
-                <span class="muted small">Tú fijas el monto; abajo tienes nuestros precios base de referencia.</span>
+                <span class="muted small">Tú fijas el monto por severidad; pagas solo por hallazgos válidos.</span>
             </footer>
         </div>
     </div>
-</section>
-
-{# ============================================================
-   PRECIOS BASE — referencia de montos por severidad + OSINT
-   ============================================================ #}
-<section style="margin-top: 64px;">
-    <div style="text-align: center; margin-bottom: 24px;">
-        <span class="kbd">PRECIOS BASE</span>
-        <h2 style="margin-top: 12px;">Cuánto vale cada hallazgo</h2>
-        <p class="muted" style="max-width: 640px; margin: 8px auto 0;">
-            Precios de referencia con los precios más bajos del mercado. Las empresas
-            pagan por vulnerabilidad validada; los investigadores también pueden vendernos
-            <strong>informes OSINT</strong> sobre empresas y nosotros los revendemos para
-            remediarlos.
-        </p>
-    </div>
-
-    <div class="price-grid">
-        <div class="price-card price-osint">
-            <span class="price-emoji">⚫</span>
-            <div class="price-label">Informe OSINT</div>
-            <div class="price-range">${{ osint_base_usd }}</div>
-            <div class="price-note">inteligencia sobre empresas · precio base</div>
-        </div>
-        {% for t in pricing %}
-        <div class="price-card">
-            <span class="price-emoji">{{ t.emoji }}</span>
-            <div class="price-label">{{ t.label }}</div>
-            <div class="price-range">{{ t.range }}</div>
-            <div class="price-note">por vulnerabilidad validada</div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <p class="muted small" style="text-align:center; margin-top:16px;">
-        ¿Empiezas en OSINT? Te formamos desde Escudo Digital y sus aliados, y luego
-        trabajas en la plataforma vendiendo tus hallazgos.
-    </p>
 </section>
 
 {# ============================================================
@@ -159,6 +120,44 @@
             <h3 style="margin-top:10px;">Triage y pago directo</h3>
             <p class="muted">Validas el reporte, fijas el bounty, y el dinero sale de tu escrow prefondeado al método que elija el researcher (USDT, banco USD o VES, PayPal).</p>
         </div>
+    </div>
+</section>
+
+{# ============================================================
+   INVESTIGADORES — incentivo a la comunidad de hackers
+   ============================================================ #}
+<section class="researcher-cta" style="margin-top: 72px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">PARA HACKERS E INVESTIGADORES</span>
+        <h2 style="margin-top: 12px;">Tu talento, recompensado</h2>
+        <p class="muted" style="max-width: 640px; margin: 8px auto 0;">
+            No necesitas un empleo formal para vivir de la ciberseguridad. En Escudo Digital
+            conviertes tus hallazgos en ingresos reales, con pagos rápidos y respaldo de la red REDSEG.
+        </p>
+    </div>
+
+    <div class="card-grid">
+        <div class="card-box">
+            <h3 style="margin-top:0;">🐛 Reporta vulnerabilidades</h3>
+            <p class="muted">Elige un programa público, encuentra fallos reales y cobra por cada hallazgo válido. Tú decides en qué empresas cazar.</p>
+        </div>
+        <div class="card-box">
+            <h3 style="margin-top:0;">🔎 Vende inteligencia OSINT</h3>
+            <p class="muted">¿Encontraste credenciales filtradas o exposición de una empresa? Véndenos tu informe OSINT y lo monetizamos por ti.</p>
+        </div>
+        <div class="card-box">
+            <h3 style="margin-top:0;">🎓 Fórmate desde cero</h3>
+            <p class="muted">¿Empiezas? Te capacitamos en OSINT junto a los aliados de REDSEG y, al certificarte, ya puedes vender tus hallazgos en la plataforma.</p>
+        </div>
+        <div class="card-box">
+            <h3 style="margin-top:0;">💸 Cobra a tu manera</h3>
+            <p class="muted">Pagos en USDT, banco USD o VES, PayPal y más. Tú eliges el método; nosotros nos encargamos del resto.</p>
+        </div>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 24px;">
+        <a class="btn-primary" href="/signup">Unirme como investigador →</a>
+        <a class="btn-link" href="/programs" style="padding: 10px 16px; border: 1px solid var(--line2);">Ver programas para cazar</a>
     </div>
 </section>
 

@@ -219,10 +219,6 @@ pub struct HomeTemplate {
     /// Duplicados para que el marquee CSS haga loop continuo.
     pub ally_ids: Vec<i32>,
     pub handle: String,
-    /// Tramos de precio por severidad (tabla de referencia).
-    pub pricing: Vec<PriceTierView>,
-    /// Precio base de un informe OSINT en USD ($50).
-    pub osint_base_usd: i32,
 }
 
 #[derive(Template)]

@@ -8,7 +8,7 @@ use crate::auth::MaybeUser;
 use crate::db;
 use crate::error::AppResult;
 use crate::state::AppState;
-use crate::web::shared::{current_year, severity_tier_views};
+use crate::web::shared::current_year;
 use crate::web::templates::{HomeTemplate, ProgramPublicCardView};
 
 pub async fn index(
@@ -40,8 +40,6 @@ pub async fn index(
         programs: cards,
         ally_ids,
         handle: user.map(|u| u.handle).unwrap_or_default(),
-        pricing: severity_tier_views(),
-        osint_base_usd: crate::domain::pricing::OSINT_BASE_CENTS / 100,
     })
 }
 
