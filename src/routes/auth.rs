@@ -214,7 +214,16 @@ async fn logout(
     }
     let removal = Cookie::build((SESSION_COOKIE, "")).path("/").build();
     let jar = jar.remove(removal);
-    Ok(redirect_response(jar, "/login"))
+    // El form de logout es un POST normal (no HTMX), así que devolvemos un
+    // redirect HTTP real (303 + Location) que el navegador sigue. Usar el
+    // header HX-Redirect aquí dejaría la página en blanco (el navegador no lo
+    // interpreta y el cuerpo va vacío).
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        axum::http::header::LOCATION,
+        HeaderValue::from_static("/login"),
+    );
+    Ok((StatusCode::SEE_OTHER, headers, jar, "").into_response())
 }
 
 // ---------- helpers ----------
