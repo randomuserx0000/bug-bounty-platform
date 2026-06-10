@@ -20,10 +20,10 @@
     {# EasyMDE para los textareas[data-easymde]. #}
     <link rel="stylesheet" href="https://unpkg.com/easymde@2.18.0/dist/easymde.min.css">
     <script defer src="https://unpkg.com/easymde@2.18.0/dist/easymde.min.js"></script>
-    {# Font Awesome 4.7 para los iconos de la toolbar de EasyMDE. Lo cargamos
-       nosotros (autoDownloadFontAwesome=false) porque el CDN por defecto de
-       EasyMDE (maxcdn) está descontinuado. cdnjs está permitido en la CSP. #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {# Font Awesome 4.7 para los iconos de la toolbar de EasyMDE. Autohospedado
+       en static/ (autoDownloadFontAwesome=false): el CDN por defecto de EasyMDE
+       (maxcdn) está descontinuado y así no dependemos de orígenes externos. #}
+    <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="/static/app.css">
     <script>

@@ -74,8 +74,8 @@ async fn security_headers(req: Request, next: Next) -> Response {
         HeaderValue::from_static(
             "default-src 'self'; \
              script-src 'self' 'unsafe-inline' https://unpkg.com; \
-             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; \
-             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; \
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; \
+             font-src 'self' https://fonts.gstatic.com; \
              img-src 'self' data:; \
              connect-src 'self'; \
              frame-ancestors 'none'; \
