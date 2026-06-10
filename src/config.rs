@@ -52,6 +52,12 @@ pub struct Config {
     pub google_client_id: String,
     #[serde(default)]
     pub google_client_secret: SecretString,
+
+    /// Correo que recibe el aviso cuando entra un nuevo informe OSINT a revisar
+    /// (env `OSINT_NOTIFY_EMAIL`). Vacío = no se envía aviso (el informe igual
+    /// queda en BD + audit log).
+    #[serde(default)]
+    pub osint_notify_email: String,
 }
 
 
@@ -83,6 +89,12 @@ impl Config {
 
     pub fn cookie_secure(&self) -> bool {
         self.public_url.starts_with("https://")
+    }
+
+    /// Dirección de aviso de OSINT, si está configurada y no vacía.
+    pub fn osint_notify_email(&self) -> Option<&str> {
+        let e = self.osint_notify_email.trim();
+        if e.is_empty() { None } else { Some(e) }
     }
 
     pub fn google_oauth_enabled(&self) -> bool {

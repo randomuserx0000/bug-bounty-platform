@@ -156,6 +156,35 @@ async fn create(
             "subject_name": form.subject_name.trim(),
         }))).await;
 
+    // Aviso al buzón OSINT de la plataforma (si está configurado). Best-effort:
+    // un fallo de email no debe tumbar el envío, que ya quedó en BD.
+    if let Some(to) = state.cfg.osint_notify_email() {
+        let body = format!(
+            "Nuevo informe OSINT para revisar.\n\n\
+             ID: {public_id}\n\
+             Investigador: {handle}\n\
+             Empresa objetivo: {subject}\n\
+             Categoría: {category}\n\
+             Criticidad: {crit}\n\
+             Título: {title}\n\n\
+             Resumen:\n{summary}\n\n\
+             Revisar: {url}/osint/{public_id}\n",
+            handle = current.user.handle,
+            subject = form.subject_name.trim(),
+            category = category.label(),
+            crit = criticality.as_str(),
+            title = form.title.trim(),
+            summary = form.summary.trim(),
+            url = state.cfg.public_url,
+        );
+        let _ = state.email.send(&crate::email::Email {
+            to: to.to_string(),
+            subject: format!("[OSINT] nuevo informe {public_id} sobre {}", form.subject_name.trim()),
+            text_body: body.clone(),
+            html_body: body.replace('\n', "<br>"),
+        }).await;
+    }
+
     Ok(htmx_redirect_owned(format!("/osint/{public_id}")))
 }
 
