@@ -60,6 +60,16 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
     expose:
       - "8080"
+    # Healthcheck del servicio app: clave para que Coolify/Traefik NO enrute
+    # tráfico al contenedor nuevo hasta que /readyz responda 200 (BD accesible,
+    # migraciones aplicadas). Reduce el "no available server" en cada redeploy.
+    # `start_period` amplio para dar margen a conectar BD + migrar.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/readyz"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
     # Coolify enrutará tráfico aquí. Si lo levantás manualmente sin Coolify,
     # descomentá el ports: ["8080:8080"] para acceder desde el host.
     # ports:
