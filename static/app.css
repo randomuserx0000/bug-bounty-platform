@@ -612,20 +612,25 @@ form.inline { display: inline; margin: 0; }
 .kpi-mini { text-align: right; }
 .kpi-mini strong { display: block; font-size: 1.25rem; }
 
-/* Selector de tipo de cuenta (signup) */
+/* Selector de tipo de cuenta (signup).
+   Nota: se usa selector compuesto `.account-type .radio-card` para ganar en
+   especificidad a `.auth-card label { display:block }` y forzar el layout flex. */
 .account-type { border: 0; padding: 0; margin: 0 0 18px; }
 .account-type legend { font-size: .9rem; color: var(--slate2); margin-bottom: 8px; padding: 0; }
-.radio-card {
-    display: flex; align-items: flex-start; gap: 10px;
+.account-type .radio-card {
+    display: flex; flex-direction: row; align-items: flex-start; gap: 10px;
     border: 1px solid var(--line2); border-radius: 10px;
-    padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+    padding: 12px 14px; margin-bottom: 10px; cursor: pointer;
 }
-.radio-card input { margin-top: 3px; }
-.radio-card span { display: flex; flex-direction: column; }
-.radio-card small { color: var(--slate2); font-size: .8rem; }
-.radio-card:has(input:checked) { border-color: var(--brand); background: var(--brand-50); }
-[data-theme="dark"] .radio-card { background: #111827; border-color: var(--line2); }
-[data-theme="dark"] .radio-card:has(input:checked) { border-color: var(--brand-500); }
+.account-type .radio-card input { margin-top: 3px; width: auto; flex: 0 0 auto; }
+.account-type .radio-card > span {
+    display: flex; flex-direction: column; gap: 3px; margin-bottom: 0;
+}
+.account-type .radio-card strong { font-weight: 600; color: var(--ink); }
+.account-type .radio-card small { color: var(--slate2); font-size: .82rem; line-height: 1.35; }
+.account-type .radio-card:has(input:checked) { border-color: var(--brand); background: var(--brand-50); }
+[data-theme="dark"] .account-type .radio-card { background: #111827; border-color: var(--line2); }
+[data-theme="dark"] .account-type .radio-card:has(input:checked) { border-color: var(--brand-500); background: #0f1d24; }
 
 /* Card grid (programas públicos) */
 .card-grid {
