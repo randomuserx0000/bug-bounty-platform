@@ -20,6 +20,10 @@
     {# EasyMDE para los textareas[data-easymde]. #}
     <link rel="stylesheet" href="https://unpkg.com/easymde@2.18.0/dist/easymde.min.css">
     <script defer src="https://unpkg.com/easymde@2.18.0/dist/easymde.min.js"></script>
+    {# Font Awesome 4.7 para los iconos de la toolbar de EasyMDE. Lo cargamos
+       nosotros (autoDownloadFontAwesome=false) porque el CDN por defecto de
+       EasyMDE (maxcdn) está descontinuado. cdnjs está permitido en la CSP. #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="/static/app.css">
     <script>
@@ -117,7 +121,7 @@
                 var editor = new EasyMDE({
                     element: ta,
                     spellChecker: false,
-                    autoDownloadFontAwesome: true,
+                    autoDownloadFontAwesome: false,
                     minHeight: '100px',
                     status: false,
                     toolbar: ['bold','italic','heading','|','code','quote','unordered-list','ordered-list','|','link','preview','|','guide'],
