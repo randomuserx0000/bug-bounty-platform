@@ -56,10 +56,11 @@ RUN cargo build --release --bin bugbounty
 # -----------------------------------------------------------------------------
 FROM debian:bookworm-slim AS runtime
 
-# Solo necesitamos ca-certificates para TLS saliente (Google OAuth, MinIO, etc.).
+# ca-certificates para TLS saliente (Google OAuth, MinIO, etc.) y curl para el
+# HEALTHCHECK (necesario para el deploy zero-downtime de Coolify).
 # No hace falta libpq porque sqlx-postgres habla protocolo nativo con rustls.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
+    ca-certificates curl \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -u 1001 -U -m -s /sbin/nologin bb
 
@@ -78,7 +79,13 @@ ENV BIND_ADDR=0.0.0.0:8080 \
 
 EXPOSE 8080
 
-# Sin HEALTHCHECK nativo (debian-slim no trae wget/curl). Coolify hace
-# probes HTTP a /healthz y /readyz por sí mismo desde su UI.
+# HEALTHCHECK del contenedor: Coolify lo usa para el deploy zero-downtime —
+# mantiene el contenedor viejo sirviendo hasta que el nuevo reporte `healthy`,
+# evitando el "no available server" durante el redeploy.
+# - /readyz devuelve 200 solo si la BD está accesible (migraciones ya corrieron
+#   antes de bindear el puerto en main.rs).
+# - start-period amplio para dar tiempo a conectar BD + aplicar migraciones.
+HEALTHCHECK --interval=15s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:8080/readyz || exit 1
 
 CMD ["bugbounty"]
