@@ -26,9 +26,11 @@ informe **antes de ser aceptado** (submitted/in_review/rejected), revelando su
 existencia y el teaser. **Fix aplicado**: el sujeto solo puede ver el informe
 cuando está `accepted`/`sold` (`subject_can_view = manages_subject && is_listed`).
 
-### H-2 (recomendación) — Sin rate-limit en envío de OSINT
-`POST /osint` no tiene rate-limit (el `GovernorLayer` solo cubre `/auth`). Un usuario
-podría spamear informes. **Sugerencia**: cuota por usuario/día o extender el rate-limit.
+### H-2 (corregido) — Sin rate-limit en envío de OSINT
+`POST /osint` no tenía rate-limit. **Fix aplicado**: `GovernorLayer` por IP solo sobre
+ese POST (ráfaga de 5, luego 1 cada 30s) vía un sub-router en `osint::router()`; las
+vistas GET y el resto de acciones no se ven afectadas. Mejora futura posible: cuota
+por usuario/día (el governor es por IP).
 
 ### H-3 (recomendación) — CSRF solo por `SameSite=Lax`
 Es defensa suficiente para el MVP, pero no defensa en profundidad. **Sugerencia**:
