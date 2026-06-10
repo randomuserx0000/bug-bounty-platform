@@ -234,12 +234,13 @@ async fn callback(
         .metadata(serde_json::json!({ "via": "google_oauth" })))
         .await;
 
+    // Cookie de sesión (sin expires/max-age): se borra al cerrar el navegador.
+    // El límite absoluto lo da `expires_at` de la fila en BD.
     let session_cookie = Cookie::build((SESSION_COOKIE, cookie))
         .path("/")
         .http_only(true)
         .secure(state.cfg.cookie_secure())
         .same_site(SameSite::Lax)
-        .expires(expires)
         .build();
     let jar = jar.add(session_cookie);
 

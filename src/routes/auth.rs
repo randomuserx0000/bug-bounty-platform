@@ -245,12 +245,14 @@ async fn issue_session(
     .await?;
     let _ = db::users::touch_last_login(&state.db, *user_id).await;
 
+    // SIN `.expires()`/max-age a propósito: cookie de **sesión**, el navegador
+    // la borra al cerrarse. La sesión en BD sí tiene `expires_at` (cap de 30d)
+    // como límite absoluto server-side. (`expires` se usa solo para esa fila.)
     Ok(Cookie::build((SESSION_COOKIE, token))
         .path("/")
         .http_only(true)
         .secure(state.cfg.cookie_secure())
         .same_site(SameSite::Lax)
-        .expires(expires)
         .build())
 }
 

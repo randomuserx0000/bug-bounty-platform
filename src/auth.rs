@@ -31,8 +31,10 @@ use crate::state::AppState;
 /// Nombre de la cookie de sesión.
 pub const SESSION_COOKIE: &str = "bb_session";
 
-/// Vida útil de una sesión.
-pub const SESSION_TTL: Duration = Duration::days(30);
+/// Vida útil máxima (absoluta) de una sesión server-side. La cookie en sí es
+/// de sesión (muere al cerrar el navegador); este es el tope de respaldo por si
+/// el navegador la restaura. Corto a propósito para una plataforma sensible.
+pub const SESSION_TTL: Duration = Duration::hours(12);
 
 /// Hash precomputado para `verify_password_or_dummy`. Se calcula una vez
 /// al primer uso y se cachea estáticamente. El password "irrelevante" no
