@@ -78,6 +78,7 @@ async fn new_form(
     Ok(OsintNewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         categories: OsintCategory::all()
             .iter()
             .map(|c| (c.as_str().to_string(), c.label().to_string()))
@@ -200,6 +201,7 @@ async fn mine(
     Ok(OsintMineTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         rows: rows.iter().map(row_view).collect(),
     })
 }
@@ -213,6 +215,7 @@ async fn review(
     Ok(OsintReviewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         rows: rows.iter().map(row_view).collect(),
     })
 }
@@ -236,6 +239,7 @@ async fn catalog(
     Ok(OsintCatalogTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         company_name: company.display_name,
         escrow_usd: format!("${:.2}", escrow as f64 / 100.0),
@@ -293,6 +297,7 @@ async fn show(
     Ok(OsintShowTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         public_id: r.public_id.clone(),
         title: r.title.clone(),
         subject_name: r.subject_name.clone(),

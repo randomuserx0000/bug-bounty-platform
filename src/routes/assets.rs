@@ -61,6 +61,7 @@ async fn new_form(
     Ok(AssetNewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug,
         program_slug: program.slug,
         program_name: program.name,

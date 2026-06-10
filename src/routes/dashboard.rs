@@ -1,9 +1,10 @@
-//! Dashboard del researcher. Resume su actividad (KPIs, action items,
-//! reports recientes, payouts recientes, programas destacados). Alineado
-//! con el flujo de HackerOne/Intigriti/Bugcrowd.
+//! Dashboard post-login, ramificado por rol:
+//! - **researcher** → resumen de caza (KPIs, action items, reports, payouts, programas).
+//! - **company** (o staff) → sus empresas con escrow, programas y payouts pendientes.
+//! - **admin** → panel de plataforma (revisión OSINT, audit).
 
 use axum::extract::State;
-use axum::response::IntoResponse;
+use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::Router;
 use time::format_description::well_known::Rfc3339;
@@ -14,30 +15,35 @@ use crate::domain::ids::UserId;
 use crate::error::AppResult;
 use crate::state::AppState;
 use crate::web::templates::{
-    DashboardAction, DashboardPayoutRow, DashboardProgramCard, DashboardReportRow,
-    DashboardTemplate,
+    AdminDashboardTemplate, CompanyDashCard, CompanyDashboardTemplate, DashboardAction,
+    DashboardPayoutRow, DashboardProgramCard, DashboardReportRow, DashboardTemplate,
 };
 
 pub fn router() -> Router<AppState> {
     Router::new().route("/dashboard", get(index))
 }
 
-async fn index(
-    State(state): State<AppState>,
-    current: CurrentUser,
-) -> AppResult<impl IntoResponse> {
+async fn index(State(state): State<AppState>, current: CurrentUser) -> AppResult<Response> {
+    match current.user.role.as_str() {
+        "company" | "triager" => company_dashboard(&state, current).await,
+        "admin" => admin_dashboard(&state, current).await,
+        _ => researcher_dashboard(&state, current).await,
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Researcher
+// ----------------------------------------------------------------------------
+
+async fn researcher_dashboard(state: &AppState, current: CurrentUser) -> AppResult<Response> {
     let user_id = UserId::from(current.user.id);
     let data = db::dashboard::load_for_researcher(&state.db, user_id).await?;
 
     let valid_rate = if data.kpi.reports_total > 0 {
-        format!(
-            "{}%",
-            (data.kpi.reports_valid * 100 / data.kpi.reports_total).max(0)
-        )
+        format!("{}%", (data.kpi.reports_valid * 100 / data.kpi.reports_total).max(0))
     } else {
         "—".into()
     };
-
     let rank_label = match data.kpi.rank_pct {
         Some(p) if p > 0.0 => format!("Top {:.0}%", p),
         _ => "—".into(),
@@ -45,6 +51,7 @@ async fn index(
 
     Ok(DashboardTemplate {
         year: time::OffsetDateTime::now_utc().year(),
+        account_role: current.user.role.clone(),
         handle: current.user.handle,
         role: current.user.role,
         kpi_reports_total: data.kpi.reports_total,
@@ -57,11 +64,7 @@ async fn index(
         action_items: data
             .action_items
             .into_iter()
-            .map(|a| DashboardAction {
-                kind: a.kind.to_string(),
-                message: a.message,
-                href: a.href,
-            })
+            .map(|a| DashboardAction { kind: a.kind.to_string(), message: a.message, href: a.href })
             .collect(),
         recent_reports: data
             .recent_reports
@@ -95,7 +98,75 @@ async fn index(
                 bounty_max_usd: p.bounty_max_usd,
             })
             .collect(),
-    })
+    }
+    .into_response())
+}
+
+// ----------------------------------------------------------------------------
+// Company
+// ----------------------------------------------------------------------------
+
+async fn company_dashboard(state: &AppState, current: CurrentUser) -> AppResult<Response> {
+    use crate::domain::payout::PayoutStatus;
+    let user_id = UserId::from(current.user.id);
+    let companies = db::companies::list_for_user(&state.db, user_id).await?;
+
+    let mut cards = Vec::with_capacity(companies.len());
+    for (c, role) in companies {
+        let escrow = db::companies::escrow_balance(&state.db, c.id).await.unwrap_or(0);
+        let programs_count = db::programs::list_for_company(&state.db, c.id)
+            .await
+            .map(|p| p.len())
+            .unwrap_or(0);
+        let pending_payouts = db::payouts::list_for_company(&state.db, c.id)
+            .await
+            .map(|ps| {
+                ps.iter()
+                    .filter(|p| {
+                        matches!(
+                            p.status,
+                            PayoutStatus::Pending | PayoutStatus::Processing | PayoutStatus::Failed
+                        )
+                    })
+                    .count()
+            })
+            .unwrap_or(0);
+        cards.push(CompanyDashCard {
+            slug: c.slug,
+            name: c.display_name,
+            role: role.as_str().into(),
+            escrow_usd: format_usd(escrow),
+            programs_count,
+            pending_payouts,
+        });
+    }
+
+    Ok(CompanyDashboardTemplate {
+        year: time::OffsetDateTime::now_utc().year(),
+        account_role: current.user.role.clone(),
+        handle: current.user.handle,
+        companies: cards,
+    }
+    .into_response())
+}
+
+// ----------------------------------------------------------------------------
+// Admin
+// ----------------------------------------------------------------------------
+
+async fn admin_dashboard(state: &AppState, current: CurrentUser) -> AppResult<Response> {
+    let osint_pending = db::osint::list_for_review(&state.db)
+        .await
+        .map(|v| v.len())
+        .unwrap_or(0);
+
+    Ok(AdminDashboardTemplate {
+        year: time::OffsetDateTime::now_utc().year(),
+        account_role: current.user.role.clone(),
+        handle: current.user.handle,
+        osint_pending,
+    }
+    .into_response())
 }
 
 fn format_usd(cents: i64) -> String {

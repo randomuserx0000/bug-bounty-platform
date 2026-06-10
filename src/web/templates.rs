@@ -16,6 +16,7 @@ pub struct LoginTemplate {
     /// Handle del usuario logueado (vacío = no logueado). Usado por base.html
     /// para decidir si pintar el menú de usuario o los CTA Entrar/Registrarme.
     pub handle: String,
+    pub account_role: String,
 }
 
 #[derive(Template)]
@@ -23,6 +24,7 @@ pub struct LoginTemplate {
 pub struct DashboardTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub role: String,
     // KPIs (todos pre-formateados como string para no calcular en el template)
     pub kpi_reports_total: i64,
@@ -43,6 +45,35 @@ pub struct DashboardAction {
     pub kind: String,
     pub message: String,
     pub href: String,
+}
+
+/// Tarjeta de empresa en el dashboard de cuentas tipo company.
+pub struct CompanyDashCard {
+    pub slug: String,
+    pub name: String,
+    pub role: String,
+    pub escrow_usd: String,
+    pub programs_count: usize,
+    pub pending_payouts: usize,
+}
+
+#[derive(Template)]
+#[template(path = "dashboard_company.html")]
+pub struct CompanyDashboardTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub account_role: String,
+    pub companies: Vec<CompanyDashCard>,
+}
+
+#[derive(Template)]
+#[template(path = "dashboard_admin.html")]
+pub struct AdminDashboardTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub account_role: String,
+    /// Informes OSINT pendientes de revisión.
+    pub osint_pending: usize,
 }
 
 pub struct DashboardReportRow {
@@ -74,6 +105,7 @@ pub struct SignupTemplate {
     pub year: i32,
     pub google_enabled: bool,
     pub handle: String,
+    pub account_role: String,
 }
 
 /// Fragmento de error de formulario. Lo inyecta HTMX en `#form-feedback`.
@@ -99,6 +131,7 @@ pub struct PaymentMethodView {
 pub struct ProfileTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub reports_total: i64,
     pub reports_valid: i64,
     pub reputation: i32,
@@ -112,6 +145,7 @@ pub struct ProfileTemplate {
 pub struct PaymentMethodsTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub methods: Vec<PaymentMethodView>,
 }
 
@@ -120,6 +154,7 @@ pub struct PaymentMethodsTemplate {
 pub struct PaymentMethodsNewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub rails: Vec<(String, String)>,
     pub initial_fields: String,
 }
@@ -144,6 +179,7 @@ pub struct CompanyMembershipView {
 pub struct CompaniesIndexTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub memberships: Vec<CompanyMembershipView>,
 }
 
@@ -152,6 +188,7 @@ pub struct CompaniesIndexTemplate {
 pub struct CompaniesNewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
 }
 
 pub struct ProgramRowView {
@@ -167,6 +204,7 @@ pub struct ProgramRowView {
 pub struct CompanyShowTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub company_name: String,
     pub company_description: String,
@@ -194,6 +232,7 @@ pub struct ProgramsPublicTemplate {
     pub year: i32,
     pub programs: Vec<ProgramPublicCardView>,
     pub handle: String,
+    pub account_role: String,
 }
 
 /// Una fila de la tabla de precios base de referencia. Reutilizada por la home
@@ -219,6 +258,7 @@ pub struct HomeTemplate {
     /// Duplicados para que el marquee CSS haga loop continuo.
     pub ally_ids: Vec<i32>,
     pub handle: String,
+    pub account_role: String,
 }
 
 #[derive(Template)]
@@ -226,6 +266,7 @@ pub struct HomeTemplate {
 pub struct ProgramNewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub company_name: String,
     /// Tramos de precio recomendados, para pre-rellenar y guiar los montos.
@@ -262,6 +303,7 @@ pub struct ProgramShowTemplate {
     pub bounty_critical: String,
     pub assets: Vec<AssetRowView>,
     pub handle: String,
+    pub account_role: String,
 }
 
 // ---------- assets ----------
@@ -271,6 +313,7 @@ pub struct ProgramShowTemplate {
 pub struct AssetNewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub program_slug: String,
     pub program_name: String,
@@ -291,6 +334,7 @@ pub struct AssetFieldsPartial {
 pub struct ReportFormTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub company_name: String,
     pub program_slug: String,
@@ -310,6 +354,7 @@ pub struct MyReportRow {
 pub struct ReportListTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub reports: Vec<MyReportRow>,
 }
 
@@ -318,6 +363,7 @@ pub struct ReportListTemplate {
 pub struct TriageListTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub program_slug: String,
     pub program_name: String,
@@ -360,6 +406,7 @@ pub struct PayoutQueueRow {
 pub struct PayoutsQueueTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub company_name: String,
     pub escrow_usd: String,
@@ -371,6 +418,7 @@ pub struct PayoutsQueueTemplate {
 pub struct MinePayoutsTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub payouts: Vec<PayoutQueueRow>,
 }
 
@@ -397,6 +445,7 @@ pub struct AdminAuditRow {
 pub struct AdminAuditTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub rows: Vec<AdminAuditRow>,
     pub action_prefix: String,
     pub target_type: String,
@@ -426,6 +475,7 @@ pub struct OsintRowView {
 pub struct OsintNewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub categories: Vec<(String, String)>,
     pub severities: Vec<(String, String)>,
     pub osint_base_usd: i32,
@@ -436,6 +486,7 @@ pub struct OsintNewTemplate {
 pub struct OsintMineTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub rows: Vec<OsintRowView>,
 }
 
@@ -444,6 +495,7 @@ pub struct OsintMineTemplate {
 pub struct OsintReviewTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub rows: Vec<OsintRowView>,
 }
 
@@ -452,6 +504,7 @@ pub struct OsintReviewTemplate {
 pub struct OsintCatalogTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub company_slug: String,
     pub company_name: String,
     pub escrow_usd: String,
@@ -463,6 +516,7 @@ pub struct OsintCatalogTemplate {
 pub struct OsintShowTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub public_id: String,
     pub title: String,
     pub subject_name: String,
@@ -487,6 +541,7 @@ pub struct OsintShowTemplate {
 pub struct ReportShowTemplate {
     pub year: i32,
     pub handle: String,
+    pub account_role: String,
     pub public_id: String,
     pub title: String,
     pub state: String,

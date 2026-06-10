@@ -1,5 +1,6 @@
-//! Handlers de companies. Cualquier user logueado puede crear una; el
-//! creador queda como `owner` en `company_members` (en la misma tx).
+//! Handlers de companies. Solo cuentas de tipo `company` (o `admin`) pueden
+//! crear una; el creador queda como `owner` en `company_members` (en la misma
+//! tx). Las cuentas `researcher` no gestionan empresas.
 
 use axum::extract::{Path, State};
 use axum::response::{IntoResponse, Response};
@@ -44,14 +45,24 @@ async fn index(State(state): State<AppState>, current: CurrentUser) -> AppResult
     Ok(CompaniesIndexTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         memberships,
     })
 }
 
+/// Solo cuentas de empresa (o admin) pueden crear/gestionar empresas.
+fn is_company_account(current: &CurrentUser) -> bool {
+    matches!(current.user.role.as_str(), "company" | "admin")
+}
+
 async fn new_form(current: CurrentUser) -> AppResult<impl IntoResponse> {
+    if !is_company_account(&current) {
+        return Err(AppError::Forbidden);
+    }
     Ok(CompaniesNewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
     })
 }
 
@@ -70,6 +81,11 @@ async fn create(
     current: CurrentUser,
     Form(form): Form<CreateForm>,
 ) -> AppResult<Response> {
+    if !is_company_account(&current) {
+        return Ok(error_fragment(
+            "tu cuenta es de investigador; regístrate como empresa para publicar programas",
+        ));
+    }
     let slug = form.slug.trim().to_lowercase();
     if !slug_re().is_match(&slug) {
         return Ok(error_fragment("slug solo permite letras, números y guiones (3-40 chars)"));
@@ -132,6 +148,7 @@ async fn show(
     Ok(CompanyShowTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         company_name: company.display_name,
         company_description: company.description.unwrap_or_default(),

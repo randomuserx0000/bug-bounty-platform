@@ -43,15 +43,17 @@ pub struct NewUser<'a> {
     pub email: &'a str,
     pub handle: &'a str,
     pub password_hash: &'a str,
+    /// 'researcher' | 'company'. El caller ya lo valida.
+    pub role: &'a str,
 }
 
-/// Inserta un usuario nuevo en estado 'active' con rol 'researcher'.
+/// Inserta un usuario nuevo en estado 'active' con el rol indicado.
 /// En el futuro: estado 'pending' + email de verificación.
 pub async fn create(pool: &PgPool, u: NewUser<'_>) -> Result<UserRecord, sqlx::Error> {
     let id = Uuid::new_v4();
     let sql = format!(
         "INSERT INTO users (id, email, handle, password_hash, role, status) \
-         VALUES ($1, $2, $3, $4, 'researcher', 'active') \
+         VALUES ($1, $2, $3, $4, $5::user_role, 'active') \
          RETURNING {COLUMNS}"
     );
     sqlx::query_as::<_, UserRecord>(&sql)
@@ -59,6 +61,7 @@ pub async fn create(pool: &PgPool, u: NewUser<'_>) -> Result<UserRecord, sqlx::E
         .bind(u.email)
         .bind(u.handle)
         .bind(u.password_hash)
+        .bind(u.role)
         .fetch_one(pool)
         .await
 }

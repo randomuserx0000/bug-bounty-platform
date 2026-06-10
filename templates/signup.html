@@ -23,6 +23,18 @@
           hx-target="#form-feedback"
           hx-swap="innerHTML">
 
+        <fieldset class="account-type">
+            <legend>¿cómo quieres usar Escudo Digital?</legend>
+            <label class="radio-card">
+                <input type="radio" name="account_type" value="researcher" checked>
+                <span><strong>Soy investigador</strong><small>reporto vulnerabilidades y vendo informes OSINT para ganar dinero.</small></span>
+            </label>
+            <label class="radio-card">
+                <input type="radio" name="account_type" value="company">
+                <span><strong>Represento una empresa</strong><small>quiero publicar programas y proteger mis sistemas.</small></span>
+            </label>
+        </fieldset>
+
         <label>
             <span>email</span>
             <input type="email" name="email" required autocomplete="email">

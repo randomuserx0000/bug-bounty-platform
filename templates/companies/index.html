@@ -9,13 +9,19 @@
             <h1>mis empresas</h1>
             <p class="muted">empresas donde eres miembro, {{ handle }}.</p>
         </div>
-        <a class="btn-primary" href="/companies/new">+ nueva empresa</a>
+        {% if account_role == "company" || account_role == "admin" %}
+            <a class="btn-primary" href="/companies/new">+ nueva empresa</a>
+        {% endif %}
     </header>
 
     {% if memberships.is_empty() %}
         <div class="empty">
             <p>todavía no perteneces a ninguna empresa.</p>
-            <p class="muted">crea una para publicar programas de bug bounty.</p>
+            {% if account_role == "company" || account_role == "admin" %}
+                <p class="muted">crea una para publicar programas de bug bounty.</p>
+            {% else %}
+                <p class="muted">tu cuenta es de investigador. <a href="/programs">explora programas para cazar →</a></p>
+            {% endif %}
         </div>
     {% else %}
         <table class="data-table">

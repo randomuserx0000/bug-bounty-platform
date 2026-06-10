@@ -81,6 +81,7 @@ async fn queue(
     Ok(PayoutsQueueTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         company_name: company.display_name,
         escrow_usd: format!("${:.2}", escrow as f64 / 100.0),
@@ -115,6 +116,7 @@ async fn mine(
     Ok(MinePayoutsTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         payouts: items,
     })
 }

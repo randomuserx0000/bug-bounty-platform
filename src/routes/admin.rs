@@ -76,6 +76,7 @@ async fn audit_index(
     Ok(AdminAuditTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         rows: items,
         action_prefix: q.action_prefix.unwrap_or_default(),
         target_type: q.target_type.unwrap_or_default(),

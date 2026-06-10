@@ -39,6 +39,7 @@ pub async fn index(
         year: current_year(),
         programs: cards,
         ally_ids,
+        account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }

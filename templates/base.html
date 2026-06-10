@@ -55,13 +55,26 @@
             <nav>
                 {% if handle.is_empty() %}
                     <a href="/programs">Programas</a>
-                {% else %}
+                {% else if account_role == "researcher" %}
+                    {# Investigador: cazar, reportar, vender OSINT, cobrar. #}
                     <a href="/dashboard">Dashboard</a>
                     <a href="/programs">Programas</a>
-                    <a href="/companies">Empresas</a>
                     <a href="/reports">Reports</a>
                     <a href="/osint/mine">OSINT</a>
                     <a href="/payouts/mine">Bounties</a>
+                {% else if account_role == "admin" %}
+                    {# Admin de la plataforma: gestión + curaduría. #}
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/companies">Empresas</a>
+                    <a href="/programs">Programas</a>
+                    <a href="/reports">Reports</a>
+                    <a href="/osint/review">Revisión OSINT</a>
+                    <a href="/admin/audit">Audit</a>
+                {% else %}
+                    {# Empresa (o staff): publicar programas, gestionar. #}
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/companies">Empresas</a>
+                    <a href="/programs">Programas</a>
                 {% endif %}
             </nav>
             <div class="topbar-actions">
@@ -78,7 +91,9 @@
                         <div class="user-menu-panel" hidden>
                             <a href="/dashboard">Dashboard</a>
                             <a href="/settings/profile">Perfil</a>
-                            <a href="/osint/new">Vender informe OSINT</a>
+                            {% if account_role == "researcher" || account_role == "admin" %}
+                                <a href="/osint/new">Vender informe OSINT</a>
+                            {% endif %}
                             <a href="/settings/payment-methods">Métodos de pago</a>
                             <hr>
                             <form action="/logout" method="post" class="inline">

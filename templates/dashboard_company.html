@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}dashboard · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>hola, {{ handle }}</h1>
+            <p class="muted">gestiona tus programas de bug bounty y la inteligencia OSINT de tu organización.</p>
+        </div>
+        <a href="/companies/new" class="btn-primary">+ nueva empresa</a>
+    </header>
+
+    {% if companies.is_empty() %}
+        <div class="empty">
+            <p>todavía no tienes ninguna empresa registrada.</p>
+            <p class="muted"><a href="/companies/new">registra tu empresa</a> para publicar tu primer programa.</p>
+        </div>
+    {% else %}
+        <div class="card-grid">
+        {% for c in companies %}
+            <div class="card-box">
+                <header style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
+                    <h3 style="margin:0;">{{ c.name }}</h3>
+                    <span class="badge">{{ c.role }}</span>
+                </header>
+                <div class="pc-meta" style="margin:14px 0;">
+                    <div><span>escrow</span><strong>{{ c.escrow_usd }}</strong></div>
+                    <div><span>programas</span><strong>{{ c.programs_count }}</strong></div>
+                    <div><span>payouts pend.</span><strong>{{ c.pending_payouts }}</strong></div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <a class="btn-link" href="/companies/{{ c.slug }}">gestionar →</a>
+                    <a class="btn-link" href="/manage/{{ c.slug }}/payouts">payouts</a>
+                    <a class="btn-link" href="/manage/{{ c.slug }}/osint">OSINT</a>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

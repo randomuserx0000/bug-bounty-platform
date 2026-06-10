@@ -47,6 +47,7 @@ async fn login_form(
         year: current_year(),
         next,
         google_enabled: state.cfg.google_oauth_enabled(),
+        account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
@@ -123,6 +124,7 @@ async fn signup_form(
     Ok(SignupTemplate {
         year: current_year(),
         google_enabled: state.cfg.google_oauth_enabled(),
+        account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
@@ -138,6 +140,9 @@ struct SignupForm {
     handle: String,
     #[validate(length(min = 10, message = "contraseña mínimo 10 caracteres"))]
     password: String,
+    /// "researcher" | "company". Cualquier otro valor cae a researcher.
+    #[serde(default)]
+    account_type: Option<String>,
 }
 
 static HANDLE_RE: once_cell::sync::Lazy<regex::Regex> =
@@ -158,12 +163,19 @@ async fn signup_submit(
     let pwhash = auth::hash_password(&form.password)
         .map_err(|e| anyhow::anyhow!("hash password: {e}"))?;
 
+    // Solo dos roles elegibles en el registro. Cualquier otra cosa → researcher.
+    let role = match form.account_type.as_deref() {
+        Some("company") => "company",
+        _ => "researcher",
+    };
+
     let created = db::users::create(
         &state.db,
         db::users::NewUser {
             email: &form.email,
             handle: &form.handle,
             password_hash: &pwhash,
+            role,
         },
     )
     .await;

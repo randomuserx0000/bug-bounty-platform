@@ -104,6 +104,7 @@ async fn new_form(
     Ok(ReportFormTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         company_name: company.display_name,
         program_slug: program.slug,
@@ -207,6 +208,7 @@ async fn my_reports(
     Ok(ReportListTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         reports: items,
     })
 }
@@ -222,6 +224,7 @@ async fn triage_list(
     Ok(TriageListTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         program_slug: program.slug,
         program_name: program.name,
@@ -297,6 +300,7 @@ async fn show(
     Ok(ReportShowTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         public_id: r.public_id.clone(),
         title: r.title.clone(),
         state: r.state.as_str().into(),

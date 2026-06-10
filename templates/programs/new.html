@@ -49,13 +49,14 @@
         </div>
 
         <fieldset>
-            <legend class="muted small">bounty en USD — precios base sugeridos (puedes ajustarlos o dejar vacío)</legend>
+            <legend class="muted small">bounty en USD — obligatorio, no puede ser menor al mínimo de cada severidad</legend>
             <div class="grid-4">
                 {% for t in tiers %}
                 <label>
                     <span>{{ t.emoji }} {{ t.label }}</span>
-                    <input type="number" name="bounty_{{ t.key }}" min="0" value="{{ t.default_usd }}">
-                    <small class="muted">rango {{ t.range }}</small>
+                    <input type="number" name="bounty_{{ t.key }}" required
+                           min="{{ t.default_usd }}" value="{{ t.default_usd }}">
+                    <small class="muted">mínimo ${{ t.default_usd }} · rango {{ t.range }}</small>
                 </label>
                 {% endfor %}
             </div>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}dashboard admin · Escudo Digital{% endblock %}
+
+{% block content %}
+<section class="page">
+    <header class="page-head">
+        <div>
+            <h1>panel de plataforma</h1>
+            <p class="muted">administración de Escudo Digital, {{ handle }}.</p>
+        </div>
+    </header>
+
+    <div class="card-grid">
+        <a class="card-box" href="/osint/review" style="text-decoration:none;">
+            <h3 style="margin-top:0;">🔎 Revisión OSINT</h3>
+            <p class="muted"><strong>{{ osint_pending }}</strong> informe(s) pendiente(s) de revisar/aceptar.</p>
+        </a>
+        <a class="card-box" href="/admin/audit" style="text-decoration:none;">
+            <h3 style="margin-top:0;">📜 Audit log</h3>
+            <p class="muted">registro append-only de acciones sensibles (auth, dinero, mutaciones).</p>
+        </a>
+        <a class="card-box" href="/companies" style="text-decoration:none;">
+            <h3 style="margin-top:0;">🏢 Empresas</h3>
+            <p class="muted">empresas y programas de la plataforma.</p>
+        </a>
+        <a class="card-box" href="/programs" style="text-decoration:none;">
+            <h3 style="margin-top:0;">🎯 Programas</h3>
+            <p class="muted">programas públicos activos.</p>
+        </a>
+    </div>
+</section>
+{% endblock %}

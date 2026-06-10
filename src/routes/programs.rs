@@ -68,6 +68,7 @@ async fn public_index(
     Ok(ProgramsPublicTemplate {
         year: current_year(),
         programs: cards,
+        account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
@@ -122,6 +123,7 @@ async fn public_show(
         bounty_high: program.bounty_high_cents.map(usd).unwrap_or_default(),
         bounty_critical: program.bounty_critical_cents.map(usd).unwrap_or_default(),
         assets: asset_rows,
+        account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
     })
 }
@@ -178,6 +180,7 @@ async fn manage_show(
         bounty_critical: program.bounty_critical_cents.map(usd).unwrap_or_default(),
         assets: asset_rows,
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
     })
 }
 
@@ -203,6 +206,7 @@ async fn new_form(
     Ok(ProgramNewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         company_slug: company.slug,
         company_name: company.display_name,
         tiers: severity_tier_views(),
@@ -264,6 +268,23 @@ async fn create(
         _ => return Ok(error_fragment("status inválido")),
     };
 
+    // Bounty obligatorio y >= mínimo por severidad. Una empresa NO puede dejar
+    // vulnerabilidades sin pago ni poner montos por debajo del estándar.
+    use crate::domain::pricing::SEVERITY_TIERS;
+    let bounties = [
+        (&form.bounty_low, &SEVERITY_TIERS[0]),
+        (&form.bounty_medium, &SEVERITY_TIERS[1]),
+        (&form.bounty_high, &SEVERITY_TIERS[2]),
+        (&form.bounty_critical, &SEVERITY_TIERS[3]),
+    ];
+    let mut cents = [0i32; 4];
+    for (i, (raw, tier)) in bounties.iter().enumerate() {
+        match require_bounty(raw.as_deref(), tier) {
+            Ok(c) => cents[i] = c,
+            Err(e) => return Ok(error_fragment(&e)),
+        }
+    }
+
     let result = db::programs::create(
         &state.db,
         NewProgram {
@@ -274,10 +295,10 @@ async fn create(
             policy_md: form.policy_md.trim(),
             visibility,
             status,
-            bounty_low_cents: parse_usd(form.bounty_low.as_deref()),
-            bounty_medium_cents: parse_usd(form.bounty_medium.as_deref()),
-            bounty_high_cents: parse_usd(form.bounty_high.as_deref()),
-            bounty_critical_cents: parse_usd(form.bounty_critical.as_deref()),
+            bounty_low_cents: Some(cents[0]),
+            bounty_medium_cents: Some(cents[1]),
+            bounty_high_cents: Some(cents[2]),
+            bounty_critical_cents: Some(cents[3]),
             allows_redteam: form.allows_redteam.as_deref() == Some("on"),
             allows_hardware: form.allows_hardware.as_deref() == Some("on"),
         },
@@ -312,13 +333,37 @@ fn opt(s: &Option<String>) -> Option<&str> {
     s.as_deref().map(str::trim).filter(|x| !x.is_empty())
 }
 
-/// Parsea "1500" (USD) → 150000 (cents). Acepta vacío como None.
-fn parse_usd(s: Option<&str>) -> Option<i32> {
-    let v = s?.trim();
-    if v.is_empty() {
-        return None;
+/// Valida y parsea un bounty (USD → cents) contra el mínimo de su tramo.
+/// Obligatorio y `>= tier.min_cents`: la empresa no puede dejarlo vacío, en $0
+/// ni por debajo del estándar. Devuelve mensaje de error listo para el usuario.
+fn require_bounty(
+    raw: Option<&str>,
+    tier: &crate::domain::pricing::Tier,
+) -> Result<i32, String> {
+    let v = raw.map(str::trim).filter(|s| !s.is_empty());
+    let usd: i32 = match v {
+        Some(s) => s
+            .parse()
+            .map_err(|_| format!("el bounty de {} debe ser un número en USD", tier.label))?,
+        None => {
+            return Err(format!(
+                "el bounty de {} es obligatorio (mínimo ${})",
+                tier.label,
+                tier.min_usd()
+            ))
+        }
+    };
+    let cents = usd
+        .checked_mul(100)
+        .ok_or_else(|| format!("el bounty de {} es demasiado grande", tier.label))?;
+    if cents < tier.min_cents {
+        return Err(format!(
+            "el bounty de {} no puede ser menor a ${} (estándar de la plataforma)",
+            tier.label,
+            tier.min_usd()
+        ));
     }
-    v.parse::<i32>().ok().and_then(|usd| usd.checked_mul(100))
+    Ok(cents)
 }
 
 /// Formatea cents → "$X,XXX" para display.

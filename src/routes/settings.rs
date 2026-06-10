@@ -71,6 +71,7 @@ async fn profile_form(
     Ok(ProfileTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         reports_total: kpi.reports_total,
         reports_valid: kpi.reports_valid,
         reputation: kpi.reputation,
@@ -144,6 +145,7 @@ async fn list(State(state): State<AppState>, current: CurrentUser) -> AppResult<
     Ok(PaymentMethodsTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         methods,
     })
 }
@@ -179,6 +181,7 @@ async fn new_form(current: CurrentUser) -> AppResult<impl IntoResponse> {
     Ok(PaymentMethodsNewTemplate {
         year: current_year(),
         handle: current.user.handle,
+        account_role: current.user.role.clone(),
         rails: ALL_RAILS
             .iter()
             .map(|r| (r.as_str().to_string(), r.display_name().to_string()))
