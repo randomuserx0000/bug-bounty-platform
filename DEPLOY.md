@@ -81,6 +81,30 @@ UPDATE users SET role='admin' WHERE handle='tu_handle';
 
 ## Notas operativas
 
+### Rate-limit y el IP real del cliente (⚠️ requisito de seguridad)
+El rate-limit de `/login`, `/signup` y `/osint` identifica al cliente por su
+**IP real**, leída de los headers `X-Forwarded-For` / `X-Real-IP`
+(`SmartIpKeyExtractor`). Esto es **obligatorio** detrás del reverse proxy: sin
+ello, la app vería siempre el IP del proxy y todos los usuarios compartirían un
+único bucket → un atacante podría agotar el cupo de auth de **toda** la
+plataforma (DoS de login) con un solo origen.
+
+Para que sea **no-spoofeable**, el proxy debe **sobrescribir** el
+`X-Forwarded-For` que mande el cliente (no appendear el del cliente delante del
+real). El Traefik/Caddy que provisiona Coolify lo hace por defecto, porque no
+confía en los `X-Forwarded-*` de orígenes externos. **No** marques el cliente
+como `trustedIPs` ni actives `forwardedHeaders.insecure` en Traefik, y **no**
+antepongas otro proxy/CDN que appendee XFF sin sanearlo: en ese caso el IP de
+la izquierda pasa a ser controlable por el atacante y se rompe el límite por IP.
+
+Verificación rápida tras deploy (debe haber 429 a partir del request ~6 desde
+un mismo origen, y orígenes distintos NO deben compartir bucket):
+```bash
+URL=https://tu-dominio
+# mismo origen → ~6×200 y luego 429
+seq 1 40 | xargs -P40 -I{} curl -s -o /dev/null -w "%{http_code}\n" "$URL/login" | sort | uniq -c
+```
+
 ### Persistencia
 Los volúmenes `pgdata` y `miniodata` viven en el host de Coolify. **Redeploy
 no los borra**, pero si destruís el resource desde Coolify sí. Antes de borrar

@@ -21,6 +21,7 @@ use axum::routing::{get, post};
 use axum::{Form, Router};
 use serde::Deserialize;
 use tower_governor::governor::GovernorConfigBuilder;
+use tower_governor::key_extractor::SmartIpKeyExtractor;
 use tower_governor::GovernorLayer;
 
 use crate::audit;
@@ -40,14 +41,19 @@ use crate::web::templates::{
 };
 
 pub fn router() -> Router<AppState> {
-    // Rate-limit anti-spam SOLO sobre el envío de informes (POST /osint): por IP,
-    // ráfaga de 5 y luego 1 cada 30s. Suficiente para uso humano legítimo; corta
-    // el envío masivo automatizado. El resto de rutas (GET, comprar, revisar) no
-    // se limitan aquí. El rate-limit fuerte de fuerza bruta sigue en /auth.
+    // Rate-limit anti-spam SOLO sobre el envío de informes (POST /osint): por IP
+    // de cliente, ráfaga de 5 y luego 1 cada 30s. Suficiente para uso humano
+    // legítimo; corta el envío masivo automatizado. El resto de rutas (GET,
+    // comprar, revisar) no se limitan aquí.
+    //
+    // `SmartIpKeyExtractor` resuelve el IP real vía `X-Forwarded-For`/`X-Real-IP`;
+    // sin él, detrás del proxy todos comparten un bucket global (mismo problema
+    // que en /auth). Ver nota de confianza en `routes/mod.rs` y DEPLOY.md.
     let submit_governor = Arc::new(
         GovernorConfigBuilder::default()
             .period(Duration::from_secs(30))
             .burst_size(5)
+            .key_extractor(SmartIpKeyExtractor)
             .finish()
             .expect("governor config OSINT válida"),
     );

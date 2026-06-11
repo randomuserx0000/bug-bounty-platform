@@ -18,6 +18,7 @@ use axum::response::Response;
 use axum::routing::get;
 use axum::http::{HeaderName, HeaderValue, header};
 use tower_governor::governor::GovernorConfigBuilder;
+use tower_governor::key_extractor::SmartIpKeyExtractor;
 use tower_governor::GovernorLayer;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
@@ -103,12 +104,26 @@ async fn security_headers(req: Request, next: Next) -> Response {
 }
 
 pub fn router(state: AppState) -> Router {
-    // Rate limit por IP para auth: ~1 req/seg, ráfaga de 5.
+    // Rate limit por IP de **cliente** para auth: ~1 req/seg, ráfaga de 5.
     // Suficiente para uso humano normal; brute force se rompe en 5 intentos.
+    //
+    // `SmartIpKeyExtractor` toma el IP real del cliente desde `X-Forwarded-For`
+    // / `X-Real-IP` (en ese orden) y cae al peer IP solo si no hay headers. Sin
+    // esto, detrás del reverse proxy (Traefik/Caddy de Coolify) el peer IP es
+    // **siempre el del proxy** → un único bucket global: un atacante podría
+    // agotar el cupo de auth de TODA la plataforma (DoS de login/signup).
+    //
+    // SEGURIDAD — supuesto de confianza: esto solo es no-spoofeable si el proxy
+    // **sobrescribe** el `X-Forwarded-For` entrante con el IP real (descarta el
+    // que mande el cliente). Traefik y Caddy lo hacen por defecto cuando la
+    // fuente no está en sus `trustedIPs`. Si algún día se antepone un CDN/proxy
+    // que *appendea* XFF, el IP izquierdo pasa a ser controlable por el atacante
+    // y habría que revisar esto. Ver DEPLOY.md.
     let governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .per_second(1)
             .burst_size(5)
+            .key_extractor(SmartIpKeyExtractor)
             .finish()
             .expect("governor config válida"),
     );
