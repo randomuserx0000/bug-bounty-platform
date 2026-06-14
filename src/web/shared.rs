@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use time::OffsetDateTime;
 
-use super::templates::{FormErrorPartial, PriceTierView};
+use super::templates::{FormErrorPartial, FormOkPartial, PriceTierView};
 
 pub fn current_year() -> i32 {
     OffsetDateTime::now_utc().year()
@@ -51,6 +51,16 @@ pub fn error_fragment(msg: &str) -> Response {
     let body = FormErrorPartial { message: msg.into() }
         .render()
         .unwrap_or_else(|_| String::from("<div class=\"alert alert-error\">error</div>"));
+    Html(body).into_response()
+}
+
+/// 200 con un fragment `FormOkPartial`. Contraparte de éxito de
+/// `error_fragment`, para forms cuyo final feliz no es un redirect
+/// (p.ej. la solicitud de curso).
+pub fn ok_fragment(msg: &str) -> Response {
+    let body = FormOkPartial { message: msg.into() }
+        .render()
+        .unwrap_or_else(|_| String::from("<div class=\"alert alert-ok\">listo</div>"));
     Html(body).into_response()
 }
 

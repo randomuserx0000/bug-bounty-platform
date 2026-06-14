@@ -115,6 +115,37 @@ pub struct FormErrorPartial {
     pub message: String,
 }
 
+/// Fragmento de éxito de formulario. Lo inyecta HTMX en `#form-feedback`.
+#[derive(Template)]
+#[template(path = "partials/form_ok.html")]
+pub struct FormOkPartial {
+    pub message: String,
+}
+
+// ---------- cursos / academia ----------
+
+#[derive(Template)]
+#[template(path = "courses/index.html")]
+pub struct CourseCatalogTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub account_role: String,
+    pub price_analista: i32,
+}
+
+#[derive(Template)]
+#[template(path = "courses/analista.html")]
+pub struct CourseAnalistaTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub account_role: String,
+    /// Precio de lanzamiento en USD (desde `domain::pricing`).
+    pub price_usd: i32,
+    /// Prefill del form si el visitante ya tiene sesión.
+    pub prefill_name: String,
+    pub prefill_email: String,
+}
+
 // ---------- settings / payment methods ----------
 
 pub struct PaymentMethodView {

@@ -1,14 +1,27 @@
-# OSINT Academy — diseño (fase futura)
+# Academia — curso "Analista de Ciberseguridad" (diseño + v1 de captación)
 
-> Estado: **diseño documentado, no implementado**. El producto OSINT (envío,
-> revisión, catálogo, compra) ya está en la plataforma; el módulo de formación
-> que sigue es la siguiente capa para captar y capacitar nuevos investigadores.
+> Estado: **landing + captación de leads implementadas; LMS pendiente**.
+> El producto OSINT (envío, revisión, catálogo, compra) ya está en la
+> plataforma. La oferta formativa se amplió de "curso OSINT" a un curso de
+> iniciación **Analista de Ciberseguridad** con 3 pilares: fundamentos de
+> ethical hacking, pentesting y OSINT.
 
 ## Objetivo
 
-Captar talento local sin experiencia y convertirlo en investigadores OSINT que
-vendan sus hallazgos en Escudo Digital. El que no sabe nada compra un curso;
-al aprobarlo, queda habilitado para vender informes OSINT en la plataforma.
+Captar talento local sin experiencia y convertirlo en investigadores
+certificados que vendan sus hallazgos en Escudo Digital. El que no sabe nada
+compra el curso de iniciación (precio accesible, `COURSE_ANALISTA_CENTS` en
+`domain/pricing.rs`); al aprobarlo, entra al staff de investigadores
+certificados y queda habilitado para vender informes en la plataforma.
+
+## Implementado (v1 — captación)
+
+- Landing pública `/cursos/analista-ciberseguridad` (3 pilares, precio de
+  lanzamiento, formulario "Solicitar curso" con honeypot y rate-limit por IP).
+- `POST /cursos/solicitar` guarda el lead en `course_requests`
+  (migración `0005_course_requests.sql`) y avisa al buzón de la plataforma
+  (`osint_notify_email`). Inscripción y cobro se gestionan operativamente.
+- CTA "Solicitar curso" en la tarjeta "🎓 Fórmate desde cero" de la home.
 
 ## Flujo
 
@@ -63,7 +76,8 @@ CREATE TABLE course_enrollments (
 
 ## Pendiente para implementar
 
-- Migración `0005_courses.sql`, dominio `src/domain/course.rs`,
-  `src/db/courses.rs`, rutas `src/routes/courses.rs`, templates `templates/courses/`.
+- Vista admin de `course_requests` (hoy los leads llegan por email y quedan en BD).
+- Migración de cursos/LMS (`courses`, `course_modules`, `course_enrollments`),
+  dominio `src/domain/course.rs` y contenido de los módulos.
 - Pasarela de pago para cursos de pago (reusar rails existentes o checkout aparte).
-- Evaluación/quiz y emisión de certificado.
+- Evaluación/quiz y emisión de certificado + badge en el perfil.

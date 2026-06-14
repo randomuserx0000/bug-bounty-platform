@@ -31,6 +31,7 @@ mod admin;
 mod assets;
 mod auth;
 mod companies;
+mod courses;
 mod dashboard;
 mod health;
 mod home;
@@ -144,6 +145,7 @@ pub fn router(state: AppState) -> Router {
         .merge(assets::router())
         .merge(reports::router())
         .merge(osint::router())
+        .merge(courses::router())
         .merge(payouts::router())
         .merge(admin::router())
         .merge(oauth::router())

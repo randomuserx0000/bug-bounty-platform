@@ -14,6 +14,7 @@ use crate::config::Config;
 pub mod assets;
 pub mod attachments;
 pub mod companies;
+pub mod courses;
 pub mod dashboard;
 pub mod osint;
 pub mod payment_methods;

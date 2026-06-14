@@ -41,3 +41,4 @@ typed_id!(PaymentMethodId);
 typed_id!(SessionId);
 typed_id!(ReportEventId);
 typed_id!(OsintReportId);
+typed_id!(CourseRequestId);

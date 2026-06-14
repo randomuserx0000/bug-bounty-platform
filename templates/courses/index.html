@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Formación · Escudo Digital{% endblock %}
+
+{% block content %}
+
+{# ============================================================
+   HERO
+   ============================================================ #}
+<section class="hero">
+    <div class="hero-inner">
+        <span class="kbd" style="display:inline-block; margin-bottom:18px;">🎓 FORMACIÓN</span>
+        <h1>Capacítate como <span class="accent">investigador certificado</span></h1>
+        <p>
+            4 capacitaciones básicas diseñadas para quienes desean trabajar como
+            investigadores en Escudo Digital. Aprende las disciplinas del oficio
+            y empieza a vender tus hallazgos en la plataforma.
+        </p>
+    </div>
+</section>
+
+{# ============================================================
+   CURSO DISPONIBLE AHORA — Analista de Ciberseguridad
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">DISPONIBLE AHORA</span>
+        <h2 style="margin-top: 12px;">Curso de iniciación</h2>
+        <p class="muted" style="max-width: 620px; margin: 8px auto 0;">
+            El punto de entrada perfecto si no tienes experiencia previa. Cubre
+            los 3 pilares del investigador certificado de Escudo Digital.
+        </p>
+    </div>
+
+    <div style="max-width: 680px; margin: 0 auto;">
+        <div class="card-box" style="position:relative; border: 1px solid var(--accent);">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <span class="kbd" style="background: var(--accent); color: #fff;">INSCRIPCIÓN ABIERTA</span>
+                    <h3 style="margin-top: 10px;">🎓 Analista de Ciberseguridad</h3>
+                    <p class="muted">
+                        Curso de iniciación que cubre los fundamentos de Ethical Hacking,
+                        Pentesting y OSINT. Al aprobarlo te certifica como Analista y
+                        entras al staff de investigadores de Escudo Digital.
+                    </p>
+                    <p style="margin: 0;">
+                        <span style="font-size: 1.6rem; font-weight: 800;">${{ price_analista }} USD</span>
+                        <span class="muted" style="font-size: 0.9rem;"> · curso completo</span>
+                    </p>
+                </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <span class="kbd">🎩 Ethical Hacking</span>
+                <span class="kbd">🛠️ Pentesting</span>
+                <span class="kbd">🔎 OSINT</span>
+            </div>
+            <div style="margin-top: 16px;">
+                <a href="/cursos/analista-ciberseguridad" class="btn-primary">Ver temario y solicitar →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   4 CAPACITACIONES BÁSICAS — próximamente
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">PRÓXIMAMENTE</span>
+        <h2 style="margin-top: 12px;">4 capacitaciones básicas</h2>
+        <p class="muted" style="max-width: 620px; margin: 8px auto 0;">
+            Cursos individuales por disciplina. Ideales para quien ya tiene base
+            y quiere profundizar en un área específica.
+        </p>
+    </div>
+
+    <div class="card-grid">
+
+        <div class="card-box" style="opacity: 0.8;">
+            <span class="kbd">01</span>
+            <h3 style="margin-top: 10px;">🔎 OSINT</h3>
+            <p class="muted">
+                Inteligencia de fuentes abiertas: búsqueda de credenciales filtradas,
+                exposición de infraestructura y marca, Google Dorks, Shodan, y cómo
+                convertir hallazgos en informes vendibles.
+            </p>
+            <p class="muted small" style="margin-top: 8px;">Próximamente · notifícate en el curso de iniciación</p>
+        </div>
+
+        <div class="card-box" style="opacity: 0.8;">
+            <span class="kbd">02</span>
+            <h3 style="margin-top: 10px;">🛡️ CTI — Cyber Threat Intelligence</h3>
+            <p class="muted">
+                Análisis de amenazas, actores y TTPs. Uso de MITRE ATT&amp;CK, feeds de
+                inteligencia, clasificación de indicadores y producción de reportes
+                de inteligencia estratégica y táctica.
+            </p>
+            <p class="muted small" style="margin-top: 8px;">Próximamente · notifícate en el curso de iniciación</p>
+        </div>
+
+        <div class="card-box" style="opacity: 0.8;">
+            <span class="kbd">03</span>
+            <h3 style="margin-top: 10px;">🛠️ Pentesting Web</h3>
+            <p class="muted">
+                Metodología de pruebas de penetración en aplicaciones web: OWASP Top 10,
+                enumeración, explotación, escalada de privilegios y redacción de
+                reportes técnicos de vulnerabilidades.
+            </p>
+            <p class="muted small" style="margin-top: 8px;">Próximamente · notifícate en el curso de iniciación</p>
+        </div>
+
+        <div class="card-box" style="opacity: 0.8;">
+            <span class="kbd">04</span>
+            <h3 style="margin-top: 10px;">🎩 Ethical Hacking</h3>
+            <p class="muted">
+                Hacking ético profesional: marco legal, alcance de evaluaciones,
+                técnicas de reconocimiento, explotación avanzada y comunicación
+                responsable de hallazgos a equipos de seguridad.
+            </p>
+            <p class="muted small" style="margin-top: 8px;">Próximamente · notifícate en el curso de iniciación</p>
+        </div>
+
+    </div>
+</section>
+
+{# ============================================================
+   CTA — llevar al formulario de solicitud
+   ============================================================ #}
+<section style="margin-top: 64px; text-align: center;">
+    <p class="muted">¿Quieres ser notificado cuando abran los cursos individuales?</p>
+    <a href="/cursos/analista-ciberseguridad#solicitar" class="btn-primary" style="margin-top: 12px;">
+        Solicitar el curso de iniciación e indicar tu interés →
+    </a>
+</section>
+
+{% endblock %}

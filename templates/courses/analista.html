@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Curso Analista de Ciberseguridad · Escudo Digital{% endblock %}
+
+{% block content %}
+
+{# ============================================================
+   HERO DEL CURSO — público objetivo: gente sin experiencia
+   ============================================================ #}
+<section class="hero">
+    <div class="hero-inner">
+        <span class="kbd" style="display:inline-block; margin-bottom:18px;">🎓 FÓRMATE DESDE CERO</span>
+        <h1>Curso <span class="accent">Analista de Ciberseguridad</span></h1>
+        <p>
+            ¿Estás iniciándote? ¿Tienes poca o ninguna experiencia? Te capacitamos
+            como Analista en Ciberseguridad para que formes parte del staff de
+            <strong>investigadores certificados</strong> y puedas vender tus
+            informes de hallazgos en la plataforma.
+        </p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 12px;">
+            <a class="btn-primary" href="#solicitar">Solicitar curso →</a>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   LOS 3 PILARES
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">3 PILARES</span>
+        <h2 style="margin-top: 12px;">Fundamentos básicos de</h2>
+        <p class="muted" style="max-width: 620px; margin: 8px auto 0;">
+            Un curso de iniciación, pensado para empezar sin conocimientos previos
+            y salir con una base práctica en las tres disciplinas del oficio.
+        </p>
+    </div>
+
+    <div class="card-grid">
+        <div class="card-box">
+            <span class="kbd">01</span>
+            <h3 style="margin-top:10px;">🎩 Ethical Hacking</h3>
+            <p class="muted">Mentalidad y ética del hacker: cómo piensa un atacante, marco legal, alcance autorizado y reporte responsable de vulnerabilidades.</p>
+        </div>
+        <div class="card-box">
+            <span class="kbd">02</span>
+            <h3 style="margin-top:10px;">🛠️ Pentesting</h3>
+            <p class="muted">Metodología de pruebas de penetración: reconocimiento, análisis de superficie de ataque, explotación básica y cómo documentar hallazgos.</p>
+        </div>
+        <div class="card-box">
+            <span class="kbd">03</span>
+            <h3 style="margin-top:10px;">🔎 OSINT</h3>
+            <p class="muted">Inteligencia de fuentes abiertas: credenciales filtradas, exposición de infraestructura y de marca, y cómo convertirlo en informes vendibles.</p>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   QUÉ OBTIENES + PRECIO
+   ============================================================ #}
+<section style="margin-top: 64px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <span class="kbd">AL APROBAR</span>
+        <h2 style="margin-top: 12px;">Tu salida laboral está en esta misma plataforma</h2>
+    </div>
+    <div class="card-grid">
+        <div class="card-box">
+            <h3 style="margin-top:0;">🪪 Certificación</h3>
+            <p class="muted">Te certificas como Analista de Ciberseguridad respaldado por la red REDSEG y sus aliados.</p>
+        </div>
+        <div class="card-box">
+            <h3 style="margin-top:0;">👥 Staff de investigadores</h3>
+            <p class="muted">Entras al staff de investigadores certificados de Escudo Digital, con acceso a los programas de bug bounty activos.</p>
+        </div>
+        <div class="card-box">
+            <h3 style="margin-top:0;">💵 Vende tus informes</h3>
+            <p class="muted">Monetizas desde el día uno: vendes tus informes OSINT a la plataforma y cobras bounties por vulnerabilidades válidas.</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 28px;">
+        <p class="muted" style="margin-bottom: 4px;">Precio de lanzamiento accesible</p>
+        <p style="font-size: 2rem; font-weight: 800; margin: 0;">${{ price_usd }} <small class="muted" style="font-size: 1rem; font-weight: 500;">USD · curso completo</small></p>
+        <p class="muted small" style="max-width: 520px; margin: 8px auto 0;">
+            Queremos formar nuevos talentos, no ponerles barreras. Aliados de la red
+            REDSEG patrocinan becas para cupos seleccionados.
+        </p>
+    </div>
+</section>
+
+{# ============================================================
+   FORMULARIO DE SOLICITUD (lead)
+   ============================================================ #}
+<section id="solicitar" style="margin-top: 64px;">
+    <div class="page narrow" style="margin: 0 auto;">
+        <h2>Solicitar el curso</h2>
+        <p class="muted">
+            Déjanos tus datos y te escribimos con los pasos de inscripción y la
+            fecha de inicio de la próxima cohorte.
+        </p>
+
+        <form hx-post="/cursos/solicitar" hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+
+            <label>
+                <span>nombre completo</span>
+                <input type="text" name="name" required maxlength="120"
+                       value="{{ prefill_name }}" placeholder="ej: María Pérez">
+            </label>
+
+            <label>
+                <span>correo electrónico</span>
+                <input type="email" name="email" required maxlength="160"
+                       value="{{ prefill_email }}" placeholder="tu@correo.com">
+            </label>
+
+            <label>
+                <span>¿cuánta experiencia tienes?</span>
+                <select name="experience">
+                    <option value="none">Ninguna, empiezo desde cero</option>
+                    <option value="basic">Básica (autodidacta, cursos sueltos)</option>
+                    <option value="intermediate">Intermedia (ya hice algún CTF / trabajo en TI)</option>
+                </select>
+            </label>
+
+            <label>
+                <span>cuéntanos de ti <small class="muted">(opcional)</small></span>
+                <textarea name="message" rows="3" maxlength="2000"
+                          placeholder="Qué te motiva, desde qué ciudad/país escribes, etc."></textarea>
+            </label>
+
+            {# Honeypot anti-bots: invisible para humanos, los bots lo llenan. #}
+            <label style="position:absolute; left:-9999px;" aria-hidden="true" tabindex="-1">
+                <span>website</span>
+                <input type="text" name="website" autocomplete="off" tabindex="-1">
+            </label>
+
+            <div id="form-feedback" class="feedback"></div>
+
+            <button type="submit" class="btn-primary">Solicitar curso →</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

@@ -9,6 +9,12 @@
 /// aceptado. En USD cents ($50).
 pub const OSINT_BASE_CENTS: i32 = 5_000;
 
+/// Precio de lanzamiento del curso "Analista de Ciberseguridad" (fundamentos
+/// de ethical hacking, pentesting y OSINT). En USD cents ($25). Accesible a
+/// propósito: el objetivo es captar y formar talento nuevo que luego venda
+/// hallazgos en la plataforma, no monetizar el curso en sí.
+pub const COURSE_ANALISTA_CENTS: i32 = 2_500;
+
 /// Un tramo de precio por severidad, con su rango recomendado.
 #[derive(Debug, Clone, Copy)]
 pub struct Tier {
