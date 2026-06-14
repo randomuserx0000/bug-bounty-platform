@@ -62,6 +62,7 @@
                     <a href="/reports">Reports</a>
                     <a href="/osint/mine">OSINT</a>
                     <a href="/payouts/mine">Bounties</a>
+                    <a href="/cursos">Formación</a>
                 {% else if account_role == "admin" %}
                     {# Admin de la plataforma: gestión + curaduría. #}
                     <a href="/dashboard">Dashboard</a>
@@ -93,6 +94,9 @@
                             <a href="/settings/profile">Perfil</a>
                             {% if account_role == "researcher" || account_role == "admin" %}
                                 <a href="/osint/new">Vender informe OSINT</a>
+                            {% endif %}
+                            {% if account_role == "researcher" %}
+                                <a href="/cursos">Formación</a>
                             {% endif %}
                             <a href="/settings/payment-methods">Métodos de pago</a>
                             <hr>

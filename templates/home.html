@@ -25,7 +25,11 @@
         </p>
         <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 12px;">
             <a class="btn-primary" href="/companies/new">Quiero publicar un programa</a>
-            <a class="btn-link" href="/signup" style="padding: 10px 16px; border: 1px solid var(--line2); background: white;">Soy researcher →</a>
+            {% if handle.is_empty() %}
+                <a class="btn-link" href="/signup" style="padding: 10px 16px; border: 1px solid var(--line2); background: white;">Soy researcher →</a>
+            {% else %}
+                <a class="btn-link" href="/dashboard" style="padding: 10px 16px; border: 1px solid var(--line2); background: white;">Mi dashboard →</a>
+            {% endif %}
         </div>
 
         {# Stats de la red REDSEG: prueba social de respaldo #}
@@ -160,7 +164,11 @@
     </div>
 
     <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 24px;">
-        <a class="btn-primary" href="/signup">Unirme como investigador →</a>
+        {% if handle.is_empty() %}
+            <a class="btn-primary" href="/signup">Unirme como investigador →</a>
+        {% else %}
+            <a class="btn-primary" href="/dashboard">Ir a mi dashboard →</a>
+        {% endif %}
         <a class="btn-link" href="/programs" style="padding: 10px 16px; border: 1px solid var(--line2);">Ver programas para cazar</a>
     </div>
 </section>
