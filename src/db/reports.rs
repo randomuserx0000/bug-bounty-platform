@@ -174,3 +174,33 @@ pub async fn update_bounty(
     .await?;
     Ok(())
 }
+
+pub struct ProgramStats {
+    pub total_reports: i64,
+    pub resolved_reports: i64,
+    /// Promedio en horas desde `created_at` hasta `first_response_at`.
+    pub avg_response_hours: Option<f64>,
+}
+
+pub async fn stats_for_program(
+    pool: &PgPool,
+    program_id: ProgramId,
+) -> Result<ProgramStats, sqlx::Error> {
+    let row: (i64, i64, Option<f64>) = sqlx::query_as(
+        "SELECT
+            COUNT(*)::bigint,
+            COUNT(*) FILTER (WHERE state IN ('resolved', 'accepted'))::bigint,
+            AVG(EXTRACT(EPOCH FROM (first_response_at - created_at)) / 3600.0)
+         FROM reports
+         WHERE program_id = $1",
+    )
+    .bind(program_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(ProgramStats {
+        total_reports: row.0,
+        resolved_reports: row.1,
+        avg_response_hours: row.2,
+    })
+}

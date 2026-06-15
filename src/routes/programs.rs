@@ -92,8 +92,11 @@ async fn public_show(
         return Err(AppError::NotFound);
     }
 
-    let assets = db::assets::list_for_program(&state.db, program.id).await?;
-    let asset_rows = assets
+    let (assets, stats) = tokio::join!(
+        db::assets::list_for_program(&state.db, program.id),
+        db::reports::stats_for_program(&state.db, program.id),
+    );
+    let asset_rows = assets?
         .into_iter()
         .map(|a| AssetRowView {
             id: a.id.to_string(),
@@ -105,6 +108,7 @@ async fn public_show(
             severity_cap: a.severity_cap.as_str().into(),
         })
         .collect();
+    let stats = stats?;
 
     Ok(ProgramShowTemplate {
         year: current_year(),
@@ -125,6 +129,9 @@ async fn public_show(
         assets: asset_rows,
         account_role: user.as_ref().map(|u| u.role.clone()).unwrap_or_default(),
         handle: user.map(|u| u.handle).unwrap_or_default(),
+        total_reports: stats.total_reports,
+        resolved_reports: stats.resolved_reports,
+        avg_response: format_hours(stats.avg_response_hours),
     })
 }
 
@@ -148,8 +155,11 @@ async fn manage_show(
         .await?
         .ok_or(AppError::NotFound)?;
 
-    let assets = db::assets::list_for_program(&state.db, program.id).await?;
-    let asset_rows = assets
+    let (assets, stats) = tokio::join!(
+        db::assets::list_for_program(&state.db, program.id),
+        db::reports::stats_for_program(&state.db, program.id),
+    );
+    let asset_rows = assets?
         .into_iter()
         .map(|a| AssetRowView {
             id: a.id.to_string(),
@@ -161,6 +171,7 @@ async fn manage_show(
             severity_cap: a.severity_cap.as_str().into(),
         })
         .collect();
+    let stats = stats?;
 
     Ok(ProgramShowTemplate {
         year: current_year(),
@@ -181,6 +192,9 @@ async fn manage_show(
         assets: asset_rows,
         handle: current.user.handle,
         account_role: current.user.role.clone(),
+        total_reports: stats.total_reports,
+        resolved_reports: stats.resolved_reports,
+        avg_response: format_hours(stats.avg_response_hours),
     })
 }
 
@@ -369,6 +383,15 @@ fn require_bounty(
 /// Formatea cents → "$X,XXX" para display.
 fn usd(cents: i32) -> String {
     format!("${}", cents / 100)
+}
+
+fn format_hours(h: Option<f64>) -> String {
+    match h {
+        None => "—".into(),
+        Some(v) if v < 1.0 => format!("{:.0} min", v * 60.0),
+        Some(v) if v < 48.0 => format!("{:.1} h", v),
+        Some(v) => format!("{:.1} días", v / 24.0),
+    }
 }
 
 /// Markdown sanitizado a HTML. Defensive defaults: solo tags seguros, sin

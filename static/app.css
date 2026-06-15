@@ -689,6 +689,23 @@ form.inline { display: inline; margin: 0; }
 .bounty-grid strong { font-size: 1.4rem; color: var(--brand-700); font-weight: 700; }
 @media (max-width: 720px) { .bounty-grid { grid-template-columns: repeat(2,1fr); } }
 
+/* Program stats */
+.program-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin: 20px 0;
+}
+.stat-item {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--slate-100, #e5e7eb);
+    border-radius: 10px;
+    text-align: center;
+}
+.stat-value { font-size: 1.6rem; font-weight: 700; color: var(--brand-700); }
+.stat-label { font-size: 0.72rem; color: var(--slate2); text-transform: uppercase; letter-spacing: 0.05em; }
+@media (max-width: 720px) { .program-stats { grid-template-columns: repeat(3, 1fr); } }
+
 /* Policy markdown */
 .policy {
     background: white;

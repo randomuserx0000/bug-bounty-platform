@@ -36,6 +36,21 @@
         </section>
     {% endif %}
 
+    <section class="program-stats">
+        <div class="stat-item">
+            <span class="stat-value">{{ total_reports }}</span>
+            <span class="stat-label">reports recibidos</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ resolved_reports }}</span>
+            <span class="stat-label">validados</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ avg_response }}</span>
+            <span class="stat-label">tiempo de respuesta promedio</span>
+        </div>
+    </section>
+
     <h2>política</h2>
     <article class="policy">{{ policy_html|safe }}</article>
 

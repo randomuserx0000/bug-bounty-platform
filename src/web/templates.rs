@@ -335,6 +335,9 @@ pub struct ProgramShowTemplate {
     pub assets: Vec<AssetRowView>,
     pub handle: String,
     pub account_role: String,
+    pub total_reports: i64,
+    pub resolved_reports: i64,
+    pub avg_response: String,
 }
 
 // ---------- assets ----------
