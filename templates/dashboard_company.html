@@ -29,9 +29,20 @@
                     <div><span>escrow</span><strong>{{ c.escrow_usd }}</strong></div>
                     <div><span>programas</span><strong>{{ c.programs_count }}</strong></div>
                     <div><span>payouts pend.</span><strong>{{ c.pending_payouts }}</strong></div>
+                    <div>
+                        <span>reports pendientes</span>
+                        {% if c.pending_reports > 0 %}
+                            <strong class="badge-alert">{{ c.pending_reports }}</strong>
+                        {% else %}
+                            <strong>0</strong>
+                        {% endif %}
+                    </div>
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <a class="btn-link" href="/companies/{{ c.slug }}">gestionar →</a>
+                    {% if c.pending_reports > 0 %}
+                        <a class="btn-primary" href="/companies/{{ c.slug }}">{{ c.pending_reports }} report{% if c.pending_reports != 1 %}s{% endif %} pendiente{% if c.pending_reports != 1 %}s{% endif %} →</a>
+                    {% endif %}
                     <a class="btn-link" href="/manage/{{ c.slug }}/payouts">payouts</a>
                     <a class="btn-link" href="/manage/{{ c.slug }}/osint">OSINT</a>
                 </div>

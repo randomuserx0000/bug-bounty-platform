@@ -30,7 +30,7 @@
     {% else %}
         <table class="data-table">
             <thead>
-                <tr><th>nombre</th><th>visibilidad</th><th>estado</th><th></th></tr>
+                <tr><th>nombre</th><th>visibilidad</th><th>estado</th><th>reports pendientes</th><th></th></tr>
             </thead>
             <tbody>
             {% for p in programs %}
@@ -43,7 +43,19 @@
                     </td>
                     <td><span class="badge">{{ p.visibility }}</span></td>
                     <td><span class="badge">{{ p.status }}</span></td>
-                    <td><a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ p.slug }}">abrir →</a></td>
+                    <td>
+                        {% if p.pending_reports > 0 %}
+                            <a href="/manage/{{ company_slug }}/programs/{{ p.slug }}/reports" class="badge-alert">{{ p.pending_reports }} pendiente{% if p.pending_reports != 1 %}s{% endif %}</a>
+                        {% else %}
+                            <span class="muted small">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ p.slug }}">abrir →</a>
+                        {% if can_manage %}
+                            <a class="btn-link" href="/manage/{{ company_slug }}/programs/{{ p.slug }}/reports">triage →</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

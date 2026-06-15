@@ -113,13 +113,15 @@ async fn company_dashboard(state: &AppState, current: CurrentUser) -> AppResult<
 
     let mut cards = Vec::with_capacity(companies.len());
     for (c, role) in companies {
-        let escrow = db::companies::escrow_balance(&state.db, c.id).await.unwrap_or(0);
-        let programs_count = db::programs::list_for_company(&state.db, c.id)
-            .await
-            .map(|p| p.len())
-            .unwrap_or(0);
-        let pending_payouts = db::payouts::list_for_company(&state.db, c.id)
-            .await
+        let (escrow, programs, payouts, pending_reports) = tokio::join!(
+            db::companies::escrow_balance(&state.db, c.id),
+            db::programs::list_for_company(&state.db, c.id),
+            db::payouts::list_for_company(&state.db, c.id),
+            db::reports::count_pending_for_company(&state.db, c.id),
+        );
+        let escrow = escrow.unwrap_or(0);
+        let programs_count = programs.map(|p| p.len()).unwrap_or(0);
+        let pending_payouts = payouts
             .map(|ps| {
                 ps.iter()
                     .filter(|p| {
@@ -131,6 +133,7 @@ async fn company_dashboard(state: &AppState, current: CurrentUser) -> AppResult<
                     .count()
             })
             .unwrap_or(0);
+        let pending_reports = pending_reports.unwrap_or(0);
         cards.push(CompanyDashCard {
             slug: c.slug,
             name: c.display_name,
@@ -138,6 +141,7 @@ async fn company_dashboard(state: &AppState, current: CurrentUser) -> AppResult<
             escrow_usd: format_usd(escrow),
             programs_count,
             pending_payouts,
+            pending_reports,
         });
     }
 

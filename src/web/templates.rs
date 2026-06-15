@@ -55,6 +55,7 @@ pub struct CompanyDashCard {
     pub escrow_usd: String,
     pub programs_count: usize,
     pub pending_payouts: usize,
+    pub pending_reports: i64,
 }
 
 #[derive(Template)]
@@ -228,6 +229,7 @@ pub struct ProgramRowView {
     pub visibility: String,
     pub status: String,
     pub summary: String,
+    pub pending_reports: i64,
 }
 
 #[derive(Template)]

@@ -175,6 +175,37 @@ pub async fn update_bounty(
     Ok(())
 }
 
+pub async fn count_pending_for_program(
+    pool: &PgPool,
+    program_id: ProgramId,
+) -> Result<i64, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT COUNT(*)::bigint FROM reports
+         WHERE program_id = $1
+           AND state IN ('new', 'triaging', 'needs_info')",
+    )
+    .bind(program_id)
+    .fetch_one(pool)
+    .await
+}
+
+/// Reports pendientes de triage (new/triaging/needs_info) para todos los
+/// programas de una company. Se usa en el dashboard de empresa.
+pub async fn count_pending_for_company(
+    pool: &PgPool,
+    company_id: crate::domain::ids::CompanyId,
+) -> Result<i64, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT COUNT(*)::bigint FROM reports r
+         JOIN programs p ON p.id = r.program_id
+         WHERE p.company_id = $1
+           AND r.state IN ('new', 'triaging', 'needs_info')",
+    )
+    .bind(company_id)
+    .fetch_one(pool)
+    .await
+}
+
 pub struct ProgramStats {
     pub total_reports: i64,
     pub resolved_reports: i64,

@@ -133,17 +133,21 @@ async fn show(
         .await?
         .ok_or(AppError::Forbidden)?;
 
-    let programs = db::programs::list_for_company(&state.db, company.id).await?;
-    let programs = programs
-        .into_iter()
-        .map(|p| ProgramRowView {
+    let programs_raw = db::programs::list_for_company(&state.db, company.id).await?;
+    let mut programs = Vec::with_capacity(programs_raw.len());
+    for p in programs_raw {
+        let pending = db::reports::count_pending_for_program(&state.db, p.id)
+            .await
+            .unwrap_or(0);
+        programs.push(ProgramRowView {
             slug: p.slug,
             name: p.name,
             visibility: p.visibility.as_str().into(),
             status: p.status.as_str().into(),
             summary: p.summary.unwrap_or_default(),
-        })
-        .collect();
+            pending_reports: pending,
+        });
+    }
 
     Ok(CompanyShowTemplate {
         year: current_year(),
