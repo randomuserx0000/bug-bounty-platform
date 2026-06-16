@@ -38,7 +38,8 @@
         <h2>acciones de triage</h2>
         <div class="triage-actions">
             {% if !next_states.is_empty() %}
-                <form hx-post="/reports/{{ public_id }}/state" hx-swap="none" class="stack inline-form">
+                <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+                      hx-disabled-elt="find button[type=submit]" class="stack inline-form">
                     <label>
                         <span>cambiar estado a</span>
                         <select name="target">
@@ -53,7 +54,8 @@
                 </form>
             {% endif %}
 
-            <form hx-post="/reports/{{ public_id }}/severity" hx-swap="none" class="stack inline-form">
+            <form hx-post="/reports/{{ public_id }}/severity" hx-swap="none"
+                  hx-disabled-elt="find button[type=submit]" class="stack inline-form">
                 <label>
                     <span>severity</span>
                     <select name="severity">
@@ -67,7 +69,8 @@
                 <button class="btn-link" type="submit">cambiar severity</button>
             </form>
 
-            <form hx-post="/reports/{{ public_id }}/bounty" hx-swap="none" class="stack inline-form">
+            <form hx-post="/reports/{{ public_id }}/bounty" hx-swap="none"
+                  hx-disabled-elt="find button[type=submit]" class="stack inline-form">
                 <label>
                     <span>bounty USD</span>
                     <input type="number" name="amount_usd" min="0" required>
@@ -77,7 +80,8 @@
         </div>
     {% else if is_reporter && !next_states.is_empty() %}
         <h2>tus acciones</h2>
-        <form hx-post="/reports/{{ public_id }}/state" hx-swap="none" class="stack inline-form">
+        <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+              hx-disabled-elt="find button[type=submit]" class="stack inline-form">
             <label>
                 <span>cambiar estado a</span>
                 <select name="target">
@@ -174,7 +178,9 @@
     {# === Form de comentario === #}
     <h2>añadir comentario</h2>
     <form hx-post="/reports/{{ public_id }}/comments"
-          hx-target="#form-feedback" hx-swap="innerHTML" class="stack">
+          hx-target="#form-feedback" hx-swap="innerHTML"
+          hx-disabled-elt="find button[type=submit]"
+          class="stack">
         <label>
             <span>comentario (markdown)</span>
             <textarea name="body_md" required rows="4" data-easymde></textarea>
@@ -182,7 +188,7 @@
         {% if is_triager %}
             <label class="inline">
                 <input type="checkbox" name="internal">
-                <span>comentario interno (no visible para el reporter)</span>
+                <span>comentario interno (no visible para el researcher)</span>
             </label>
         {% endif %}
         <div id="form-feedback" class="feedback"></div>
