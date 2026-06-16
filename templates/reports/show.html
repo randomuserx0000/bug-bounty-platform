@@ -158,6 +158,7 @@
             <header>
                 <span class="badge">{{ e.event_type }}</span>
                 {% if e.is_internal %}<span class="badge badge-default">interno</span>{% endif %}
+                <strong class="event-actor">@{{ e.actor_label }}</strong>
                 <small class="muted">{{ e.at }}</small>
             </header>
             {% if !e.body_html.is_empty() %}

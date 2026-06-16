@@ -254,19 +254,37 @@ async fn show(
 
     let events = db::report_events::list_for_report(&state.db, ctx.report.id, ctx.is_triager)
         .await?;
+
+    let actor_ids: Vec<Uuid> = events
+        .iter()
+        .filter_map(|e| e.actor_id.map(|id| id.0))
+        .collect::<std::collections::HashSet<_>>()
+        .into_iter()
+        .collect();
+    let handles = db::users::handles_by_ids(&state.db, &actor_ids).await.unwrap_or_default();
+
+    let date_fmt = time::format_description::parse(
+        "[day padding:none] [month repr:short] [year], [hour]:[minute]"
+    ).unwrap_or_default();
+
     let events_view = events
         .into_iter()
-        .map(|e| EventView {
-            event_type: e.event_type.clone(),
-            body_html: e.body_md.as_deref().map(render_markdown).unwrap_or_default(),
-            metadata_text: e
-                .metadata
-                .as_ref()
-                .map(|v| v.to_string())
-                .unwrap_or_default(),
-            is_internal: e.is_internal,
-            at: e.created_at.format(&time::format_description::well_known::Rfc3339)
-                .unwrap_or_default(),
+        .map(|e| {
+            let actor_label = e.actor_id
+                .and_then(|id| handles.get(&id.0).cloned())
+                .unwrap_or_else(|| "sistema".to_string());
+            EventView {
+                event_type: e.event_type.clone(),
+                actor_label,
+                body_html: e.body_md.as_deref().map(render_markdown).unwrap_or_default(),
+                metadata_text: e
+                    .metadata
+                    .as_ref()
+                    .map(|v| v.to_string())
+                    .unwrap_or_default(),
+                is_internal: e.is_internal,
+                at: e.created_at.format(&date_fmt).unwrap_or_default(),
+            }
         })
         .collect();
 

@@ -154,3 +154,20 @@ pub async fn touch_last_login(pool: &PgPool, id: Uuid) -> Result<(), sqlx::Error
         .await?;
     Ok(())
 }
+
+/// Devuelve un mapa `id → handle` para los UUIDs dados (en una sola query).
+pub async fn handles_by_ids(
+    pool: &PgPool,
+    ids: &[Uuid],
+) -> Result<std::collections::HashMap<Uuid, String>, sqlx::Error> {
+    if ids.is_empty() {
+        return Ok(std::collections::HashMap::new());
+    }
+    let rows: Vec<(Uuid, String)> = sqlx::query_as(
+        "SELECT id, handle FROM users WHERE id = ANY($1)"
+    )
+    .bind(ids)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().collect())
+}

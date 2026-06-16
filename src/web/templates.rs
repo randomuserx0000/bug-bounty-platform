@@ -408,6 +408,7 @@ pub struct TriageListTemplate {
 
 pub struct EventView {
     pub event_type: String,
+    pub actor_label: String,
     pub body_html: String,
     pub metadata_text: String,
     pub is_internal: bool,
