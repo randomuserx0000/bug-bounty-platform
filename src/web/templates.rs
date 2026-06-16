@@ -383,6 +383,17 @@ pub struct MyReportRow {
     pub title: String,
     pub state: String,
     pub severity: String,
+    pub status_group: String,   // "pendiente" | "rechazado" | "completado"
+    pub program_name: String,
+    pub program_slug: String,
+    pub company_slug: String,
+}
+
+pub struct ReportProgramGroup {
+    pub program_name: String,
+    pub program_slug: String,
+    pub company_slug: String,
+    pub reports: Vec<MyReportRow>,
 }
 
 #[derive(Template)]
@@ -391,7 +402,7 @@ pub struct ReportListTemplate {
     pub year: i32,
     pub handle: String,
     pub account_role: String,
-    pub reports: Vec<MyReportRow>,
+    pub groups: Vec<ReportProgramGroup>,
 }
 
 #[derive(Template)]
@@ -413,6 +424,11 @@ pub struct EventView {
     pub metadata_text: String,
     pub is_internal: bool,
     pub at: String,
+}
+
+pub struct StateOption {
+    pub value: String,
+    pub label: String,
 }
 
 pub struct AttachmentView {
@@ -591,6 +607,13 @@ pub struct ReportShowTemplate {
     pub bounty_usd: String,
     pub is_triager: bool,
     pub is_reporter: bool,
+    /// Para el triager: botones de acción rápida.
+    pub action_accept: bool,
+    pub action_reject: bool,
+    pub action_resolve: bool,
+    /// Transiciones del triager que no tienen botón propio (dropdown).
+    pub other_states: Vec<StateOption>,
+    /// Transiciones disponibles para el reporter (dropdown).
     pub next_states: Vec<String>,
     pub events: Vec<EventView>,
     pub attachments: Vec<AttachmentView>,

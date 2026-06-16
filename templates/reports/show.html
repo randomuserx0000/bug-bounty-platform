@@ -33,25 +33,69 @@
         <article class="policy">{{ repro_html|safe }}</article>
     {% endif %}
 
-    {# === Acciones del triager === #}
+    {# === Acciones de triage (empresa) === #}
     {% if is_triager %}
         <h2>acciones de triage</h2>
         <div class="triage-actions">
-            {% if !next_states.is_empty() %}
-                <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
-                      hx-disabled-elt="find button[type=submit]" class="stack inline-form">
-                    <label>
-                        <span>cambiar estado a</span>
-                        <select name="target">
-                            {% for s in next_states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
-                        </select>
-                    </label>
-                    <label>
-                        <span>nota (opcional)</span>
-                        <input type="text" name="comment" maxlength="200">
-                    </label>
-                    <button class="btn-primary" type="submit">aplicar</button>
-                </form>
+
+            {# Aceptar #}
+            {% if action_accept %}
+            <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+                  hx-disabled-elt="find button[type=submit]">
+                <input type="hidden" name="target" value="accepted">
+                <button class="btn-success" type="submit">✓ aceptar reporte</button>
+            </form>
+            {% endif %}
+
+            {# Rechazar — requiere motivo #}
+            {% if action_reject %}
+            <details class="reject-panel">
+                <summary>✗ rechazar reporte</summary>
+                <div class="reject-form stack">
+                    <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+                          hx-disabled-elt="find button[type=submit]" class="stack">
+                        <input type="hidden" name="target" value="rejected">
+                        <label>
+                            <span>motivo del rechazo <strong>(requerido · el researcher lo verá)</strong></span>
+                            <textarea name="comment" required rows="3" maxlength="800"
+                                placeholder="Ej: no es una vulnerabilidad válida porque no permite acceso a datos de otros usuarios..."></textarea>
+                        </label>
+                        <button class="btn-danger" type="submit">confirmar rechazo</button>
+                    </form>
+                </div>
+            </details>
+            {% endif %}
+
+            {# Resolver (bounty ya debe estar fijado) #}
+            {% if action_resolve %}
+            <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+                  hx-disabled-elt="find button[type=submit]" class="stack inline-form">
+                <input type="hidden" name="target" value="resolved">
+                <label>
+                    <span>nota de cierre (opcional)</span>
+                    <input type="text" name="comment" maxlength="200"
+                           placeholder="Ej: corregido en v2.3.1">
+                </label>
+                <button class="btn-primary" type="submit">marcar como resuelto</button>
+            </form>
+            {% endif %}
+
+            {# Otras transiciones en dropdown #}
+            {% if !other_states.is_empty() %}
+            <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"
+                  hx-disabled-elt="find button[type=submit]" class="stack inline-form">
+                <label>
+                    <span>otras acciones</span>
+                    <select name="target">
+                        {% for s in other_states %}<option value="{{ s.value }}">{{ s.label }}</option>{% endfor %}
+                    </select>
+                </label>
+                <label>
+                    <span>nota (opcional)</span>
+                    <input type="text" name="comment" maxlength="200">
+                </label>
+                <button class="btn-link" type="submit">aplicar</button>
+            </form>
             {% endif %}
 
             <form hx-post="/reports/{{ public_id }}/severity" hx-swap="none"
@@ -78,6 +122,8 @@
                 <button class="btn-link" type="submit">fijar bounty</button>
             </form>
         </div>
+
+    {# === Acciones del researcher === #}
     {% else if is_reporter && !next_states.is_empty() %}
         <h2>tus acciones</h2>
         <form hx-post="/reports/{{ public_id }}/state" hx-swap="none"

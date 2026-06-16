@@ -37,7 +37,7 @@ use crate::state::AppState;
 use crate::web::shared::{current_year, error_fragment, htmx_redirect_owned};
 use crate::web::templates::{
     AttachmentView, EventView, MyReportRow, ReportFormTemplate, ReportListTemplate,
-    ReportShowTemplate, TriageListTemplate,
+    ReportProgramGroup, ReportShowTemplate, StateOption, TriageListTemplate,
 };
 
 /// Tamaño máximo por upload (suma de todos los campos del multipart).
@@ -203,14 +203,62 @@ async fn my_reports(
     State(state): State<AppState>,
     current: CurrentUser,
 ) -> AppResult<impl IntoResponse> {
-    let rows = db::reports::list_for_reporter(&state.db, UserId::from(current.user.id)).await?;
-    let items = rows.into_iter().map(report_row_view).collect();
+    let rows = db::reports::list_for_reporter_with_program(&state.db, UserId::from(current.user.id)).await?;
+
+    // Agrupamos por programa (la query ya viene ordenada por program_slug)
+    let mut groups: Vec<ReportProgramGroup> = Vec::new();
+    for r in rows {
+        let status_group = state_to_status_group(r.state);
+        let row = MyReportRow {
+            public_id: r.public_id,
+            title: r.title,
+            state: r.state.as_str().into(),
+            severity: r.severity.as_str().into(),
+            status_group,
+            program_name: r.program_name.clone(),
+            program_slug: r.program_slug.clone(),
+            company_slug: r.company_slug.clone(),
+        };
+        if let Some(last) = groups.last_mut() {
+            if last.program_slug == r.program_slug {
+                last.reports.push(row);
+                continue;
+            }
+        }
+        groups.push(ReportProgramGroup {
+            program_name: r.program_name,
+            program_slug: r.program_slug,
+            company_slug: r.company_slug,
+            reports: vec![row],
+        });
+    }
+
     Ok(ReportListTemplate {
         year: current_year(),
         handle: current.user.handle,
         account_role: current.user.role.clone(),
-        reports: items,
+        groups,
     })
+}
+
+fn state_to_status_group(state: ReportState) -> String {
+    match state {
+        ReportState::New | ReportState::Triaging | ReportState::NeedsInfo | ReportState::Accepted => "pendiente".into(),
+        ReportState::Rejected | ReportState::Duplicate | ReportState::NotApplicable | ReportState::Informative => "rechazado".into(),
+        ReportState::Resolved | ReportState::Disclosed => "completado".into(),
+    }
+}
+
+fn state_display_label(s: &str) -> &str {
+    match s {
+        "triaging"       => "en revisión (triaging)",
+        "needs_info"     => "solicitar más info",
+        "duplicate"      => "duplicado",
+        "not_applicable" => "no aplica",
+        "informative"    => "informativo",
+        "disclosed"      => "divulgar públicamente",
+        other            => other,
+    }
 }
 
 async fn triage_list(
@@ -220,7 +268,16 @@ async fn triage_list(
 ) -> AppResult<impl IntoResponse> {
     let (company, program) = require_member(&state, &current, &company_slug, &program_slug).await?;
     let rows = db::reports::list_for_program(&state.db, program.id).await?;
-    let items = rows.into_iter().map(report_row_view).collect();
+    let items = rows.into_iter().map(|r| MyReportRow {
+        public_id: r.public_id,
+        title: r.title,
+        state: r.state.as_str().into(),
+        severity: r.severity.as_str().into(),
+        status_group: state_to_status_group(r.state),
+        program_name: program.name.clone(),
+        program_slug: program.slug.clone(),
+        company_slug: company.slug.clone(),
+    }).collect();
     Ok(TriageListTemplate {
         year: current_year(),
         handle: current.user.handle,
@@ -230,15 +287,6 @@ async fn triage_list(
         program_name: program.name,
         reports: items,
     })
-}
-
-fn report_row_view(r: crate::domain::report::ReportRecord) -> MyReportRow {
-    MyReportRow {
-        public_id: r.public_id,
-        title: r.title,
-        state: r.state.as_str().into(),
-        severity: r.severity.as_str().into(),
-    }
 }
 
 // ----------------------------------------------------------------------------
@@ -305,15 +353,34 @@ async fn show(
 
     let r = &ctx.report;
     let actor = if ctx.is_triager { ActorKind::Triager } else { ActorKind::Reporter };
-    let next_states = ReportState::from_str(r.state.as_str())
+    let all_available: Vec<ReportState> = ReportState::from_str(r.state.as_str())
         .map(|cur| {
             all_states()
                 .into_iter()
                 .filter(|s| can_actor_transition(actor, cur, *s))
-                .map(|s| s.as_str().to_string())
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
+
+    // Triager: botones de acción rápida + dropdown para el resto.
+    // Reporter: solo dropdown.
+    let (action_accept, action_reject, action_resolve, other_states, next_states) =
+        if ctx.is_triager {
+            let accept = all_available.contains(&ReportState::Accepted);
+            let reject = all_available.contains(&ReportState::Rejected);
+            let resolve = all_available.contains(&ReportState::Resolved);
+            let others = all_available.iter()
+                .filter(|&&s| !matches!(s, ReportState::Accepted | ReportState::Rejected | ReportState::Resolved))
+                .map(|s| StateOption {
+                    label: state_display_label(s.as_str()).to_string(),
+                    value: s.as_str().to_string(),
+                })
+                .collect::<Vec<_>>();
+            (accept, reject, resolve, others, vec![])
+        } else {
+            let next = all_available.iter().map(|s| s.as_str().to_string()).collect::<Vec<_>>();
+            (false, false, false, vec![], next)
+        };
 
     Ok(ReportShowTemplate {
         year: current_year(),
@@ -331,6 +398,10 @@ async fn show(
         bounty_usd: r.bounty_amount_cents.map(|c| format!("${}", c / 100)).unwrap_or_default(),
         is_triager: ctx.is_triager,
         is_reporter: ctx.is_reporter,
+        action_accept,
+        action_reject,
+        action_resolve,
+        other_states,
         next_states,
         events: events_view,
         attachments: attachments_view,
@@ -407,6 +478,12 @@ async fn change_state(
         return Ok(error_fragment("transición no permitida"));
     }
 
+    // Rechazar requiere motivo explícito cuando lo hace el triager.
+    let comment_text = form.comment.as_deref().unwrap_or("").trim().to_string();
+    if matches!(target, ReportState::Rejected) && ctx.is_triager && comment_text.is_empty() {
+        return Ok(error_fragment("debes indicar el motivo del rechazo para que el researcher pueda entender la decisión"));
+    }
+
     db::reports::update_state(&state.db, ctx.report.id, target).await?;
     audit::log(&state.db, audit::AuditEntry::new(audit::REPORT_STATE_CHANGE)
         .actor(current.user.id).target("report", ctx.report.id)
@@ -415,23 +492,27 @@ async fn change_state(
             "from": ctx.report.state.as_str(),
             "to": target.as_str(),
         }))).await;
+    let body_opt = if comment_text.is_empty() { None } else { Some(comment_text.clone()) };
     db::report_events::create(
         &state.db,
         db::report_events::NewEvent {
             report_id: ctx.report.id,
             actor_id: Some(UserId::from(current.user.id)),
             event_type: EventType::StateChange,
-            body_md: opt(&form.comment),
+            body_md: body_opt.as_deref(),
             metadata: Some(json!({ "from": ctx.report.state.as_str(), "to": target.as_str() })),
             is_internal: false,
         },
     )
     .await?;
 
-    let _ = notify_other_side(
-        &state, &ctx, &current, &public_id,
-        &format!("estado: {} → {}", ctx.report.state.as_str(), target.as_str()),
-    ).await;
+    // Notificación: incluir el motivo si lo hay (especialmente en rechazos).
+    let notify_msg = if comment_text.is_empty() {
+        format!("estado: {} → {}", ctx.report.state.as_str(), target.as_str())
+    } else {
+        format!("estado: {} → {}\n\n{}", ctx.report.state.as_str(), target.as_str(), comment_text)
+    };
+    let _ = notify_other_side(&state, &ctx, &current, &public_id, &notify_msg).await;
 
     // Hook de payouts: si pasamos a `resolved` y hay bounty fijado, generar
     // el payout (pending o failed según método de pago + escrow). Errores

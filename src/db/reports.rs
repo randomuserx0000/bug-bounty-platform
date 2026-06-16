@@ -44,6 +44,36 @@ pub async fn list_for_reporter(
         .await
 }
 
+#[derive(Debug, sqlx::FromRow)]
+pub struct ReportListRow {
+    pub public_id: String,
+    pub title: String,
+    pub severity: ReportSeverity,
+    pub state: ReportState,
+    pub program_name: String,
+    pub program_slug: String,
+    pub company_slug: String,
+}
+
+pub async fn list_for_reporter_with_program(
+    pool: &PgPool,
+    reporter_id: UserId,
+) -> Result<Vec<ReportListRow>, sqlx::Error> {
+    sqlx::query_as::<_, ReportListRow>(
+        "SELECT r.public_id, r.title, r.severity, r.state,
+                p.name as program_name, p.slug as program_slug,
+                c.slug as company_slug
+         FROM reports r
+         JOIN programs p ON p.id = r.program_id
+         JOIN companies c ON c.id = p.company_id
+         WHERE r.reporter_id = $1
+         ORDER BY p.slug, r.created_at DESC"
+    )
+    .bind(reporter_id)
+    .fetch_all(pool)
+    .await
+}
+
 pub async fn list_for_program(
     pool: &PgPool,
     program_id: ProgramId,

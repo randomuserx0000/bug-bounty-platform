@@ -11,27 +11,37 @@
         </div>
     </header>
 
-    {% if reports.is_empty() %}
+    {% if groups.is_empty() %}
         <div class="empty">
             <p>todavía no has enviado reports.</p>
             <p class="muted"><a href="/programs">explora programas públicos</a> para empezar.</p>
         </div>
     {% else %}
-        <table class="data-table">
-            <thead>
-                <tr><th>id</th><th>título</th><th>severity</th><th>estado</th></tr>
-            </thead>
-            <tbody>
-            {% for r in reports %}
-                <tr>
-                    <td><a href="/reports/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
-                    <td>{{ r.title }}</td>
-                    <td><span class="badge sev-{{ r.severity }}">{{ r.severity }}</span></td>
-                    <td><span class="badge state-{{ r.state }}">{{ r.state }}</span></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% for g in groups %}
+        <div class="program-reports-group">
+            <h2 class="group-heading">
+                <a href="/programs/{{ g.company_slug }}/{{ g.program_slug }}">{{ g.program_name }}</a>
+            </h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>id</th><th>título</th><th>severity</th><th>estado</th></tr>
+                </thead>
+                <tbody>
+                {% for r in g.reports %}
+                    <tr>
+                        <td><a href="/reports/{{ r.public_id }}"><code>{{ r.public_id }}</code></a></td>
+                        <td>{{ r.title }}</td>
+                        <td><span class="badge sev-{{ r.severity }}">{{ r.severity }}</span></td>
+                        <td>
+                            <span class="badge sg-{{ r.status_group }}">{{ r.status_group }}</span>
+                            <small class="muted">{{ r.state }}</small>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
     {% endif %}
 
     <p class="muted small"><a href="/dashboard">← dashboard</a></p>

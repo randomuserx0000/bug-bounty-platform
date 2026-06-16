@@ -419,6 +419,24 @@ button[type="submit"]:not(.btn-link):not(.btn-link.danger):hover { filter: brigh
 .btn-link:hover { background: var(--brand-50); color: var(--brand-700); }
 .btn-link.danger { color: var(--accent-500); }
 .btn-link.danger:hover { background: #fef2f2; color: var(--accent-600); }
+.btn-danger, button.btn-danger {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(180deg, #ef4444, #dc2626);
+    color: white !important; border: 0; border-radius: 8px;
+    font-weight: 600; font-size: 0.92rem; cursor: pointer;
+    transition: filter .15s ease;
+}
+.btn-danger:hover { filter: brightness(1.08); }
+.btn-success, button.btn-success {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(180deg, #22c55e, #16a34a);
+    color: white !important; border: 0; border-radius: 8px;
+    font-weight: 600; font-size: 0.92rem; cursor: pointer;
+    transition: filter .15s ease;
+}
+.btn-success:hover { filter: brightness(1.08); }
 form.inline { display: inline; margin: 0; }
 .inline-form { margin: 0; }
 .inline-form label { margin-bottom: 8px; }
@@ -517,6 +535,34 @@ a.badge-alert:hover { background: #fee2e2; }
 .state-disclosed     { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
 .state-rejected, .state-duplicate, .state-not_applicable, .state-informative {
     background: var(--mist); color: var(--slate2);
+}
+
+/* Report list grouped by program */
+.program-reports-group { margin-bottom: 2rem; }
+.group-heading { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--slate1); }
+.group-heading a { color: inherit; text-decoration: none; }
+.group-heading a:hover { color: var(--brand-600); }
+
+/* Status group (researcher list) */
+.sg-pendiente  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.sg-rechazado  { background: var(--mist); color: var(--slate2); }
+.sg-completado { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+
+/* Reject panel (details/summary) */
+.reject-panel > summary {
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(180deg, #ef4444, #dc2626);
+    color: white; border: 0; border-radius: 8px;
+    font-weight: 600; font-size: 0.92rem; list-style: none;
+    transition: filter .15s ease;
+}
+.reject-panel > summary:hover { filter: brightness(1.08); }
+.reject-panel > summary::-webkit-details-marker { display: none; }
+.reject-panel[open] > summary { border-radius: 8px 8px 0 0; }
+.reject-panel .reject-form {
+    border: 1px solid #fca5a5; border-radius: 0 8px 8px 8px;
+    padding: 16px; background: #fff5f5;
 }
 
 /* Payouts */
