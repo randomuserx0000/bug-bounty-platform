@@ -13,6 +13,7 @@ use crate::config::Config;
 
 pub mod assets;
 pub mod attachments;
+pub mod email_verifications;
 pub mod companies;
 pub mod courses;
 pub mod dashboard;

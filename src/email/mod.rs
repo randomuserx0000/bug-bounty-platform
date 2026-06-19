@@ -1,15 +1,8 @@
-//! Envío de email transaccional.
-//!
-//! El proveedor real (Postmark / Resend / SES) requiere dominio verificado
-//! y credenciales. Hasta entonces vivimos con [`LogOnly`], que escribe el
-//! email al log y devuelve Ok — suficiente para desarrollar el flujo de
-//! reports y revisar que los hooks disparen en los momentos correctos.
-//!
-//! El día que elijamos proveedor: añadir una impl que llame su API HTTP
-//! (con `reqwest`) y cambiar el constructor en `main.rs`. Los handlers
-//! no se enteran.
-
 use async_trait::async_trait;
+use lettre::{
+    AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
+    message::header::ContentType,
+};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -22,8 +15,12 @@ pub struct Email {
 
 #[derive(Debug, thiserror::Error)]
 pub enum EmailError {
-    #[error("provider error: {0}")]
-    Provider(String),
+    #[error("smtp error: {0}")]
+    Smtp(#[from] lettre::transport::smtp::Error),
+    #[error("build error: {0}")]
+    Build(#[from] lettre::error::Error),
+    #[error("address error: {0}")]
+    Address(#[from] lettre::address::AddressError),
 }
 
 #[async_trait]
@@ -34,7 +31,6 @@ pub trait EmailSender: Send + Sync {
 pub type SharedEmailSender = Arc<dyn EmailSender>;
 
 /// Stub que no envía nada — sólo loggea. Pensado para dev y para tests.
-/// En prod cae el deploy y forzamos a inyectar un sender real.
 pub struct LogOnly;
 
 #[async_trait]
@@ -47,6 +43,35 @@ impl EmailSender for LogOnly {
             "would send email"
         );
         tracing::debug!(text = %e.text_body, "email body");
+        Ok(())
+    }
+}
+
+pub struct SmtpSender {
+    transport: AsyncSmtpTransport<Tokio1Executor>,
+    from: String,
+}
+
+impl SmtpSender {
+    /// Conecta sin TLS al servidor SMTP local (Postfix en 127.0.0.1:25).
+    pub fn new(host: &str, port: u16, from: String) -> Self {
+        let transport = AsyncSmtpTransport::<Tokio1Executor>::builder_dangerous(host)
+            .port(port)
+            .build();
+        Self { transport, from }
+    }
+}
+
+#[async_trait]
+impl EmailSender for SmtpSender {
+    async fn send(&self, email: &Email) -> Result<(), EmailError> {
+        let msg = Message::builder()
+            .from(self.from.parse()?)
+            .to(email.to.parse()?)
+            .subject(&email.subject)
+            .header(ContentType::TEXT_HTML)
+            .body(email.html_body.clone())?;
+        self.transport.send(msg).await?;
         Ok(())
     }
 }

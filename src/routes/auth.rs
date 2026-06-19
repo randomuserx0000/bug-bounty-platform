@@ -15,17 +15,21 @@ use std::net::SocketAddr;
 use time::OffsetDateTime;
 use validator::Validate;
 
+use sha2::Digest as _;
+
 use crate::audit;
 use crate::auth::{self, SESSION_COOKIE};
 use crate::db;
 use crate::error::AppResult;
 use crate::state::AppState;
-use crate::web::templates::{FormErrorPartial, LoginTemplate, SignupTemplate};
+use crate::web::templates::{FormErrorPartial, LoginTemplate, SignupPendingTemplate, SignupTemplate};
 
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/login", get(login_form).post(login_submit))
         .route("/signup", get(signup_form).post(signup_submit))
+        .route("/signup/pending", get(signup_pending))
+        .route("/verify-email", get(verify_email))
         .route("/logout", axum::routing::post(logout))
 }
 
@@ -152,7 +156,7 @@ async fn signup_submit(
     State(state): State<AppState>,
     jar: SignedCookieJar,
     ConnectInfo(remote): ConnectInfo<SocketAddr>,
-    headers_in: HeaderMap,
+    _headers_in: HeaderMap,
     Form(form): Form<SignupForm>,
 ) -> AppResult<axum::response::Response> {
     if let Err(errs) = form.validate() {
@@ -189,13 +193,78 @@ async fn signup_submit(
         Err(e) => return Err(e.into()),
     };
 
-    let cookie = issue_session(&state, &user.id, &remote, &headers_in).await?;
     audit::log(&state.db, audit::AuditEntry::new(audit::USER_SIGNUP)
         .actor(user.id).ip(remote.ip())
         .target("user", user.id)
         .metadata(serde_json::json!({ "handle": user.handle }))).await;
+
+    // Generar token de verificación (32 bytes aleatorios, almacenamos el hash)
+    let token = {
+        let mut bytes = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut bytes);
+        hex::encode(bytes)
+    };
+    let token_hash = hex::encode(sha2::Sha256::digest(token.as_bytes()));
+
+    db::email_verifications::create(&state.db, user.id, &token_hash)
+        .await
+        .map_err(|e| anyhow::anyhow!("email_verif insert: {e}"))?;
+
+    let verify_url = format!("{}/verify-email?token={token}", state.cfg.public_url);
+    let _ = state.email.send(&crate::email::Email {
+        to: form.email.clone(),
+        subject: "Confirma tu cuenta — Escudo Digital".to_string(),
+        html_body: format!(
+            "<p>Haz clic para activar tu cuenta:</p>\
+             <p><a href=\"{verify_url}\">{verify_url}</a></p>"
+        ),
+        text_body: format!("Activa tu cuenta: {verify_url}"),
+    }).await;
+
+    Ok(redirect_response(jar, "/signup/pending"))
+}
+
+// ---------- email verification ----------
+
+async fn signup_pending() -> impl IntoResponse {
+    SignupPendingTemplate {
+        year: current_year(),
+        handle: String::new(),
+        account_role: String::new(),
+    }
+}
+
+async fn verify_email(
+    State(state): State<AppState>,
+    jar: SignedCookieJar,
+    ConnectInfo(remote): ConnectInfo<SocketAddr>,
+    headers_in: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<std::collections::HashMap<String, String>>,
+) -> AppResult<axum::response::Response> {
+    let token = params
+        .get("token")
+        .ok_or_else(|| crate::error::AppError::Validation("token requerido".into()))?;
+    let token_hash = hex::encode(sha2::Sha256::digest(token.as_bytes()));
+
+    let row = db::email_verifications::consume(&state.db, &token_hash)
+        .await
+        .map_err(|e| anyhow::anyhow!("email_verif consume: {e}"))?
+        .ok_or(crate::error::AppError::NotFound)?;
+
+    sqlx::query("UPDATE users SET status = 'active' WHERE id = $1")
+        .bind(row.user_id)
+        .execute(&state.db)
+        .await
+        .map_err(|e| anyhow::anyhow!("update user status: {e}"))?;
+
+    let cookie = issue_session(&state, &row.user_id, &remote, &headers_in).await?;
     let jar = jar.add(cookie);
-    Ok(redirect_response(jar, "/dashboard"))
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        axum::http::header::LOCATION,
+        HeaderValue::from_static("/dashboard"),
+    );
+    Ok((StatusCode::SEE_OTHER, headers, jar, "").into_response())
 }
 
 // ---------- logout ----------

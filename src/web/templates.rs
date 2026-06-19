@@ -109,6 +109,14 @@ pub struct SignupTemplate {
     pub account_role: String,
 }
 
+#[derive(Template)]
+#[template(path = "signup_pending.html")]
+pub struct SignupPendingTemplate {
+    pub year: i32,
+    pub handle: String,
+    pub account_role: String,
+}
+
 /// Fragmento de error de formulario. Lo inyecta HTMX en `#form-feedback`.
 #[derive(Template)]
 #[template(path = "partials/form_error.html")]

@@ -58,8 +58,20 @@ pub struct Config {
     /// queda en BD + audit log).
     #[serde(default)]
     pub osint_notify_email: String,
+
+    // ---- SMTP (Postfix local) ----
+    #[serde(default = "default_smtp_host")]
+    pub smtp_host: String,
+    #[serde(default = "default_smtp_port")]
+    pub smtp_port: u16,
+    #[serde(default = "default_smtp_from")]
+    pub smtp_from: String,
 }
 
+
+fn default_smtp_host() -> String { "127.0.0.1".to_string() }
+fn default_smtp_port() -> u16 { 25 }
+fn default_smtp_from() -> String { "noreply@cristiancorderosecurity.com".to_string() }
 
 fn default_bind() -> String { "127.0.0.1:8080".into() }
 fn default_db_max_conn() -> u32 { 10 }
