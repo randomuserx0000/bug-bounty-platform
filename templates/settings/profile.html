@@ -181,32 +181,6 @@
         </div>
       </div>
 
-      {# Apariencia #}
-      <div class="pf-card">
-        <h2>Apariencia</h2>
-        <div class="theme-grid">
-          <button type="button" class="theme-opt" data-theme-val="light" onclick="bbSetTheme('light')">
-            <div class="theme-opt-preview theme-opt-light"></div>
-            <span>Claro</span>
-          </button>
-          <button type="button" class="theme-opt" data-theme-val="dark" onclick="bbSetTheme('dark')">
-            <div class="theme-opt-preview theme-opt-dark"></div>
-            <span>Oscuro</span>
-          </button>
-          <button type="button" class="theme-opt" data-theme-val="system" onclick="bbSetTheme('system')">
-            <div class="theme-opt-preview theme-opt-system"></div>
-            <span>Sistema</span>
-          </button>
-        </div>
-        <script>
-          (function() {
-            var cur = localStorage.getItem('bb-theme') || 'light';
-            document.querySelectorAll('[data-theme-val]').forEach(function(btn) {
-              if (btn.dataset.themeVal === cur) btn.classList.add('theme-opt--active');
-            });
-          })();
-        </script>
-      </div>
 
     </div>
   </div>

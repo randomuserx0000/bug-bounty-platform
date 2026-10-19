@@ -4,13 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#007a96">
+    <meta name="theme-color" content="#0A0F1C">
+    <meta name="color-scheme" content="dark">
     <title>{% block title %}Escudo Digital{% endblock %}</title>
 
-    {# Fuentes Inter + JetBrains Mono (estilo redseg). #}
+    {# Archivo (eje de ancho 62–125: expandida para títulos y cifras) + JetBrains Mono para código. #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     {# HTMX desde CDN. Suficiente para MVP; en prod self-host con SRI. #}
     <script src="https://unpkg.com/htmx.org@2.0.3"
@@ -26,22 +27,13 @@
     <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="/static/app.css">
-    <script>
-      (function(){
-        var t=localStorage.getItem('bb-theme');
-        if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}
-        else if(t==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches){
-          document.documentElement.setAttribute('data-theme','dark');
-        }
-      })();
-    </script>
 </head>
 <body>
     {# Top strip mini, estilo redseg #}
     <div class="topstrip">
         <div class="topstrip-inner">
-            <span><span class="live-dot"></span>&nbsp;&nbsp;Escudo Digital · ciberseguridad para Venezuela y LATAM</span>
-            <span class="hidden-mobile"><a href="/programs">programas públicos</a></span>
+            <span><span class="live-dot"></span>&nbsp;&nbsp;Bug bounty para Venezuela y Latinoamérica</span>
+            <span class="hidden-mobile"><a href="/programs">Ver programas públicos</a></span>
         </div>
     </div>
 
@@ -49,7 +41,7 @@
     <header class="topbar">
         <div class="topbar-inner">
             <a href="/" class="brand">
-                <span class="brand-dot"></span>
+                <span class="brand-dot" aria-hidden="true"></span>
                 Escudo Digital
             </a>
             <nav>
@@ -115,11 +107,9 @@
     </main>
 
     <footer class="foot">
-        <div>
-            <strong style="color: var(--ink);">Escudo Digital</strong>
-            · plataforma regional de bug bounty para Venezuela y LATAM
-        </div>
-        <div style="margin-top: 6px;">
+        <div class="foot-inner">
+            <a href="/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Escudo Digital</a>
+            <span>Plataforma regional de bug bounty para Venezuela y Latinoamérica</span>
             <small>© {{ year }}</small>
         </div>
     </footer>
@@ -153,25 +143,6 @@
         document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
         document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
 
-        function bbSetTheme(t) {
-            if (t === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('bb-theme', 'dark');
-            } else if (t === 'light') {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('bb-theme', 'light');
-            } else {
-                localStorage.setItem('bb-theme', 'system');
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-theme');
-                }
-            }
-            document.querySelectorAll('[data-theme-val]').forEach(function(btn) {
-                btn.classList.toggle('theme-opt--active', btn.dataset.themeVal === t);
-            });
-        }
 
         // Dropdown del menú de usuario en el topbar.
         function bbToggleUserMenu(ev) {
