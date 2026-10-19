@@ -91,16 +91,21 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio:latest
+    # Las imagenes oficiales minio/minio y minio/mc ya no se publican en
+    # Docker Hub ni Quay. Chainguard mantiene una build que trae minio + mc.
+    image: cgr.dev/chainguard/minio:latest
     restart: unless-stopped
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      # Para el healthcheck con `mc ready` (la imagen no trae curl).
+      MC_CONFIG_DIR: /tmp/.mc
+      MC_HOST_local: http://${MINIO_ROOT_USER:-minioadmin}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000
     command: server /data --console-address ":9001"
     volumes:
       - miniodata:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -109,7 +114,10 @@ services:
     # publicar /minio:9001 como segundo servicio HTTP en Coolify.
 
   minio-init:
-    image: minio/mc:latest
+    # Misma imagen que minio: incluye el cliente `mc` y /bin/sh.
+    image: cgr.dev/chainguard/minio:latest
+    environment:
+      MC_CONFIG_DIR: /tmp/.mc
     depends_on:
       minio:
         condition: service_healthy
