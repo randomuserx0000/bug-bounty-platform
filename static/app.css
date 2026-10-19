@@ -26,11 +26,16 @@
     --ink-2: #B4BDD1;
     --muted: #8590A8;
 
-    /* Acento "señal" */
-    --signal:   #2FD3F5;
-    --signal-2: #5B7CFF;
-    --grad: linear-gradient(100deg, var(--signal) 0%, var(--signal-2) 100%);
-    --signal-soft: rgba(47, 211, 245, .12);
+    /* Acento de marca: el azul del logo.
+       --brand-solid para rellenos (botones, avatar, barras) con texto blanco.
+       --signal es el mismo azul aclarado, para texto y bordes sobre fondo oscuro
+       (el azul puro no alcanza contraste suficiente en texto pequeño). */
+    --brand-solid: #1F5EFF;
+    --brand-hover: #3A72FF;
+    --signal:   #6E97FF;
+    --signal-2: #1F5EFF;
+    --grad: var(--brand-solid);
+    --signal-soft: rgba(31, 94, 255, .14);
 
     /* Severidades */
     --sev-critical: #FF4D6D;
@@ -58,7 +63,7 @@
     --r-pill: 999px;
 
     --shadow-pop: 0 18px 40px -12px rgba(0, 0, 0, .6);
-    --ring: 0 0 0 3px rgba(47, 211, 245, .35);
+    --ring: 0 0 0 3px rgba(31, 94, 255, .35);
 
     --page-max: 1200px;
     --gutter: 24px;
@@ -70,8 +75,8 @@
     --mist: var(--surface-2);
     --brand: var(--signal);
     --brand-50: var(--signal-soft);
-    --brand-100: rgba(47, 211, 245, .2);
-    --brand-200: rgba(47, 211, 245, .35);
+    --brand-100: rgba(31, 94, 255, .2);
+    --brand-200: rgba(31, 94, 255, .35);
     --brand-500: var(--signal);
     --brand-600: var(--signal);
     --brand-700: var(--signal);
@@ -104,11 +109,11 @@ body {
 }
 
 a { color: var(--signal); text-decoration: none; transition: color .15s ease; }
-a:hover { color: #7FE4F9; }
+a:hover { color: #9DB8FF; }
 
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--r-xs); }
 
-::selection { background: rgba(47, 211, 245, .3); color: #fff; }
+::selection { background: rgba(31, 94, 255, .3); color: #fff; }
 
 code, pre, kbd { font-family: var(--font-mono); font-size: .88em; }
 code {
@@ -235,12 +240,11 @@ strong { font-weight: 650; color: var(--ink); }
     letter-spacing: -0.02em;
 }
 .brand:hover { color: var(--ink); }
-/* Marca: escudo geométrico con el degradado de señal */
-.brand-dot {
-    width: 18px; height: 20px;
-    background: var(--grad);
-    clip-path: polygon(50% 0, 100% 16%, 100% 52%, 50% 100%, 0 52%, 0 16%);
-}
+/* Logo horizontal (static/brand/escudo-logo-on-dark.svg).
+   El SVG ya incluye símbolo + texto; la altura manda y el ancho sigue la proporción. */
+.brand-logo { display: block; height: 26px; width: auto; }
+.foot .brand-logo { height: 22px; }
+@media (max-width: 480px) { .topbar .brand-logo { height: 22px; } }
 .topbar nav {
     display: flex;
     gap: 4px;
@@ -279,8 +283,8 @@ strong { font-weight: 650; color: var(--ink); }
 .user-avatar {
     width: 28px; height: 28px;
     border-radius: 50%;
-    background: var(--grad);
-    color: var(--bg);
+    background: var(--brand-solid);
+    color: #fff;
     font-weight: 800;
     font-size: .8rem;
     display: inline-flex; align-items: center; justify-content: center;
@@ -408,7 +412,7 @@ button[type="submit"]:not(.btn-link):not(.btn-danger):not(.btn-success):not(.use
     gap: 8px;
     padding: 11px 20px;
     background: var(--grad);
-    color: #06121F !important;
+    color: #fff !important;
     border: 0;
     border-radius: var(--r-sm);
     font: inherit;
@@ -421,8 +425,8 @@ button[type="submit"]:not(.btn-link):not(.btn-danger):not(.btn-success):not(.use
 }
 .btn-primary:hover,
 button[type="submit"]:not(.btn-link):not(.btn-danger):not(.btn-success):not(.user-menu-logout):hover {
-    filter: brightness(1.1);
-    color: #06121F !important;
+    background: var(--brand-hover);
+    color: #fff !important;
 }
 .btn-primary:active,
 button[type="submit"]:not(.btn-link):active { transform: translateY(1px); }
@@ -461,7 +465,7 @@ button[type="submit"]:not(.btn-link):active { transform: translateY(1px); }
     border-radius: var(--r-xs);
     transition: background .15s ease, color .15s ease;
 }
-.btn-link:hover { background: var(--signal-soft); color: #7FE4F9; }
+.btn-link:hover { background: var(--signal-soft); color: #9DB8FF; }
 .btn-link.danger { color: var(--danger); }
 .btn-link.danger:hover { background: rgba(255, 77, 109, .1); color: #FF7A93; }
 
@@ -1278,7 +1282,7 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
 }
 .EasyMDEContainer .CodeMirror-cursor { border-left-color: var(--signal); }
 .EasyMDEContainer .CodeMirror-selected,
-.EasyMDEContainer .CodeMirror-focused .CodeMirror-selected { background: rgba(47, 211, 245, .2); }
+.EasyMDEContainer .CodeMirror-focused .CodeMirror-selected { background: rgba(31, 94, 255, .2); }
 .EasyMDEContainer .editor-toolbar {
     background: var(--surface-2);
     border-color: var(--line-strong);
@@ -1309,8 +1313,8 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     padding: 72px var(--gutter) 64px;
     border-bottom: 1px solid var(--line);
     background:
-        radial-gradient(900px 420px at 88% -10%, rgba(91, 124, 255, .16), transparent 70%),
-        radial-gradient(700px 360px at 70% 110%, rgba(47, 211, 245, .08), transparent 70%);
+        radial-gradient(900px 420px at 88% -10%, rgba(31, 94, 255, .16), transparent 70%),
+        radial-gradient(700px 360px at 70% 110%, rgba(31, 94, 255, .08), transparent 70%);
     overflow: hidden;
 }
 .hero-inner {
@@ -1345,10 +1349,7 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     font-stretch: var(--wide);
     letter-spacing: -0.06em;
     line-height: .85;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--brand-solid);
 }
 .hero-figure-caption { color: var(--ink); font-size: 1.05rem; font-weight: 550; margin: 14px 0 22px; max-width: 30ch; }
 .hero-figure-vs {
@@ -1418,7 +1419,7 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     flex-direction: column;
 }
 .compare-card.compare-old { background: transparent; }
-.compare-card.compare-new { border-color: rgba(47, 211, 245, .4); }
+.compare-card.compare-new { border-color: rgba(31, 94, 255, .4); }
 .compare-card header { margin-bottom: 14px; }
 .compare-tag { font-size: .86rem; color: var(--muted); font-weight: 550; }
 .compare-card.compare-new .compare-tag { color: var(--signal); }
@@ -1584,8 +1585,8 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     flex-shrink: 0;
 }
 .country-card.hub .cc { box-shadow: inset 0 0 0 1px var(--signal); color: var(--signal); }
-.country-card.focus { border-color: rgba(47, 211, 245, .45); }
-.country-card.focus .cc { background: var(--grad); color: #06121F; }
+.country-card.focus { border-color: rgba(31, 94, 255, .45); }
+.country-card.focus .cc { background: var(--brand-solid); color: #fff; }
 .country-card.mute .cc { color: var(--muted); }
 .country-card strong { display: block; font-size: .94rem; }
 .country-card small { display: block; font-size: .8rem; color: var(--muted); margin-top: 1px; }
@@ -1596,7 +1597,7 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     border-radius: var(--r-lg);
     padding: 48px;
     background:
-        radial-gradient(600px 300px at 100% 0%, rgba(91, 124, 255, .18), transparent 70%),
+        radial-gradient(600px 300px at 100% 0%, rgba(31, 94, 255, .18), transparent 70%),
         var(--surface);
     display: flex;
     justify-content: space-between;
@@ -1621,7 +1622,7 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     border-radius: var(--r-md);
     padding: 18px 16px;
 }
-.price-card.price-osint { border-color: rgba(47, 211, 245, .45); }
+.price-card.price-osint { border-color: rgba(31, 94, 255, .45); }
 .price-emoji { font-size: 1.4rem; display: block; margin-bottom: 6px; }
 .price-label { font-weight: 650; font-size: .9rem; color: var(--ink-2); }
 .price-range {
@@ -1744,14 +1745,14 @@ a.badge-alert:hover { background: color-mix(in srgb, var(--c) 22%, transparent);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background:
-        radial-gradient(500px 240px at 100% 0%, rgba(91, 124, 255, .2), transparent 70%),
+        radial-gradient(500px 240px at 100% 0%, rgba(31, 94, 255, .2), transparent 70%),
         var(--surface);
 }
 .pf-avatar {
     width: 84px; height: 84px;
     border-radius: 50%;
-    background: var(--grad);
-    color: #06121F;
+    background: var(--brand-solid);
+    color: #fff;
     font-size: 2.1rem;
     font-weight: 850;
     font-stretch: var(--wide);

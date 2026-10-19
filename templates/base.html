@@ -7,6 +7,9 @@
     <meta name="theme-color" content="#0A0F1C">
     <meta name="color-scheme" content="dark">
     <title>{% block title %}Escudo Digital{% endblock %}</title>
+    <link rel="icon" href="/static/brand/escudo-favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/static/brand/escudo-favicon-32px.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="/static/brand/escudo-app-icon-180px.png">
 
     {# Archivo (eje de ancho 62–125: expandida para títulos y cifras) + JetBrains Mono para código. #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,9 +43,8 @@
     {# Sticky header #}
     <header class="topbar">
         <div class="topbar-inner">
-            <a href="/" class="brand">
-                <span class="brand-dot" aria-hidden="true"></span>
-                Escudo Digital
+            <a href="/" class="brand" aria-label="Escudo Digital, inicio">
+                <img class="brand-logo" src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="184" height="26">
             </a>
             <nav>
                 {% if handle.is_empty() %}
@@ -108,7 +110,7 @@
 
     <footer class="foot">
         <div class="foot-inner">
-            <a href="/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Escudo Digital</a>
+            <a href="/" class="brand" aria-label="Escudo Digital, inicio"><img class="brand-logo" src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="156" height="22" loading="lazy"></a>
             <span>Plataforma regional de bug bounty para Venezuela y Latinoamérica</span>
             <small>© {{ year }}</small>
         </div>
