@@ -260,11 +260,25 @@ pub struct CompanyShowTemplate {
 pub struct ProgramPublicCardView {
     pub company_slug: String,
     pub company_name: String,
+    /// Hasta dos iniciales de la empresa, para el logo provisional.
+    pub initials: String,
     pub program_slug: String,
     pub name: String,
     pub summary: String,
     pub bounty_low: String,
     pub bounty_critical: String,
+    /// Recompensa máxima en centavos (crítica, o la mínima si no hay crítica).
+    pub max_cents: i64,
+    /// Categorías cortas de los activos en alcance ("Web", "API", "Móvil"…).
+    pub asset_labels: Vec<String>,
+    /// Las mismas categorías como claves separadas por espacio, para el filtro del cliente.
+    pub asset_keys: String,
+    /// "Hoy", "Hace 3 días"…
+    pub updated_label: String,
+    /// Unix timestamp de la última actualización, para ordenar por recientes.
+    pub updated_ts: i64,
+    /// Lanzado en los últimos 7 días.
+    pub is_new: bool,
 }
 
 #[derive(Template)]
@@ -348,6 +362,7 @@ pub struct ProgramShowTemplate {
     pub total_reports: i64,
     pub resolved_reports: i64,
     pub avg_response: String,
+    pub company_initials: String,
 }
 
 // ---------- assets ----------

@@ -8,7 +8,94 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use time::OffsetDateTime;
 
-use super::templates::{FormErrorPartial, FormOkPartial, PriceTierView};
+use super::templates::{FormErrorPartial, FormOkPartial, PriceTierView, ProgramPublicCardView};
+use crate::db::programs::PublicProgramRow;
+
+/// Formatea centavos como dólares con separador de miles: 800000 → "$8.000".
+pub fn format_usd(cents: i64) -> String {
+    let dollars = (cents / 100).to_string();
+    let mut out = String::with_capacity(dollars.len() + 4);
+    for (i, ch) in dollars.chars().enumerate() {
+        if i > 0 && (dollars.len() - i) % 3 == 0 {
+            out.push('.');
+        }
+        out.push(ch);
+    }
+    format!("${out}")
+}
+
+/// Hasta dos iniciales en mayúscula: "Banco Andino" → "BA", "TeleRed" → "T".
+pub fn initials(name: &str) -> String {
+    let s: String = name
+        .split_whitespace()
+        .filter_map(|w| w.chars().next())
+        .take(2)
+        .collect::<String>()
+        .to_uppercase();
+    if s.is_empty() { "?".into() } else { s }
+}
+
+/// Agrupa un tipo de activo en una categoría corta para listados y filtros.
+fn asset_category(asset_type: &str) -> (&'static str, &'static str) {
+    match asset_type {
+        "web" => ("web", "Web"),
+        "api" => ("api", "API"),
+        "mobile_android" | "mobile_ios" => ("movil", "Móvil"),
+        "infra_host" | "infra_range" | "iot_endpoint" => ("infra", "Infraestructura"),
+        "firmware" => ("firmware", "Firmware"),
+        "hardware_device" | "radio_signal" => ("hardware", "Hardware"),
+        "source_repo" | "package" => ("codigo", "Código"),
+        _ => ("otro", "Otro"),
+    }
+}
+
+/// "Hoy", "Ayer", "Hace 3 días", "Hace 2 semanas", "Hace 4 meses".
+pub fn relative_es(when: OffsetDateTime) -> String {
+    let days = (OffsetDateTime::now_utc() - when).whole_days().max(0);
+    match days {
+        0 => "Hoy".into(),
+        1 => "Ayer".into(),
+        2..=6 => format!("Hace {days} días"),
+        7..=13 => "Hace 1 semana".into(),
+        14..=29 => format!("Hace {} semanas", days / 7),
+        30..=59 => "Hace 1 mes".into(),
+        _ => format!("Hace {} meses", days / 30),
+    }
+}
+
+/// Construye la fila de un programa público para la home y el listado.
+pub fn program_card(r: PublicProgramRow) -> ProgramPublicCardView {
+    let mut keys: Vec<&'static str> = Vec::new();
+    let mut labels: Vec<String> = Vec::new();
+    for t in &r.asset_types {
+        let (k, l) = asset_category(t);
+        if !keys.contains(&k) {
+            keys.push(k);
+            labels.push(l.to_string());
+        }
+    }
+    let max_cents = r.bounty_critical_cents.or(r.bounty_low_cents).unwrap_or(0) as i64;
+    let is_new = r
+        .launched_at
+        .map(|t| (OffsetDateTime::now_utc() - t).whole_days() < 7)
+        .unwrap_or(false);
+    ProgramPublicCardView {
+        initials: initials(&r.company_name),
+        company_slug: r.company_slug,
+        company_name: r.company_name,
+        program_slug: r.slug,
+        name: r.name,
+        summary: r.summary.unwrap_or_default(),
+        bounty_low: r.bounty_low_cents.map(|c| format_usd(c as i64)).unwrap_or_default(),
+        bounty_critical: r.bounty_critical_cents.map(|c| format_usd(c as i64)).unwrap_or_default(),
+        max_cents,
+        asset_labels: labels,
+        asset_keys: keys.join(" "),
+        updated_label: relative_es(r.updated_at),
+        updated_ts: r.updated_at.unix_timestamp(),
+        is_new,
+    }
+}
 
 pub fn current_year() -> i32 {
     OffsetDateTime::now_utc().year()

@@ -4,17 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#0A0F1C">
+    <meta name="theme-color" content="#05070c">
     <meta name="color-scheme" content="dark">
     <title>{% block title %}Escudo Digital{% endblock %}</title>
     <link rel="icon" href="/static/brand/escudo-favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/static/brand/escudo-favicon-32px.png" sizes="32x32" type="image/png">
     <link rel="apple-touch-icon" href="/static/brand/escudo-app-icon-180px.png">
 
-    {# Archivo (eje de ancho 62–125: expandida para títulos y cifras) + JetBrains Mono para código. #}
+    {# Geist (texto y títulos) + Geist Mono (etiquetas, código, identificadores). #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     {# HTMX desde CDN. Suficiente para MVP; en prod self-host con SRI. #}
     <script src="https://unpkg.com/htmx.org@2.0.3"
@@ -30,25 +30,22 @@
     <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="/static/app.css">
+    <script defer src="/static/app.js"></script>
 </head>
 <body>
-    {# Top strip mini, estilo redseg #}
-    <div class="topstrip">
-        <div class="topstrip-inner">
-            <span><span class="live-dot"></span>&nbsp;&nbsp;Bug bounty para Venezuela y Latinoamérica</span>
-            <span class="hidden-mobile"><a href="/programs">Ver programas públicos</a></span>
-        </div>
-    </div>
-
-    {# Sticky header #}
+    {# Barra fija #}
     <header class="topbar">
         <div class="topbar-inner">
             <a href="/" class="brand" aria-label="Escudo Digital, inicio">
-                <img class="brand-logo" src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="184" height="26">
+                <img class="brand-logo" src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="198" height="28">
             </a>
-            <nav>
+            <nav aria-label="Principal">
                 {% if handle.is_empty() %}
                     <a href="/programs">Programas</a>
+                    <a href="/#empresas">Empresas</a>
+                    <a href="/#investigadores">Investigadores</a>
+                    <a href="/cursos">Cursos</a>
+                    <a href="/#faq">Preguntas</a>
                 {% else if account_role == "researcher" %}
                     {# Investigador: cazar, reportar, vender OSINT, cobrar. #}
                     <a href="/dashboard">Dashboard</a>
@@ -74,8 +71,9 @@
             </nav>
             <div class="topbar-actions">
                 {% if handle.is_empty() %}
-                    <a href="/login" class="btn-link">Entrar</a>
-                    <a href="/signup" class="btn-primary">Registrarme</a>
+                    <a href="/login" class="nav-a">Entrar</a>
+                    <a href="/programs" class="btn-ghost hidden-mobile">Explorar programas</a>
+                    <a href="/signup" class="btn-primary">Crear cuenta</a>
                 {% else %}
                     <div class="user-menu">
                         <button type="button" class="user-menu-trigger" onclick="bbToggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
@@ -109,11 +107,27 @@
     </main>
 
     <footer class="foot">
-        <div class="foot-inner">
-            <a href="/" class="brand" aria-label="Escudo Digital, inicio"><img class="brand-logo" src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="156" height="22" loading="lazy"></a>
-            <span>Plataforma regional de bug bounty para Venezuela y Latinoamérica</span>
-            <small>© {{ year }}</small>
+        <div class="foot-top">
+            <div class="foot-brand">
+                <img src="/static/brand/escudo-logo-on-dark.svg" alt="Escudo Digital" width="198" height="28" loading="lazy">
+                <p>Plataforma regional de bug bounty para Venezuela y Latinoamérica.</p>
+            </div>
+            <div class="foot-cols">
+                <nav class="foot-col" aria-label="Empresas">
+                    <span class="lbl">Empresas</span>
+                    <a class="nav-a" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear programa</a>
+                    <a class="nav-a" href="/#empresas">Cómo funciona</a>
+                    <a class="nav-a" href="/#faq">Preguntas</a>
+                </nav>
+                <nav class="foot-col" aria-label="Investigadores">
+                    <span class="lbl">Investigadores</span>
+                    <a class="nav-a" href="/programs">Programas</a>
+                    <a class="nav-a" href="/cursos">Cursos</a>
+                    <a class="nav-a" href="/signup">Crear perfil</a>
+                </nav>
+            </div>
         </div>
+        <div class="foot-bottom">© {{ year }} Escudo Digital · Red REDSEG</div>
     </footer>
 
     <script>

@@ -53,7 +53,14 @@ pub async fn list_public(pool: &PgPool) -> Result<Vec<PublicProgramRow>, sqlx::E
     sqlx::query_as::<_, PublicProgramRow>(
         "SELECT p.id, p.slug, p.name, p.summary,
                 p.bounty_low_cents, p.bounty_critical_cents,
-                c.slug AS company_slug, c.display_name AS company_name
+                c.slug AS company_slug, c.display_name AS company_name,
+                p.updated_at, p.launched_at,
+                COALESCE(
+                    (SELECT array_agg(DISTINCT a.asset_type::text)
+                     FROM assets a
+                     WHERE a.program_id = p.id AND a.in_scope),
+                    '{}'::text[]
+                ) AS asset_types
          FROM programs p
          JOIN companies c ON c.id = p.company_id
          WHERE p.visibility = 'public' AND p.status = 'public'
@@ -73,6 +80,10 @@ pub struct PublicProgramRow {
     pub bounty_critical_cents: Option<i32>,
     pub company_slug: String,
     pub company_name: String,
+    pub updated_at: time::OffsetDateTime,
+    pub launched_at: Option<time::OffsetDateTime>,
+    /// Tipos de activo en alcance (valores del enum `asset_type`).
+    pub asset_types: Vec<String>,
 }
 
 pub struct NewProgram<'a> {

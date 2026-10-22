@@ -1,56 +1,101 @@
 {% extends "base.html" %}
 
-{% block title %}Programas públicos · Escudo Digital{% endblock %}
+{% block title %}Programas de bug bounty · Escudo Digital{% endblock %}
 
 {% block content %}
-<section class="page">
-    <header class="page-head">
-        <div>
-            <h1>Programas de bug bounty</h1>
-            <p class="muted">Empresas que pagan por encontrar vulnerabilidades en sus sistemas. Elige uno, revisa su alcance y reporta.</p>
+<section class="page-hero bleed bg-grid">
+    <div class="glow" aria-hidden="true" style="width: 800px; height: 800px; left: -240px; top: -420px"></div>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="page-hero-inner">
+        <div class="page-hero-copy">
+            <span class="lbl lbl--signal">// Explorar<span class="cursor" aria-hidden="true"></span></span>
+            <h1>Programas de bug bounty.</h1>
+            <p>Elige un programa, revisa qué puedes probar y cuánto paga cada severidad.</p>
         </div>
         {% if !programs.is_empty() %}
-            <span class="muted">{{ programs.len() }} {% if programs.len() == 1 %}programa activo{% else %}programas activos{% endif %}</span>
-        {% endif %}
-    </header>
-
-    {% if programs.is_empty() %}
-        <div class="empty">
-            <p>Todavía no hay programas públicos.</p>
-            <p>Cuando una empresa publique su programa, aparecerá aquí.</p>
+        <div class="stat-grid">
+            <div><span class="v">{{ programs.len() }}</span><span class="lbl">{% if programs.len() == 1 %}Programa activo{% else %}Programas activos{% endif %}</span></div>
+            <div><span class="v" data-top-reward>—</span><span class="lbl">Recompensa más alta</span></div>
         </div>
-    {% else %}
-        <ul class="prog-list">
-            <li class="prog-list-head" aria-hidden="true">
-                <span>Programa</span>
-                <span>Desde</span>
-                <span>Recompensa máxima</span>
-                <span></span>
-            </li>
-        {% for p in programs %}
-            <li>
-                <a class="prog-row" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}">
-                    <div class="prog-id">
-                        <span class="prog-logo" aria-hidden="true">{{ p.company_name.chars().next().unwrap_or('?') }}</span>
-                        <div class="prog-names">
-                            <div class="prog-name">{{ p.name }}</div>
-                            <div class="prog-company">{{ p.company_name }}</div>
-                            {% if !p.summary.is_empty() %}<div class="prog-summary">{{ p.summary }}</div>{% endif %}
-                        </div>
-                    </div>
-                    <div>
-                        <span class="prog-cell-label">Desde</span>
-                        <span class="prog-from">{% if p.bounty_low.is_empty() %}—{% else %}{{ p.bounty_low }}{% endif %}</span>
-                    </div>
-                    <div>
-                        <span class="prog-cell-label">Recompensa máxima</span>
-                        <span class="prog-max">{% if p.bounty_critical.is_empty() %}—{% else %}{{ p.bounty_critical }}{% endif %}</span>
-                    </div>
-                    <span class="prog-go">Ver programa</span>
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+        {% endif %}
+    </div>
 </section>
+
+{% if programs.is_empty() %}
+<div class="explore">
+    <div class="results">
+        <div class="prog-table">
+            <div class="grid-empty bg-grid">
+                <div class="icon-frame" aria-hidden="true">
+                    <span class="corners"></span>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"></path><path d="M12 9v6M9 12h6"></path></svg>
+                </div>
+                <h3>Todavía no hay programas públicos.</h3>
+                <p>Cuando una empresa publique su programa aparecerá aquí, con su alcance y lo que paga cada severidad.</p>
+                <div class="hero-actions">
+                    <a class="btn-primary" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear el primer programa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="explore" data-explore>
+    <aside class="filters" aria-label="Filtros">
+        <div>
+            <label for="q" class="lbl">Buscar</label>
+            <div class="search-box">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+                <input id="q" type="search" placeholder="Programa o empresa" autocomplete="off" data-filter-q>
+            </div>
+        </div>
+        <fieldset>
+            <legend class="lbl">Tipo de activo</legend>
+            <div class="filter-chips" data-filter-type>
+                <button type="button" class="chip" data-type="" aria-pressed="true">Todos</button>
+                <button type="button" class="chip" data-type="web" aria-pressed="false">Web</button>
+                <button type="button" class="chip" data-type="api" aria-pressed="false">API</button>
+                <button type="button" class="chip" data-type="movil" aria-pressed="false">Móvil</button>
+                <button type="button" class="chip" data-type="infra" aria-pressed="false">Infraestructura</button>
+                <button type="button" class="chip" data-type="firmware" aria-pressed="false">Firmware</button>
+                <button type="button" class="chip" data-type="hardware" aria-pressed="false">Hardware</button>
+                <button type="button" class="chip" data-type="codigo" aria-pressed="false">Código</button>
+            </div>
+        </fieldset>
+        <fieldset data-filter-range>
+            <legend class="lbl">Recompensa máxima</legend>
+            <label class="chk"><input type="checkbox" value="hi">Más de $2.500</label>
+            <label class="chk"><input type="checkbox" value="mid">$1.000 a $2.500</label>
+            <label class="chk"><input type="checkbox" value="lo">Menos de $1.000</label>
+        </fieldset>
+    </aside>
+
+    <section class="results" aria-label="Resultados">
+        <div class="results-bar">
+            <span class="results-count" role="status" data-count-label>{{ programs.len() }} {% if programs.len() == 1 %}programa{% else %}programas{% endif %}</span>
+            <div class="segmented" role="group" aria-label="Ordenar por" data-sort>
+                <button type="button" class="chip" data-sort-key="reward" aria-pressed="true">Mayor recompensa</button>
+                <button type="button" class="chip" data-sort-key="recent" aria-pressed="false">Más recientes</button>
+            </div>
+        </div>
+        <div class="prog-table">
+            <div class="prog-scroll">
+                <div class="prog-inner">
+                    <div class="prog-head" aria-hidden="true">
+                        <span class="lbl">Programa</span><span class="lbl">Recompensa máx.</span><span class="lbl">Activos en alcance</span><span class="lbl">Actualizado</span>
+                    </div>
+                    <div data-rows>
+                        {% include "programs/partials/rows.html" %}
+                    </div>
+                    <div class="prog-empty" data-empty hidden>
+                        <strong>Ningún programa coincide con estos filtros.</strong>
+                        <span>Prueba con otro tipo de activo o amplía el rango de recompensa.</span>
+                        <button type="button" class="btn-ghost" data-reset>Quitar filtros</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endif %}
 {% endblock %}

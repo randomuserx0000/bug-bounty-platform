@@ -55,15 +55,7 @@ async fn public_index(
     let rows = db::programs::list_public(&state.db).await?;
     let cards = rows
         .into_iter()
-        .map(|r| ProgramPublicCardView {
-            company_slug: r.company_slug,
-            company_name: r.company_name,
-            program_slug: r.slug,
-            name: r.name,
-            summary: r.summary.unwrap_or_default(),
-            bounty_low: r.bounty_low_cents.map(usd).unwrap_or_default(),
-            bounty_critical: r.bounty_critical_cents.map(usd).unwrap_or_default(),
-        })
+        .map(crate::web::shared::program_card)
         .collect();
     Ok(ProgramsPublicTemplate {
         year: current_year(),
@@ -110,7 +102,9 @@ async fn public_show(
         .collect();
     let stats = stats?;
 
+    let company_initials = crate::web::shared::initials(&company.display_name);
     Ok(ProgramShowTemplate {
+        company_initials,
         year: current_year(),
         public_view: true,
         can_manage: false,
@@ -173,7 +167,9 @@ async fn manage_show(
         .collect();
     let stats = stats?;
 
+    let company_initials = crate::web::shared::initials(&company.display_name);
     Ok(ProgramShowTemplate {
+        company_initials,
         year: current_year(),
         public_view: false,
         can_manage: m.role.can_manage_programs(),
@@ -380,9 +376,9 @@ fn require_bounty(
     Ok(cents)
 }
 
-/// Formatea cents → "$X,XXX" para display.
+/// Formatea cents → "$X.XXX" para display.
 fn usd(cents: i32) -> String {
-    format!("${}", cents / 100)
+    crate::web::shared::format_usd(cents as i64)
 }
 
 fn format_hours(h: Option<f64>) -> String {

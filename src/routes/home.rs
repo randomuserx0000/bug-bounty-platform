@@ -8,7 +8,7 @@ use crate::auth::MaybeUser;
 use crate::db;
 use crate::error::AppResult;
 use crate::state::AppState;
-use crate::web::shared::current_year;
+use crate::web::shared::{current_year, program_card};
 use crate::web::templates::{HomeTemplate, ProgramPublicCardView};
 
 pub async fn index(
@@ -19,15 +19,7 @@ pub async fn index(
     let cards: Vec<ProgramPublicCardView> = rows
         .into_iter()
         .take(6) // hero: solo los 6 más recientes
-        .map(|r| ProgramPublicCardView {
-            company_slug: r.company_slug,
-            company_name: r.company_name,
-            program_slug: r.slug,
-            name: r.name,
-            summary: r.summary.unwrap_or_default(),
-            bounty_low: r.bounty_low_cents.map(usd).unwrap_or_default(),
-            bounty_critical: r.bounty_critical_cents.map(usd).unwrap_or_default(),
-        })
+        .map(program_card)
         .collect();
 
     // IDs de logo en redseg.org/images/sN.jpg. El 14 no existe en el original.
@@ -44,6 +36,4 @@ pub async fn index(
     })
 }
 
-fn usd(cents: i32) -> String {
-    format!("${}", cents / 100)
-}
+

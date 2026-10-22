@@ -3,131 +3,170 @@
 {% block title %}{{ program_name }} · Escudo Digital{% endblock %}
 
 {% block content %}
-<section class="page">
-    <header class="program-hero">
-        <div class="program-hero-id">
-            <span class="prog-logo" aria-hidden="true">{{ company_name.chars().next().unwrap_or('?') }}</span>
-            <div>
-                <span class="program-hero-company">{{ company_name }}</span>
-                <h1>{{ program_name }}</h1>
-                {% if !summary.is_empty() %}<p class="program-hero-summary">{{ summary }}</p>{% endif %}
-                <div class="program-hero-tags">
-                    <span class="badge">{{ visibility }}</span>
-                    <span class="badge badge-default">{{ status }}</span>
+<section class="page-hero page-hero--surface bleed bg-grid">
+    <div class="glow" aria-hidden="true" style="width: 760px; height: 760px; right: -200px; top: -420px"></div>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="ph-inner">
+        <nav class="crumbs" aria-label="Ruta">
+            {% if public_view %}
+                <a href="/programs">Programas</a>
+            {% else %}
+                <a href="/companies/{{ company_slug }}">{{ company_name }}</a>
+            {% endif %}
+            <span aria-hidden="true">/</span>
+            <span>{{ program_name }}</span>
+        </nav>
+
+        <div class="ph-main">
+            <div class="ph-id">
+                <span class="ph-logo" aria-hidden="true">{{ company_initials }}</span>
+                <div class="ph-title">
+                    <div class="ph-title-row">
+                        <h1>{{ program_name }}</h1>
+                        {% if status == "public" %}
+                            <span class="tag tag--pill"><span class="dot dot--sm pulse" aria-hidden="true"></span>Activo</span>
+                        {% else if status == "paused" %}
+                            <span class="tag tag--pill sev-medium">En pausa</span>
+                        {% else if status == "closed" %}
+                            <span class="tag tag--pill sev-none">Cerrado</span>
+                        {% else if status == "draft" %}
+                            <span class="tag tag--pill sev-none">Borrador</span>
+                        {% else %}
+                            <span class="tag tag--pill sev-none">Privado</span>
+                        {% endif %}
+                    </div>
+                    <div class="ph-meta">
+                        <span>{{ company_name }}</span>
+                        {% if visibility != "public" %}<span aria-hidden="true">·</span><span>{% if visibility == "invite_only" %}Solo por invitación{% else %}Privado{% endif %}</span>{% endif %}
+                    </div>
                 </div>
             </div>
+            <div class="ph-side">
+                {% if !bounty_critical.is_empty() %}
+                    <div class="ph-reward">
+                        <span class="lbl">Recompensa máxima</span>
+                        <span class="ph-reward-v">{{ bounty_critical }}</span>
+                    </div>
+                {% endif %}
+                <a class="btn-primary btn-lg" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">Enviar un reporte</a>
+            </div>
         </div>
-        <div class="header-actions">
-            <a class="btn-primary" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">
-                {% if public_view %}Reportar una vulnerabilidad{% else %}Nuevo reporte{% endif %}
-            </a>
-        </div>
-    </header>
 
-    {% if !bounty_low.is_empty() || !bounty_critical.is_empty() %}
-        <section class="bounty-grid" aria-label="Recompensas por severidad">
-            <div><span>Baja</span><strong>{% if bounty_low.is_empty() %}—{% else %}{{ bounty_low }}{% endif %}</strong></div>
-            <div><span>Media</span><strong>{% if bounty_medium.is_empty() %}—{% else %}{{ bounty_medium }}{% endif %}</strong></div>
-            <div><span>Alta</span><strong>{% if bounty_high.is_empty() %}—{% else %}{{ bounty_high }}{% endif %}</strong></div>
-            <div><span>Crítica</span><strong>{% if bounty_critical.is_empty() %}—{% else %}{{ bounty_critical }}{% endif %}</strong></div>
+        <nav class="ph-tabs" aria-label="Secciones del programa">
+            <a href="#info" aria-current="location">Información</a>
+            {% if !bounty_low.is_empty() || !bounty_critical.is_empty() %}<a href="#recompensas">Recompensas</a>{% endif %}
+            <a href="#alcance">Alcance</a>
+            <a href="#reglas">Reglas</a>
+        </nav>
+    </div>
+</section>
+
+<div class="ph-body">
+    <div class="ph-content">
+
+        <section id="info">
+            <h2>Sobre el programa</h2>
+            {% if summary.is_empty() %}
+                <p class="lead">{{ company_name }} todavía no ha escrito una descripción. Revisa el alcance y las reglas antes de empezar.</p>
+            {% else %}
+                <p class="lead">{{ summary }}</p>
+            {% endif %}
         </section>
-    {% endif %}
 
-    <section class="program-stats">
-        <div class="stat-item">
-            <span class="stat-value">{{ total_reports }}</span>
-            <span class="stat-label">Reportes recibidos</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-value">{{ resolved_reports }}</span>
-            <span class="stat-label">Reportes validados</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-value">{{ avg_response }}</span>
-            <span class="stat-label">Tiempo de respuesta promedio</span>
-        </div>
-    </section>
+        {% if !bounty_low.is_empty() || !bounty_critical.is_empty() %}
+        <section id="recompensas" class="reveal">
+            <div class="ph-section-head">
+                <h2>Cuánto paga cada severidad</h2>
+                <span>Monto máximo por hallazgo válido</span>
+            </div>
+            <div class="rows">
+                <div class="rows-row rows-head"><span class="lbl">Severidad</span><span class="lbl">Recompensa</span></div>
+                <div class="rows-row"><span><span class="tag sev-critical">Crítica</span></span><span>{% if bounty_critical.is_empty() %}—{% else %}{{ bounty_critical }}{% endif %}</span></div>
+                <div class="rows-row"><span><span class="tag sev-high">Alta</span></span><span>{% if bounty_high.is_empty() %}—{% else %}{{ bounty_high }}{% endif %}</span></div>
+                <div class="rows-row"><span><span class="tag sev-medium">Media</span></span><span>{% if bounty_medium.is_empty() %}—{% else %}{{ bounty_medium }}{% endif %}</span></div>
+                <div class="rows-row"><span><span class="tag sev-low">Baja</span></span><span>{% if bounty_low.is_empty() %}—{% else %}{{ bounty_low }}{% endif %}</span></div>
+            </div>
+        </section>
+        {% endif %}
 
-    <div class="program-body">
-        <div>
-            <h2>Política del programa</h2>
-            <article class="policy">{{ policy_html|safe }}</article>
-
-            <h2>Alcance <span class="scope-count">({{ assets.len() }})</span></h2>
+        <section id="alcance" class="reveal">
+            <div class="ph-section-head">
+                <h2>Qué puedes probar</h2>
+                {% if can_manage %}<a class="btn-ghost" href="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/new">Añadir activo</a>{% endif %}
+            </div>
             {% if assets.is_empty() %}
                 <div class="empty">
                     <p>Este programa aún no tiene activos en el alcance.</p>
                     {% if can_manage %}
                         <p><a href="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/new">Añadir el primer activo</a></p>
+                    {% else %}
+                        <p>Vuelve pronto: la empresa está preparando qué se puede probar.</p>
                     {% endif %}
                 </div>
             {% else %}
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Tipo</th>
-                            <th>Nombre</th>
-                            <th>Objetivo</th>
-                            <th>En alcance</th>
-                            <th>Severidad máxima</th>
-                            {% if can_manage %}<th><span class="muted">Acciones</span></th>{% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for a in assets %}
-                        <tr>
-                            <td><span class="badge">{{ a.type_label }}</span></td>
-                            <td>{{ a.label }}</td>
-                            <td><code>{{ a.target }}</code></td>
-                            <td>{% if a.in_scope %}<span class="in-scope">Sí</span>{% else %}<span class="out-scope">No</span>{% endif %}</td>
-                            <td>
-                                {% if a.severity_cap == "critical" %}<span class="badge sev-critical">Crítica</span>
-                                {% else if a.severity_cap == "high" %}<span class="badge sev-high">Alta</span>
-                                {% else if a.severity_cap == "medium" %}<span class="badge sev-medium">Media</span>
-                                {% else if a.severity_cap == "low" %}<span class="badge sev-low">Baja</span>
+                <div class="rows rows-scroll">
+                    <div class="rows--scope{% if can_manage %} can-manage{% endif %}">
+                        <div class="rows-row rows-head">
+                            <span class="lbl">Objetivo</span><span class="lbl">Tipo</span><span class="lbl">En alcance</span><span class="lbl">Severidad máx.</span>
+                            {% if can_manage %}<span class="lbl">Acciones</span>{% endif %}
+                        </div>
+                        {% for a in assets %}
+                        <div class="rows-row">
+                            <span class="target">{{ a.target }}<small>{{ a.label }}</small></span>
+                            <span class="sub">{{ a.type_label }}</span>
+                            <span>{% if a.in_scope %}<span class="in-scope">Sí</span>{% else %}<span class="out-scope">No</span>{% endif %}</span>
+                            <span>
+                                {% if a.severity_cap == "critical" %}<span class="tag sev-critical">Crítica</span>
+                                {% else if a.severity_cap == "high" %}<span class="tag sev-high">Alta</span>
+                                {% else if a.severity_cap == "medium" %}<span class="tag sev-medium">Media</span>
+                                {% else if a.severity_cap == "low" %}<span class="tag sev-low">Baja</span>
                                 {% else %}<span class="muted">—</span>{% endif %}
-                            </td>
+                            </span>
                             {% if can_manage %}
-                                <td>
+                                <span>
                                     <form hx-post="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/{{ a.id }}/delete"
                                           hx-confirm="¿Eliminar este activo del alcance?"
                                           hx-swap="none" class="inline">
                                         <button class="btn-link danger" type="submit">Eliminar</button>
                                     </form>
-                                </td>
+                                </span>
                             {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-        </div>
-
-        <aside class="program-aside">
-            <div class="card-box">
-                <h3>¿Encontraste una vulnerabilidad?</h3>
-                <p class="muted small">Incluye los pasos para reproducirla, el impacto y una prueba de concepto. Los reportes completos se validan antes.</p>
-                <a class="btn-primary" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">
-                    {% if public_view %}Reportar una vulnerabilidad{% else %}Nuevo reporte{% endif %}
-                </a>
-            </div>
-            {% if can_manage %}
-                <div class="card-box">
-                    <h3>Gestionar programa</h3>
-                    <ul class="nav-list">
-                        <li><a href="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/new">Añadir activo al alcance</a></li>
-                        <li><a href="/manage/{{ company_slug }}/programs/{{ program_slug }}/reports">Revisar reportes</a></li>
-                    </ul>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
-            <p class="muted small">
-                {% if public_view %}
-                    <a href="/programs">Volver a programas públicos</a>
-                {% else %}
-                    <a href="/companies/{{ company_slug }}">Volver a {{ company_name }}</a>
-                {% endif %}
-            </p>
-        </aside>
+        </section>
+
+        <section id="reglas" class="reveal">
+            <h2>Política y reglas</h2>
+            <article class="policy">{{ policy_html|safe }}</article>
+        </section>
     </div>
-</section>
+
+    <aside class="ph-aside" aria-label="Resumen del programa">
+        <div class="ph-card">
+            <span class="corners" aria-hidden="true"></span>
+            <div class="ph-card-cta">
+                <span class="lbl lbl--signal">¿Encontraste algo?</span>
+                <p>Mándalo con pasos para reproducirlo, impacto y una prueba de concepto. Los reportes completos se validan antes.</p>
+                <a class="btn-primary" href="/programs/{{ company_slug }}/{{ program_slug }}/reports/new">Enviar un reporte</a>
+            </div>
+            <dl>
+                <div><dt>Reportes recibidos</dt><dd>{{ total_reports }}</dd></div>
+                <div><dt>Reportes validados</dt><dd>{{ resolved_reports }}</dd></div>
+                <div><dt>Respuesta promedio</dt><dd>{{ avg_response }}</dd></div>
+            </dl>
+        </div>
+        {% if can_manage %}
+            <div class="ph-card">
+                <div class="ph-links">
+                    <span class="lbl">Gestionar programa</span>
+                    <a href="/manage/{{ company_slug }}/programs/{{ program_slug }}/assets/new">Añadir activo al alcance</a>
+                    <a href="/manage/{{ company_slug }}/programs/{{ program_slug }}/reports">Revisar reportes</a>
+                </div>
+            </div>
+        {% endif %}
+    </aside>
+</div>
 {% endblock %}

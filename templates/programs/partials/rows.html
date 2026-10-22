@@ -1,0 +1,29 @@
+{# Filas de la tabla de programas públicos. Lo incluyen home.html y
+   programs/public_index.html; ambos exponen `programs: Vec<ProgramPublicCardView>`.
+   Los data-* alimentan el filtro y el orden del listado (static/app.js). #}
+{% for p in programs %}
+<a class="prog-row" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}"
+   style="animation-delay: {{ loop.index0 * 60 }}ms"
+   data-name="{{ p.name }} {{ p.company_name }} {{ p.summary }}"
+   data-assets="{{ p.asset_keys }}"
+   data-max="{{ p.max_cents }}"
+   data-updated="{{ p.updated_ts }}"
+   aria-label="{{ p.name }}, {{ p.company_name }}{% if !p.bounty_critical.is_empty() %}, recompensa máxima {{ p.bounty_critical }}{% endif %}">
+    <span class="prog-id">
+        <span class="prog-logo" aria-hidden="true">{{ p.initials }}</span>
+        <span class="prog-names">
+            <span class="prog-title">
+                <span class="prog-name">{{ p.name }}</span>
+                {% if p.is_new %}<span class="tag tag--pill">Nuevo</span>{% endif %}
+            </span>
+            <span class="prog-meta">{{ p.company_name }}{% if !p.summary.is_empty() %} · {{ p.summary }}{% endif %}</span>
+        </span>
+    </span>
+    <span class="prog-max">{% if p.bounty_critical.is_empty() %}{% if p.bounty_low.is_empty() %}—{% else %}{{ p.bounty_low }}{% endif %}{% else %}{{ p.bounty_critical }}{% endif %}</span>
+    <span class="prog-assets">
+        {% for a in p.asset_labels %}<span class="pill pill--sm">{{ a }}</span>{% endfor %}
+        {% if p.asset_labels.is_empty() %}<span class="muted small">Sin activos aún</span>{% endif %}
+    </span>
+    <span class="prog-updated">{{ p.updated_label }}<svg class="arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+</a>
+{% endfor %}

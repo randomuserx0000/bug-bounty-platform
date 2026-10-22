@@ -1,282 +1,327 @@
 {% extends "base.html" %}
 
-{% block title %}Escudo Digital · bug bounty para empresas venezolanas{% endblock %}
+{% block title %}Escudo Digital · Bug bounty para Venezuela y Latinoamérica{% endblock %}
 
 {% block content %}
 
 {# ============================================================
-   HERO — audiencia principal: empresarios/CEOs.
-   La cifra ($0 frente al pentest) es el argumento central.
+   HERO — selector empresa / investigador + consola animada.
+   Interacciones en static/app.js (data-aud, data-console).
    ============================================================ #}
-<section class="hero">
-    <div class="hero-inner">
-        <div>
-            <h1>Tu ciberseguridad no debería costar miles de dólares por adelantado.</h1>
-            <p>
-                En lugar de pagar un pentest cerrado de cinco cifras, abre un programa de
-                bug bounty. Hackers éticos verificados buscan vulnerabilidades en tus sistemas
-                y solo pagas cuando encuentran algo real. Tú decides el monto por severidad.
-            </p>
-            <div class="hero-actions">
-                <a class="btn-primary btn-lg" href="/companies/new">Publicar un programa</a>
-                {% if handle.is_empty() %}
-                    <a class="btn-ghost btn-lg" href="/signup">Soy investigador</a>
-                {% else %}
-                    <a class="btn-ghost btn-lg" href="/dashboard">Ir a mi dashboard</a>
-                {% endif %}
+<section class="home-hero bleed bg-grid bg-grid--lg">
+    <div class="glow" aria-hidden="true" style="width: 900px; height: 900px; left: -260px; top: -380px"></div>
+    <div class="glow" aria-hidden="true" style="width: 700px; height: 700px; right: -240px; top: 120px; opacity: .6"></div>
+    <div class="floor" aria-hidden="true"></div>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="beam" aria-hidden="true"></div>
+
+    <div class="home-hero-inner">
+        <div class="home-hero-copy">
+            <div class="segmented segmented--solid" role="group" aria-label="Elige tu perfil">
+                <button type="button" class="chip" data-aud="empresa" aria-pressed="true">Soy empresa</button>
+                <button type="button" class="chip" data-aud="investigador" aria-pressed="false">Soy investigador</button>
             </div>
 
-            {# Red REDSEG: prueba social de respaldo #}
-            <div class="hero-stats">
-                <div><strong>+3.000</strong><span>hackers en Latinoamérica</span></div>
-                <div><strong>+700</strong><span>empresas en la red</span></div>
-                <div><strong>11</strong><span>países cubiertos</span></div>
+            <div data-aud-panel="empresa">
+                <div class="hero-text">
+                    <span class="lbl lbl--signal">// Bug bounty para Venezuela y LATAM</span>
+                    <h1>Tu pentest dura tres semanas. <span class="glitch">Los atacantes tienen todo el año.</span></h1>
+                    <p>Publica un programa de bug bounty y pon a cientos de hackers éticos verificados a revisar tu web, tus apps y tu infraestructura. Pagas solo cuando encuentran un fallo real, al monto que tú decides.</p>
+                </div>
+                <div class="hero-actions" style="margin-top: 28px">
+                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear mi programa
+                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+                    <a class="btn-ghost btn-lg" href="#empresas">Ver cómo funciona</a>
+                </div>
+                <div class="hero-proof" style="margin-top: 28px">
+                    <span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>$0 hasta el primer hallazgo válido</span>
+                    <span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Listo en minutos, sin abogados</span>
+                </div>
+            </div>
+
+            <div data-aud-panel="investigador" hidden>
+                <div class="hero-text">
+                    <span class="lbl lbl--signal">// Para hackers éticos de LATAM</span>
+                    <h1>Encuentra fallos. <span class="glitch">Cobra en USDT, dólares o bolívares.</span></h1>
+                    <p>Elige un programa, reporta vulnerabilidades reales y cobra por cada hallazgo confirmado. Sin horario, sin jefe y sin pedir permiso.</p>
+                </div>
+                <div class="hero-actions" style="margin-top: 28px">
+                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/dashboard{% endif %}">{% if handle.is_empty() %}Crear mi perfil{% else %}Ir a mi panel{% endif %}
+                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+                    <a class="btn-ghost btn-lg" href="/programs">Explorar programas</a>
+                </div>
+                <div class="hero-proof" style="margin-top: 28px">
+                    <span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Cobras por cada hallazgo confirmado</span>
+                    <span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Curso para empezar desde cero</span>
+                </div>
             </div>
         </div>
 
-        <aside class="hero-figure" aria-label="Costo inicial">
-            <span class="hero-figure-amount">$0</span>
-            <p class="hero-figure-caption">hasta que alguien encuentre una vulnerabilidad válida en tus sistemas.</p>
-            <div class="hero-figure-vs">
-                <span>Pentest tradicional</span>
-                <strong>$5.000 – $50.000</strong>
+        {# Consola: simulación ilustrativa del ciclo de un reporte #}
+        <div class="console" data-console>
+            <span class="corners" aria-hidden="true"></span>
+            <div class="console-bar">
+                <span><span class="dot pulse" aria-hidden="true"></span><span class="lbl" style="color: var(--ink-2)">Simulación · ciclo de un reporte</span></span>
+                <button type="button" class="console-toggle" data-console-toggle aria-pressed="false">
+                    <svg class="i-pause" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5v14M16 5v14"></path></svg>
+                    <svg class="i-play" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 4 13 8-13 8V4Z"></path></svg>
+                    <span data-console-label>Pausar</span>
+                </button>
             </div>
-        </aside>
-    </div>
-</section>
-
-{# ============================================================
-   COMPARATIVA — el argumento económico
-   ============================================================ #}
-<section class="section">
-    <div class="section-head">
-        <h2>Pentest tradicional frente a bug bounty</h2>
-        <p>
-            El pentest sigue teniendo sentido para cumplir normas o auditar antes de un lanzamiento.
-            Para descubrir vulnerabilidades de forma continua, el bug bounty paga solo por resultados.
-        </p>
-    </div>
-
-    <div class="compare-grid">
-        <div class="compare-card compare-old">
-            <header>
-                <span class="compare-tag">Consultoría cerrada</span>
-                <h3>Pentest tradicional</h3>
-            </header>
-            <ul>
-                <li><span class="x" aria-hidden="true">×</span> <span>Inversión inicial de $5.000 a $50.000 USD por engagement</span></li>
-                <li><span class="x" aria-hidden="true">×</span> Equipo fijo de 1 a 3 consultores, talento limitado</li>
-                <li><span class="x" aria-hidden="true">×</span> Ventana de 2 a 6 semanas con fecha de cierre</li>
-                <li><span class="x" aria-hidden="true">×</span> Pagas el tiempo, encuentren algo o no</li>
-                <li><span class="x" aria-hidden="true">×</span> Repetirlo cada año cuesta otro engagement completo</li>
-            </ul>
-        </div>
-
-        <div class="compare-card compare-new">
-            <header>
-                <span class="compare-tag">Pago por vulnerabilidad</span>
-                <h3>Bug bounty con Escudo Digital</h3>
-            </header>
-            <ul>
-                <li><span class="check" aria-hidden="true">✓</span> <strong>$0 hasta que alguien encuentre algo</strong></li>
-                <li><span class="check" aria-hidden="true">✓</span> Cientos de investigadores buscan a la vez</li>
-                <li><span class="check" aria-hidden="true">✓</span> Programa siempre activo, todo el año</li>
-                <li><span class="check" aria-hidden="true">✓</span> Pagas solo por hallazgos válidos, con montos que tú fijas</li>
-                <li><span class="check" aria-hidden="true">✓</span> Cubre web, móvil, infraestructura, firmware, hardware y radio</li>
-            </ul>
+            <div class="console-body" role="img" aria-label="Simulación: la empresa publica su programa, un investigador reporta un fallo, la empresa lo confirma y paga la recompensa">
+                <div class="console-line"><span class="g g-cmd">$</span><span>programa publicar --alcance *.tuempresa.com</span></div>
+                <div class="console-line"><span class="g g-ok">✓</span><span>Programa activo y visible para la comunidad</span></div>
+                <div class="console-line"><span class="g g-inc">!</span><span>Reporte #0142 · IDOR en /api/v2/pagos</span><span class="tag sev-high">Alta</span></div>
+                <div class="console-line"><span class="g g-wait">…</span><span>Reproduciendo la prueba de concepto</span></div>
+                <div class="console-line"><span class="g g-ok">✓</span><span>Hallazgo confirmado por tu equipo</span></div>
+                <div class="console-line"><span class="g g-cmd">$</span><span>Recompensa enviada al investigador</span><span class="tag">USDT</span></div>
+                <div><span style="color: var(--muted)">$</span> <span class="cursor" aria-hidden="true"></span></div>
+            </div>
+            <div class="console-foot">
+                <div><span class="lbl">Costo inicial</span><strong>$0</strong></div>
+                <div><span class="lbl">Pagas por</span><strong>Hallazgo</strong></div>
+                <div><span class="lbl">Activo</span><strong>24/7</strong></div>
+            </div>
         </div>
     </div>
 </section>
 
 {# ============================================================
-   CÓMO FUNCIONA — es una secuencia real, por eso va numerada
+   CIFRAS DE LA RED REDSEG (cuentan hacia arriba al cargar)
    ============================================================ #}
-<section class="section">
-    <div class="section-head">
-        <h2>Cómo empezar como empresa</h2>
+<section class="home-stats" aria-label="La red en cifras">
+    <div class="home-stats-grid">
+        <div><span class="v"><span data-count="3000">3.000</span><span class="cur">+</span></span><span class="lbl">Investigadores en LATAM</span></div>
+        <div><span class="v"><span data-count="700">700</span><span class="cur">+</span></span><span class="lbl">Empresas en la red REDSEG</span></div>
+        <div><span class="v"><span data-count="11">11</span></span><span class="lbl">Países con comunidad</span></div>
+        <div><span class="v"><span class="cur">$</span>0</span><span class="lbl">Costo antes de un hallazgo</span></div>
     </div>
-    <ol class="steps">
-        <li>
-            <span class="step-n" aria-hidden="true">1</span>
-            <h3>Publicas tu programa</h3>
-            <p>Defines qué sistemas entran en el alcance (URLs, APIs, apps móviles, firmware), las reglas y el monto máximo por severidad. Se escribe en markdown, sin abogados.</p>
-        </li>
-        <li>
-            <span class="step-n" aria-hidden="true">2</span>
-            <h3>La comunidad busca</h3>
-            <p>Investigadores verificados de la red REDSEG analizan tu superficie de ataque y reportan con prueba de concepto, impacto y pasos para reproducirlo.</p>
-        </li>
-        <li>
-            <span class="step-n" aria-hidden="true">3</span>
-            <h3>Validas y pagas</h3>
-            <p>Revisas el reporte, fijas la recompensa y el pago sale de tu fondo prepagado al método que elija el investigador: USDT, banco en USD o VES, o PayPal.</p>
-        </li>
-    </ol>
 </section>
 
 {# ============================================================
-   PROGRAMAS ACTIVOS — datos reales de esta instancia
+   ALIADOS
    ============================================================ #}
-<section class="section">
+<section class="allies reveal" aria-label="Aliados">
+    <span class="lbl">Con el respaldo de la red REDSEG y sus aliados</span>
+    <div class="marq-wrap">
+        <div class="marq">
+            <div><span>SentinelOne</span><span>DEFCON</span><span>UNEXPO</span><span>DIGITALX</span><span>Security Magazine</span><span>SEGURED</span><span>FUNDIUP</span><span>TECNAVIX</span><span>SEC2CRIME</span><span>JIC Consultores</span><span>Monitoreo.com</span></div>
+            <div aria-hidden="true"><span>SentinelOne</span><span>DEFCON</span><span>UNEXPO</span><span>DIGITALX</span><span>Security Magazine</span><span>SEGURED</span><span>FUNDIUP</span><span>TECNAVIX</span><span>SEC2CRIME</span><span>JIC Consultores</span><span>Monitoreo.com</span></div>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   01 — PROGRAMAS ACTIVOS (datos reales)
+   ============================================================ #}
+<section class="section reveal">
     <div class="section-head section-head--row">
         <div>
-            <h2>Programas activos</h2>
-            <p>Empresas que ya pagan por encontrar sus vulnerabilidades.</p>
+            <span class="lbl lbl--signal">// 01 — Programas</span>
+            <h2>Programas activos.</h2>
+            <p>Revisa el alcance, mira cuánto paga cada severidad y envía tu reporte.</p>
         </div>
-        {% if !programs.is_empty() %}
-            <a href="/programs" class="btn-ghost">Ver todos los programas</a>
-        {% endif %}
+        <a class="btn-ghost" href="/programs">Ver todos los programas</a>
     </div>
-
-    {% if programs.is_empty() %}
-        <div class="empty">
-            <p>Todavía no hay programas publicados.</p>
-            <p>Sé la primera empresa en abrir uno. <a href="/companies/new">Publicar un programa</a></p>
-        </div>
-    {% else %}
-        <ul class="prog-list">
-            <li class="prog-list-head" aria-hidden="true">
-                <span>Programa</span>
-                <span>Desde</span>
-                <span>Recompensa máxima</span>
-                <span></span>
-            </li>
-        {% for p in programs %}
-            <li>
-                <a class="prog-row" href="/programs/{{ p.company_slug }}/{{ p.program_slug }}">
-                    <div class="prog-id">
-                        <span class="prog-logo" aria-hidden="true">{{ p.company_name.chars().next().unwrap_or('?') }}</span>
-                        <div class="prog-names">
-                            <div class="prog-name">{{ p.name }}</div>
-                            <div class="prog-company">{{ p.company_name }}</div>
+    <div class="prog-table">
+        <div class="prog-scroll">
+            <div class="prog-inner">
+                <div class="prog-head" aria-hidden="true">
+                    <span class="lbl">Programa</span><span class="lbl">Recompensa máx.</span><span class="lbl">Activos</span><span class="lbl">Actualizado</span>
+                </div>
+                {% if programs.is_empty() %}
+                    <div class="grid-empty bg-grid">
+                        <div class="icon-frame" aria-hidden="true">
+                            <span class="corners"></span>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"></path><path d="M12 9v6M9 12h6"></path></svg>
+                        </div>
+                        <h3>Este lugar es para tu empresa.</h3>
+                        <p>Los primeros programas se llevan toda la atención de la comunidad. Publicar toma minutos y no cuesta nada hasta que alguien encuentre un fallo real.</p>
+                        <div class="hero-actions">
+                            <a class="btn-primary" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear el primer programa</a>
+                            <a class="btn-ghost" href="#empresas">Ver cómo funciona</a>
                         </div>
                     </div>
-                    <div>
-                        <span class="prog-cell-label">Desde</span>
-                        <span class="prog-from">{% if p.bounty_low.is_empty() %}—{% else %}{{ p.bounty_low }}{% endif %}</span>
-                    </div>
-                    <div>
-                        <span class="prog-cell-label">Recompensa máxima</span>
-                        <span class="prog-max">{% if p.bounty_critical.is_empty() %}—{% else %}{{ p.bounty_critical }}{% endif %}</span>
-                    </div>
-                    <span class="prog-go">Ver programa</span>
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-</section>
-
-{# ============================================================
-   INVESTIGADORES
-   ============================================================ #}
-<section class="section">
-    <div class="section-head">
-        <h2>Para investigadores: tu talento, pagado</h2>
-        <p>
-            No necesitas un empleo formal para vivir de la ciberseguridad. Convierte tus hallazgos
-            en ingresos, con pagos rápidos y el respaldo de la red REDSEG.
-        </p>
-    </div>
-
-    <div class="feature-grid">
-        <div class="feature">
-            <h3>Reporta vulnerabilidades</h3>
-            <p>Elige un programa público, encuentra fallos y cobra por cada hallazgo válido. Tú decides en qué empresas buscar.</p>
-        </div>
-        <div class="feature">
-            <h3>Vende inteligencia OSINT</h3>
-            <p>¿Encontraste credenciales filtradas o información expuesta de una empresa? Envíanos tu informe OSINT y lo vendemos por ti.</p>
-        </div>
-        <div class="feature">
-            <h3>Fórmate desde cero</h3>
-            <p>Si estás empezando, te capacitamos como Analista en Ciberseguridad para que entres al equipo de investigadores certificados y vendas tus informes en la plataforma.</p>
-            <div class="feature-links">
-                <a href="/cursos/analista-ciberseguridad" class="btn-link">Solicitar el curso</a>
-                <a href="/cursos" class="btn-link">Ver todos los cursos</a>
+                {% else %}
+                    {% include "programs/partials/rows.html" %}
+                {% endif %}
             </div>
         </div>
-        <div class="feature">
-            <h3>Cobra a tu manera</h3>
-            <p>Recibe pagos en USDT, banco en USD o VES, PayPal y más. Tú eliges el método y nosotros hacemos el resto.</p>
-        </div>
-    </div>
-
-    <div class="section-actions">
-        {% if handle.is_empty() %}
-            <a class="btn-primary" href="/signup">Unirme como investigador</a>
-        {% else %}
-            <a class="btn-primary" href="/dashboard">Ir a mi dashboard</a>
-        {% endif %}
-        <a class="btn-ghost" href="/programs">Ver programas</a>
     </div>
 </section>
 
 {# ============================================================
-   ALIADOS — marquee con logos reales
+   02 — PARA EMPRESAS: pasos con pestañas (static/app.js)
    ============================================================ #}
-<section class="allies-section">
-    <p class="allies-label">Con el respaldo de la red REDSEG y sus aliados</p>
-    <div class="marquee">
-        <div class="marquee-track">
-            {% for n in ally_ids %}
-                <a href="https://www.redseg.org" target="_blank" rel="noopener" class="ally-logo">
-                    <img src="/static/allies/s{{ n }}.jpg" alt="Aliado oficial de REDSEG" loading="lazy">
-                </a>
-            {% endfor %}
-            <a href="https://www.sentinelone.com" target="_blank" rel="noopener" class="ally-logo">
-                <img src="/static/s1.svg" alt="SentinelOne, aliado comercial" loading="lazy">
-            </a>
-            <a href="https://www.sentinelone.com" target="_blank" rel="noopener" class="ally-logo">
-                <img src="/static/s1.svg" alt="SentinelOne, aliado comercial" loading="lazy">
-            </a>
-        </div>
-    </div>
-    <p class="allies-foot">
-        DIGITALX, UNEXPO, FUNDIUP, EBS, SEGURED, Security Magazine, DIGITALX Academia,
-        JIC Consultores, DEFCON, Maderos &amp; Herrera, TECNAVIX, Monitoreo.com, SEC2CRIME,
-        SentinelOne y más.
-    </p>
-</section>
-
-{# ============================================================
-   COBERTURA
-   ============================================================ #}
-<section class="section">
+<section id="empresas" class="section reveal">
     <div class="section-head">
-        <h2>Una comunidad en 11 países</h2>
-        <p>
-            Investigadores certificados de toda la región compiten por encontrar
-            vulnerabilidades en tu superficie de ataque.
-        </p>
+        <span class="lbl lbl--signal">// 02 — Para empresas</span>
+        <h2>De publicado a pagado en tres pasos.</h2>
     </div>
+    <div class="steps autoplay" data-steps>
+        <div class="steps-tabs" role="tablist" aria-label="Pasos" aria-orientation="vertical">
+            <button type="button" role="tab" class="step-tab" id="tab-0" aria-selected="true" aria-controls="panel-0" data-step="0">
+                <span class="step-tab-top"><span class="lbl step-idx">01 / 03</span><span class="lbl">Publica</span></span>
+                <span class="step-tab-title">Define alcance y recompensas</span>
+                <span class="step-bar" aria-hidden="true"><span></span></span>
+            </button>
+            <button type="button" role="tab" class="step-tab" id="tab-1" aria-selected="false" aria-controls="panel-1" data-step="1" tabindex="-1">
+                <span class="step-tab-top"><span class="lbl step-idx">02 / 03</span><span class="lbl">Recibe reportes</span></span>
+                <span class="step-tab-title">La comunidad busca por ti</span>
+                <span class="step-bar" aria-hidden="true"><span></span></span>
+            </button>
+            <button type="button" role="tab" class="step-tab" id="tab-2" aria-selected="false" aria-controls="panel-2" data-step="2" tabindex="-1">
+                <span class="step-tab-top"><span class="lbl step-idx">03 / 03</span><span class="lbl">Valida y paga</span></span>
+                <span class="step-tab-title">Paga solo lo que confirmas</span>
+                <span class="step-bar" aria-hidden="true"><span></span></span>
+            </button>
+        </div>
+        <div class="steps-panels">
+            <div class="scan" aria-hidden="true"></div>
+            <span class="corners" aria-hidden="true"></span>
+            <div class="step-panel" role="tabpanel" id="panel-0" aria-labelledby="tab-0">
+                <span class="lbl lbl--signal">Paso 01</span>
+                <h3>Define alcance y recompensas</h3>
+                <p>Lista tus URLs, APIs, apps móviles o firmware, escribe tus reglas y fija cuánto pagas por severidad. Todo en markdown, sin abogados.</p>
+                <div class="step-chips"><span class="chip-mono">*.tuempresa.com</span><span class="chip-mono">api.tuempresa.com/v2</span><span class="chip-mono">Android · iOS</span><span class="chip-mono">firmware v3.2</span></div>
+            </div>
+            <div class="step-panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1" hidden>
+                <span class="lbl lbl--signal">Paso 02</span>
+                <h3>La comunidad busca por ti</h3>
+                <p>Investigadores verificados de REDSEG analizan tu superficie de ataque y te envían cada fallo con prueba de concepto, impacto y pasos para reproducirlo.</p>
+                <div class="step-chips"><span class="tag sev-critical">Crítica</span><span class="tag sev-high">Alta</span><span class="tag sev-medium">Media</span><span class="tag sev-low">Baja</span></div>
+            </div>
+            <div class="step-panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden>
+                <span class="lbl lbl--signal">Paso 03</span>
+                <h3>Paga solo lo que confirmas</h3>
+                <p>Revisas el reporte, fijas la recompensa y nosotros pagamos desde tu fondo prepagado al método que elija el investigador.</p>
+                <div class="step-chips"><span class="pill">USDT</span><span class="pill">Transferencia en USD</span><span class="pill">Transferencia en VES</span><span class="pill">PayPal</span></div>
+            </div>
+        </div>
+    </div>
+</section>
 
+{# ============================================================
+   03 — COMPARACIÓN
+   ============================================================ #}
+<section class="section reveal">
+    <div class="section-head">
+        <span class="lbl lbl--signal">// 03 — Comparación</span>
+        <h2>Pentest o bug bounty: mira en qué pagas.</h2>
+        <p>El pentest sirve para cumplimiento y auditorías antes de lanzar. Para encontrar fallos todo el año, el bug bounty cobra solo por resultados.</p>
+    </div>
+    <div class="cmp">
+        <table>
+            <caption class="lbl">Comparación punto por punto</caption>
+            <thead><tr>
+                <th scope="col"><span class="lbl">Criterio</span></th>
+                <th scope="col" class="old"><span class="lbl">Pentest tradicional</span></th>
+                <th scope="col" class="new"><span class="lbl lbl--signal">Bug bounty con Escudo Digital</span></th>
+            </tr></thead>
+            <tbody>
+                <tr><th scope="row">Costo inicial</th><td class="old">$5.000 – $50.000 por proyecto</td><td class="new">$0 hasta el primer hallazgo</td></tr>
+                <tr><th scope="row">Quién revisa</th><td class="old">1 a 3 consultores</td><td class="new">Cientos de investigadores a la vez</td></tr>
+                <tr><th scope="row">Duración</th><td class="old">De 2 a 6 semanas</td><td class="new">Todo el año</td></tr>
+                <tr><th scope="row">Pagas por</th><td class="old">Horas, encuentren algo o no</td><td class="new">Fallos confirmados, al monto que tú fijas</td></tr>
+                <tr><th scope="row">El año siguiente</th><td class="old">Pagas otro proyecto completo</td><td class="new">Sigue activo, sin recontratar</td></tr>
+                <tr><th scope="row">Alcance</th><td class="old">Lo que diga el contrato</td><td class="new">Web, móvil, infraestructura, firmware, hardware y radio</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{# ============================================================
+   04 — PARA INVESTIGADORES
+   ============================================================ #}
+<section id="investigadores" class="section reveal">
+    <div class="split">
+        <div class="split-copy">
+            <span class="lbl lbl--signal">// 04 — Para investigadores</span>
+            <h2>Cobra por cada fallo que encuentres.</h2>
+            <p>Reporta vulnerabilidades, vende inteligencia OSINT o empieza desde cero con el curso. No necesitas un empleo formal para vivir de esto.</p>
+            <div class="pill-row"><span class="pill">USDT</span><span class="pill">Transferencia en USD</span><span class="pill">Transferencia en VES</span><span class="pill">PayPal</span></div>
+            <div class="hero-actions">
+                <a class="btn-primary" href="{% if handle.is_empty() %}/signup{% else %}/dashboard{% endif %}">{% if handle.is_empty() %}Crear mi perfil de investigador{% else %}Ir a mi panel{% endif %}</a>
+                <a class="btn-ghost" href="/programs">Explorar programas</a>
+            </div>
+        </div>
+        <div class="split-list">
+            <a class="feature-card" href="/programs">
+                <span class="corners" aria-hidden="true"></span>
+                <span class="icon-frame icon-frame--sm" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 4-4 4"></path><path d="M4 21v-7a4 4 0 0 1 4-4h12"></path></svg></span>
+                <span class="feature-card-text"><strong>Reporta vulnerabilidades</strong><span>Elige un programa público, encuentra un fallo y cobra cuando la empresa lo confirme.</span></span>
+                <span class="lbl">01</span>
+            </a>
+            <a class="feature-card" href="{% if handle.is_empty() %}/signup{% else %}/osint/new{% endif %}">
+                <span class="corners" aria-hidden="true"></span>
+                <span class="icon-frame icon-frame--sm" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>
+                <span class="feature-card-text"><strong>Vende inteligencia OSINT</strong><span>¿Encontraste credenciales filtradas o datos expuestos de una empresa? Envía tu informe y nosotros lo comercializamos.</span></span>
+                <span class="lbl">02</span>
+            </a>
+            <a class="feature-card" href="/cursos/analista-ciberseguridad">
+                <span class="corners" aria-hidden="true"></span>
+                <span class="icon-frame icon-frame--sm" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path></svg></span>
+                <span class="feature-card-text"><strong>Empieza desde cero</strong><span>El curso de Analista en Ciberseguridad te lleva hasta investigador certificado.</span></span>
+                <span class="lbl">03</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+{# ============================================================
+   05 — COMUNIDAD
+   ============================================================ #}
+<section class="section reveal">
+    <div class="section-head section-head--row">
+        <div>
+            <span class="lbl lbl--signal">// 05 — Comunidad</span>
+            <h2>Una comunidad en 11 países.</h2>
+        </div>
+        <p style="max-width: 380px; font-size: 15px; line-height: 22px">Sede en Venezuela y nodos regionales en México, Perú y Brasil.</p>
+    </div>
     <div class="country-grid">
-        <div class="country-card focus"><span class="cc">VE</span><div><strong>Venezuela</strong><small>Sede de la plataforma</small></div></div>
-        <div class="country-card hub"><span class="cc">MX</span><div><strong>México</strong><small>3 aliados, hub regional</small></div></div>
-        <div class="country-card hub"><span class="cc">PE</span><div><strong>Perú</strong><small>4 aliados, hub regional</small></div></div>
-        <div class="country-card hub"><span class="cc">BR</span><div><strong>Brasil</strong><small>2 aliados, hub regional</small></div></div>
-        <div class="country-card"><span class="cc">CO</span><div><strong>Colombia</strong><small>2 aliados</small></div></div>
-        <div class="country-card"><span class="cc">AR</span><div><strong>Argentina</strong><small>2 aliados</small></div></div>
-        <div class="country-card"><span class="cc">CL</span><div><strong>Chile</strong><small>1 aliado</small></div></div>
-        <div class="country-card"><span class="cc">EC</span><div><strong>Ecuador</strong><small>1 aliado</small></div></div>
-        <div class="country-card mute"><span class="cc">+3</span><div><strong>Más países</strong><small>Bolivia, Paraguay, Uruguay</small></div></div>
+        <div><span class="lbl lbl--signal"><span class="dot dot--sm pulse" aria-hidden="true"></span>VE · Sede</span><strong>Venezuela</strong></div>
+        <div><span class="lbl">MX · Nodo</span><strong>México <span>· 3 aliados</span></strong></div>
+        <div><span class="lbl">PE · Nodo</span><strong>Perú <span>· 4 aliados</span></strong></div>
+        <div><span class="lbl">BR · Nodo</span><strong>Brasil <span>· 2 aliados</span></strong></div>
+        <div><span class="lbl">CO</span><strong>Colombia <span>· 2 aliados</span></strong></div>
+        <div><span class="lbl">AR</span><strong>Argentina <span>· 2 aliados</span></strong></div>
+        <div><span class="lbl">CL · EC</span><strong>Chile y Ecuador</strong></div>
+        <div><span class="lbl">BO · PY · UY</span><strong>Bolivia, Paraguay y Uruguay</strong></div>
+    </div>
+</section>
+
+{# ============================================================
+   06 — PREGUNTAS
+   ============================================================ #}
+<section id="faq" class="section reveal">
+    <div class="faq">
+        <div class="faq-head">
+            <span class="lbl lbl--signal">// 06 — Preguntas</span>
+            <h2>Lo que preguntan las empresas.</h2>
+        </div>
+        <div class="faq-list">
+            <details><summary>¿Cuánto cuesta abrir un programa?<span class="chev" aria-hidden="true">+</span></summary><p>Nada por adelantado. Cargas un fondo prepagado y solo se descuenta cuando confirmas un hallazgo, al monto que fijaste para su severidad.</p></details>
+            <details><summary>¿Quiénes revisan mis sistemas?<span class="chev" aria-hidden="true">+</span></summary><p>Hackers éticos verificados de la red REDSEG en Venezuela y Latinoamérica. Cada reporte trae prueba de concepto, impacto y pasos para reproducirlo.</p></details>
+            <details><summary>¿Cómo les pago a los investigadores?<span class="chev" aria-hidden="true">+</span></summary><p>Desde tu fondo prepagado. Nosotros enviamos el pago al método que elija el investigador: USDT, transferencia en dólares o bolívares, o PayPal.</p></details>
+            <details><summary>¿Qué pasa si un reporte no es válido?<span class="chev" aria-hidden="true">+</span></summary><p>No pagas. Lo marcas como duplicado, fuera de alcance o no reproducible, y el investigador recibe el motivo.</p></details>
+            <details><summary>¿Puedo hacer el programa privado?<span class="chev" aria-hidden="true">+</span></summary><p>Sí. Un programa privado no aparece en el listado público y solo lo ve tu equipo, así que puedes prepararlo con calma antes de abrirlo a la comunidad.</p></details>
+        </div>
     </div>
 </section>
 
 {# ============================================================
    CTA FINAL
    ============================================================ #}
-<section class="section">
-    <div class="cta-final">
-        <div>
-            <h2>¿Cuánto te costaría no enterarte?</h2>
-            <p>
-                Una vulnerabilidad explotada cuesta mucho más que la recompensa por descubrirla a tiempo.
-                Abre tu programa hoy: no cobramos nada hasta que tengas un reporte que validar.
-            </p>
+<section class="section reveal">
+    <div class="cta-band">
+        <div class="cta-band-grid" aria-hidden="true"></div>
+        <div class="scan" aria-hidden="true"></div>
+        <div class="cta-band-copy">
+            <h2>¿Cuánto te cuesta no saberlo?</h2>
+            <p>Una brecha explotada cuesta mucho más que la recompensa por encontrarla a tiempo. Publica hoy y paga solo cuando haya algo que arreglar.</p>
         </div>
-        <a class="btn-primary btn-lg" href="/companies/new">Publicar mi programa</a>
+        <a class="btn-primary btn-white btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear mi programa</a>
     </div>
 </section>
 
