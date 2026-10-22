@@ -43,8 +43,21 @@ async fn main() -> anyhow::Result<()> {
     // Falla temprano si la key de payment_methods está mal: si arranca,
     // arranca seguro.
     let pm_key = payments::crypto::key_from_hex(&cfg.payment_methods_key_hex)?;
-    let email_sender: email::SharedEmailSender = std::sync::Arc::new(
-        email::SmtpSender::new(&cfg.smtp_host, cfg.smtp_port, cfg.smtp_from.clone()),
+    let smtp_tls = email::SmtpTls::parse(&cfg.smtp_tls).map_err(|e| anyhow::anyhow!(e))?;
+    let email_sender: email::SharedEmailSender = std::sync::Arc::new(email::SmtpSender::new(
+        &cfg.smtp_host,
+        cfg.smtp_port,
+        cfg.smtp_from.clone(),
+        &cfg.smtp_username,
+        &cfg.smtp_password,
+        smtp_tls,
+    )?);
+    tracing::info!(
+        host = %cfg.smtp_host,
+        port = cfg.smtp_port,
+        tls = ?smtp_tls,
+        auth = !cfg.smtp_username.is_empty(),
+        "smtp configured"
     );
     // Object storage (MinIO en dev). Falla temprano si el bucket no responde.
     let object_store = storage::S3Storage::from_config(&cfg).await?;

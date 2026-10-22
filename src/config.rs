@@ -59,19 +59,31 @@ pub struct Config {
     #[serde(default)]
     pub osint_notify_email: String,
 
-    // ---- SMTP (Postfix local) ----
+    // ---- SMTP ----
+    // Por defecto apunta a un Postfix local sin TLS. Para un proveedor externo
+    // (Gmail, Brevo, Resend…) se definen usuario, contraseña y SMTP_TLS.
     #[serde(default = "default_smtp_host")]
     pub smtp_host: String,
     #[serde(default = "default_smtp_port")]
     pub smtp_port: u16,
+    /// Remitente. Acepta "correo@dominio" o "Nombre <correo@dominio>".
     #[serde(default = "default_smtp_from")]
     pub smtp_from: String,
+    /// Usuario SMTP. Vacío = sin autenticación.
+    #[serde(default)]
+    pub smtp_username: String,
+    #[serde(default)]
+    pub smtp_password: String,
+    /// `none` (texto plano), `starttls` (p. ej. Gmail en 587) o `tls` (TLS directo, 465).
+    #[serde(default = "default_smtp_tls")]
+    pub smtp_tls: String,
 }
 
 
 fn default_smtp_host() -> String { "127.0.0.1".to_string() }
 fn default_smtp_port() -> u16 { 25 }
 fn default_smtp_from() -> String { "noreply@cristiancorderosecurity.com".to_string() }
+fn default_smtp_tls() -> String { "none".to_string() }
 
 fn default_bind() -> String { "127.0.0.1:8080".into() }
 fn default_db_max_conn() -> u32 { 10 }
