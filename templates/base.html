@@ -76,7 +76,7 @@
                     <a href="/signup" class="btn-primary">Crear cuenta</a>
                 {% else %}
                     <div class="user-menu">
-                        <button type="button" class="user-menu-trigger" onclick="bbToggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+                        <button type="button" class="user-menu-trigger" aria-haspopup="true" aria-expanded="false">
                             <span class="user-avatar" aria-hidden="true">{{ handle.chars().next().unwrap_or('?') }}</span>
                             <span class="user-handle">{{ handle }}</span>
                             <span class="user-caret" aria-hidden="true">▾</span>
@@ -130,73 +130,7 @@
         <div class="foot-bottom">© {{ year }} Escudo Digital · Red REDSEG</div>
     </footer>
 
-    <script>
-        // Inicializa EasyMDE sobre cualquier <textarea data-easymde>.
-        // Lo hacemos en DOMContentLoaded para que EasyMDE (defer) esté listo.
-        // Y también reaccionamos a htmx:afterSwap para textareas inyectados.
-        function bbInitEditors(scope) {
-            if (typeof EasyMDE === 'undefined') return;
-            (scope || document).querySelectorAll('textarea[data-easymde]:not(.easymde-init)').forEach(function(ta) {
-                ta.classList.add('easymde-init');
-                // EasyMDE oculta el <textarea> original; un atributo `required`
-                // sobre un campo no-focusable bloquea el submit del form
-                // (la validación HTML5 falla en silencio). El backend valida
-                // los mínimos igualmente, así que lo quitamos acá.
-                ta.removeAttribute('required');
-                var editor = new EasyMDE({
-                    element: ta,
-                    spellChecker: false,
-                    autoDownloadFontAwesome: false,
-                    minHeight: '100px',
-                    status: false,
-                    toolbar: ['bold','italic','heading','|','code','quote','unordered-list','ordered-list','|','link','preview','|','guide'],
-                });
-                // Guardamos el editor en el propio textarea para poder forzar
-                // sync antes de cada submit HTMX.
-                ta._easymde = editor;
-            });
-        }
-        document.addEventListener('DOMContentLoaded', function() { bbInitEditors(); });
-        document.addEventListener('htmx:afterSwap', function(e) { bbInitEditors(e.target); });
-
-
-        // Dropdown del menú de usuario en el topbar.
-        function bbToggleUserMenu(ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            var btn = ev.currentTarget;
-            var panel = btn.parentElement.querySelector('.user-menu-panel');
-            if (!panel) return;
-            var isOpen = !panel.hasAttribute('hidden');
-            if (isOpen) {
-                panel.setAttribute('hidden', '');
-                btn.setAttribute('aria-expanded', 'false');
-            } else {
-                panel.removeAttribute('hidden');
-                btn.setAttribute('aria-expanded', 'true');
-            }
-        }
-        document.addEventListener('click', function(e) {
-            document.querySelectorAll('.user-menu-panel:not([hidden])').forEach(function(panel) {
-                if (!panel.parentElement.contains(e.target)) {
-                    panel.setAttribute('hidden', '');
-                    var trig = panel.parentElement.querySelector('.user-menu-trigger');
-                    if (trig) trig.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
-        // Antes de que HTMX serialice el formulario, sincronizamos el valor
-        // del CodeMirror al <textarea> y al payload que va a enviar.
-        document.addEventListener('htmx:configRequest', function(e) {
-            document.querySelectorAll('textarea[data-easymde]').forEach(function(ta) {
-                if (!ta._easymde) return;
-                var v = ta._easymde.value();
-                ta.value = v;
-                if (e.detail && e.detail.parameters && ta.name) {
-                    e.detail.parameters[ta.name] = v;
-                }
-            });
-        });
-    </script>
+    {# La lógica de EasyMDE y del menú de usuario vive en /static/app.js (defer),
+       para que la CSP de script-src pueda prescindir de 'unsafe-inline'. #}
 </body>
 </html>

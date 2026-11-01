@@ -12,11 +12,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use axum::Router;
-use axum::extract::Request;
+use axum::extract::{Request, State};
 use axum::middleware::Next;
-use axum::response::Response;
+use axum::response::{IntoResponse, Response};
 use axum::routing::get;
-use axum::http::{HeaderName, HeaderValue, header};
+use axum::http::{HeaderName, HeaderValue, Method, header};
+
+use crate::error::AppError;
 use tower_governor::governor::GovernorConfigBuilder;
 use tower_governor::key_extractor::SmartIpKeyExtractor;
 use tower_governor::GovernorLayer;
@@ -69,13 +71,15 @@ async fn security_headers(req: Request, next: Next) -> Response {
         HeaderValue::from_static("DENY"),
     );
     // CSP: orígenes permitidos para cada tipo de recurso.
-    // unsafe-inline es necesario por los <script> inline de htmx y el editor
-    // Markdown (easymde). frame-ancestors refuerza X-Frame-Options para CSP Lv.2.
+    // script-src SIN 'unsafe-inline': todo el JS de la app es externo
+    // (/static/app.js, htmx y easymde desde unpkg). style-src conserva
+    // 'unsafe-inline' porque easymde/CodeMirror inyectan estilos inline.
+    // frame-ancestors refuerza X-Frame-Options para CSP Lv.2.
     h.insert(
         header::CONTENT_SECURITY_POLICY,
         HeaderValue::from_static(
             "default-src 'self'; \
-             script-src 'self' 'unsafe-inline' https://unpkg.com; \
+             script-src 'self' https://unpkg.com; \
              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; \
              font-src 'self' https://fonts.gstatic.com; \
              img-src 'self' data:; \
@@ -104,7 +108,46 @@ async fn security_headers(req: Request, next: Next) -> Response {
     res
 }
 
+/// CSRF defense-in-depth basada en el header `Origin` (con fallback a `Referer`).
+///
+/// Para métodos que cambian estado (POST/PUT/PATCH/DELETE), si la petición trae
+/// `Origin` este debe coincidir con el origen público configurado; si no trae
+/// `Origin` pero sí `Referer`, se valida contra ese. Una petición sin ninguno de
+/// los dos se permite: un ataque CSRF real desde otro sitio **siempre** manda
+/// `Origin` en un POST cross-origin, así que no debilitamos la protección, y a la
+/// vez no rompemos clientes no-navegador legítimos. Se apoya sobre la cookie de
+/// sesión con `SameSite=Lax`, que ya bloquea el envío de la cookie cross-site.
+async fn csrf_origin_check(State(state): State<AppState>, req: Request, next: Next) -> Response {
+    let m = req.method();
+    let state_changing =
+        *m == Method::POST || *m == Method::PUT || *m == Method::PATCH || *m == Method::DELETE;
+    if state_changing {
+        let expected = state.cfg.public_url.trim_end_matches('/');
+        let h = req.headers();
+        let origin = h
+            .get(header::ORIGIN)
+            .and_then(|v| v.to_str().ok());
+        let referer = h
+            .get(header::REFERER)
+            .and_then(|v| v.to_str().ok());
+        let ok = match (origin, referer) {
+            (Some(o), _) => o.trim_end_matches('/').eq_ignore_ascii_case(expected),
+            (None, Some(r)) => {
+                r.eq_ignore_ascii_case(expected) || r.starts_with(&format!("{expected}/"))
+            }
+            (None, None) => true,
+        };
+        if !ok {
+            tracing::warn!(method = %m, ?origin, ?referer, "csrf: origin/referer no coincide");
+            return AppError::Forbidden.into_response();
+        }
+    }
+    next.run(req).await
+}
+
 pub fn router(state: AppState) -> Router {
+    // Clon del estado para el middleware CSRF (necesita leer `public_url`).
+    let csrf_state = state.clone();
     // Rate limit por IP de **cliente** para auth: ~1 req/seg, ráfaga de 5.
     // Suficiente para uso humano normal; brute force se rompe en 5 intentos.
     //
@@ -155,6 +198,7 @@ pub fn router(state: AppState) -> Router {
         .nest_service("/static", ServeDir::new("static"))
         .with_state(state)
         .layer(axum::middleware::from_fn(security_headers))
+        .layer(axum::middleware::from_fn_with_state(csrf_state, csrf_origin_check))
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
         .layer(TimeoutLayer::new(Duration::from_secs(30)))

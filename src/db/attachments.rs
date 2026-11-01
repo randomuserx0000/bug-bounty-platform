@@ -32,6 +32,16 @@ pub async fn list_for_report(
     .await
 }
 
+/// Cuenta los adjuntos actuales de un report. Se usa para imponer un tope por
+/// report y evitar abuso de almacenamiento.
+pub async fn count_for_report(pool: &PgPool, report_id: ReportId) -> Result<i64, sqlx::Error> {
+    let row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM report_attachments WHERE report_id = $1")
+        .bind(report_id)
+        .fetch_one(pool)
+        .await?;
+    Ok(row.0)
+}
+
 pub async fn find_by_id(
     pool: &PgPool,
     id: AttachmentId,

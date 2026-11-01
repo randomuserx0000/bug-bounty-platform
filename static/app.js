@@ -192,3 +192,75 @@
         initExplore();
     });
 })();
+
+// ---------- App shell: editores Markdown (EasyMDE) + menú de usuario ----------
+// Movido desde el <script> inline de base.html para permitir una CSP sin
+// 'unsafe-inline' en script-src (endurecimiento). El comportamiento es idéntico;
+// el menú de usuario ahora usa delegación de eventos en vez de onclick inline.
+(function () {
+    'use strict';
+
+    function bbInitEditors(scope) {
+        if (typeof EasyMDE === 'undefined') return;
+        (scope || document).querySelectorAll('textarea[data-easymde]:not(.easymde-init)').forEach(function (ta) {
+            ta.classList.add('easymde-init');
+            // EasyMDE oculta el <textarea>; un `required` sobre un campo no
+            // focusable bloquea el submit en silencio. El backend valida igual.
+            ta.removeAttribute('required');
+            var editor = new EasyMDE({
+                element: ta,
+                spellChecker: false,
+                autoDownloadFontAwesome: false,
+                minHeight: '100px',
+                status: false,
+                toolbar: ['bold', 'italic', 'heading', '|', 'code', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'preview', '|', 'guide'],
+            });
+            ta._easymde = editor;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () { bbInitEditors(); });
+    document.addEventListener('htmx:afterSwap', function (e) { bbInitEditors(e.target); });
+
+    // Dropdown del menú de usuario (topbar). El botón lleva .user-menu-trigger;
+    // delegamos el click en document para no necesitar onclick inline.
+    function toggleUserMenu(btn) {
+        var panel = btn.parentElement.querySelector('.user-menu-panel');
+        if (!panel) return;
+        if (panel.hasAttribute('hidden')) {
+            panel.removeAttribute('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+        } else {
+            panel.setAttribute('hidden', '');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    }
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest ? e.target.closest('.user-menu-trigger') : null;
+        if (trigger) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleUserMenu(trigger);
+            return;
+        }
+        // Click fuera de un menú abierto: cerrarlo.
+        document.querySelectorAll('.user-menu-panel:not([hidden])').forEach(function (panel) {
+            if (!panel.parentElement.contains(e.target)) {
+                panel.setAttribute('hidden', '');
+                var trig = panel.parentElement.querySelector('.user-menu-trigger');
+                if (trig) trig.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+
+    // Antes de que HTMX serialice el form, sincroniza CodeMirror -> textarea.
+    document.addEventListener('htmx:configRequest', function (e) {
+        document.querySelectorAll('textarea[data-easymde]').forEach(function (ta) {
+            if (!ta._easymde) return;
+            var v = ta._easymde.value();
+            ta.value = v;
+            if (e.detail && e.detail.parameters && ta.name) {
+                e.detail.parameters[ta.name] = v;
+            }
+        });
+    });
+})();

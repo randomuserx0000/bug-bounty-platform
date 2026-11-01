@@ -16,6 +16,10 @@ use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Form, Router};
+use std::sync::Arc;
+use tower_governor::governor::GovernorConfigBuilder;
+use tower_governor::key_extractor::SmartIpKeyExtractor;
+use tower_governor::GovernorLayer;
 use serde::Deserialize;
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -45,16 +49,55 @@ use crate::web::templates::{
 /// varios uploads concurrentes.
 const ATTACHMENT_MAX_BYTES: usize = 50 * 1024 * 1024;
 
+/// Tope de adjuntos por report. Evita que un usuario con acceso agote
+/// almacenamiento subiendo archivos sin límite.
+const MAX_ATTACHMENTS_PER_REPORT: i64 = 25;
+
 pub fn router() -> Router<AppState> {
-    Router::new()
+    // Rate-limit anti-abuso SOLO sobre las rutas de ESCRITURA autenticadas
+    // (crear report, comentar, subir/borrar adjuntos, cambios de
+    // estado/severity/bounty): ~1/seg con ráfaga de 10 por IP de cliente.
+    // Suficiente para un triager haciendo varias acciones seguidas; corta el
+    // spam automatizado. Las LECTURAS (ver report, descargar adjunto) no se
+    // limitan. `SmartIpKeyExtractor` + nota de confianza del proxy: ver
+    // `routes/mod.rs` y DEPLOY.md.
+    let write_governor = Arc::new(
+        GovernorConfigBuilder::default()
+            .per_second(1)
+            .burst_size(10)
+            .key_extractor(SmartIpKeyExtractor)
+            .finish()
+            .expect("governor config reports válida"),
+    );
+
+    let writes = Router::new()
         // Researcher: crear desde la página pública del programa
-        .route(
-            "/programs/:company_slug/:program_slug/reports/new",
-            get(new_form),
-        )
         .route(
             "/programs/:company_slug/:program_slug/reports",
             post(create),
+        )
+        .route("/reports/:public_id/comments", post(add_comment))
+        .route("/reports/:public_id/state", post(change_state))
+        .route("/reports/:public_id/severity", post(change_severity))
+        .route("/reports/:public_id/bounty", post(set_bounty))
+        // Attachments: el upload necesita un body limit propio (50 MB).
+        .route(
+            "/reports/:public_id/attachments",
+            post(upload_attachment).layer(DefaultBodyLimit::max(ATTACHMENT_MAX_BYTES)),
+        )
+        .route(
+            "/reports/:public_id/attachments/:id/delete",
+            post(delete_attachment),
+        )
+        .layer(GovernorLayer {
+            config: write_governor,
+        });
+
+    Router::new()
+        // --- Lecturas (sin rate-limit) ---
+        .route(
+            "/programs/:company_slug/:program_slug/reports/new",
+            get(new_form),
         )
         // Mis reports (researcher view)
         .route("/reports", get(my_reports))
@@ -63,26 +106,14 @@ pub fn router() -> Router<AppState> {
             "/manage/:company_slug/programs/:program_slug/reports",
             get(triage_list),
         )
-        // Detalle + acciones (mismo URL para ambos lados)
+        // Detalle (mismo URL para ambos lados)
         .route("/reports/:public_id", get(show))
-        .route("/reports/:public_id/comments", post(add_comment))
-        .route("/reports/:public_id/state", post(change_state))
-        .route("/reports/:public_id/severity", post(change_severity))
-        .route("/reports/:public_id/bounty", post(set_bounty))
-        // Attachments: el upload necesita un body limit propio (50 MB).
-        .route(
-            "/reports/:public_id/attachments",
-            post(upload_attachment)
-                .layer(DefaultBodyLimit::max(ATTACHMENT_MAX_BYTES)),
-        )
         .route(
             "/reports/:public_id/attachments/:id",
             get(download_attachment),
         )
-        .route(
-            "/reports/:public_id/attachments/:id/delete",
-            post(delete_attachment),
-        )
+        // --- Escrituras (rate-limited) ---
+        .merge(writes)
 }
 
 // ----------------------------------------------------------------------------
@@ -877,6 +908,14 @@ async fn upload_attachment(
 ) -> AppResult<Response> {
     let ctx = load_report_ctx(&state, &current, &public_id).await?;
 
+    // Tope de adjuntos por report (anti-abuso de almacenamiento).
+    let existing = db::attachments::count_for_report(&state.db, ctx.report.id).await?;
+    if existing >= MAX_ATTACHMENTS_PER_REPORT {
+        return Ok(error_fragment(&format!(
+            "este report ya alcanzó el máximo de {MAX_ATTACHMENTS_PER_REPORT} adjuntos"
+        )));
+    }
+
     let mut file_bytes: Option<bytes::Bytes> = None;
     let mut filename = String::new();
     let mut content_type = String::new();
@@ -932,6 +971,11 @@ async fn upload_attachment(
     } else {
         content_type
     };
+    // Defensa en profundidad: neutralizamos MIMEs "activos" (HTML/SVG/JS/XML) a
+    // octet-stream. La descarga ya fuerza `Content-Disposition: attachment` +
+    // `nosniff`; esto evita además que un enlace directo al object store pueda
+    // renderizar/ejecutar el contenido.
+    let mime = neutralize_active_mime(&mime);
 
     // sha256 server-side.
     let mut hasher = Sha256::new();
@@ -1072,6 +1116,29 @@ fn sanitize_filename(name: &str) -> String {
         .filter(|c| c.is_alphanumeric() || matches!(*c, '.' | '_' | '-'))
         .take(120)
         .collect()
+}
+
+/// Devuelve `application/octet-stream` para MIMEs que un navegador podría
+/// renderizar o ejecutar (HTML, SVG, JS, XML, PHP); cualquier otro se conserva.
+fn neutralize_active_mime(mime: &str) -> String {
+    const ACTIVE: &[&str] = &[
+        "text/html",
+        "application/xhtml+xml",
+        "image/svg+xml",
+        "application/xml",
+        "text/xml",
+        "application/javascript",
+        "text/javascript",
+        "application/ecmascript",
+        "text/ecmascript",
+        "application/x-httpd-php",
+    ];
+    let lower = mime.trim().to_ascii_lowercase();
+    if ACTIVE.contains(&lower.as_str()) {
+        "application/octet-stream".to_string()
+    } else {
+        mime.to_string()
+    }
 }
 
 fn human_size(bytes: i64) -> String {
