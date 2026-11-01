@@ -479,7 +479,25 @@ main { min-height: calc(100vh - 300px); }
     border-top: 1px solid var(--line);
     font-size: 13px;
     color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    flex-wrap: wrap;
 }
+/* Atribución "Desarrollado por Cordero Security" + isotipo, enlaza al sitio. */
+.dev-by {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-2);
+    font-size: 13px;
+    transition: color .15s ease;
+}
+.dev-by:hover { color: var(--ink); }
+.dev-by img { display: block; border-radius: 5px; }
+.dev-by .dev-by-pre { color: var(--muted); }
+.dev-by strong { font-weight: 600; color: inherit; letter-spacing: -0.01em; }
 
 /* =============================================================================
    BOTONES — todo lo que se pulsa es píldora

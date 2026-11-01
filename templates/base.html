@@ -127,7 +127,14 @@
                 </nav>
             </div>
         </div>
-        <div class="foot-bottom">© {{ year }} Escudo Digital · Red REDSEG</div>
+        <div class="foot-bottom">
+            <span>© {{ year }} Escudo Digital · Red REDSEG</span>
+            <a class="dev-by" href="https://corderosecurity.com" target="_blank" rel="noopener noreferrer">
+                <span class="dev-by-pre">Desarrollado por</span>
+                <img src="/static/brand/cordero-mark.svg" alt="" width="20" height="20" loading="lazy">
+                <strong>Cordero Security</strong>
+            </a>
+        </div>
     </footer>
 
     {# La lógica de EasyMDE y del menú de usuario vive en /static/app.js (defer),
