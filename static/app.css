@@ -1692,6 +1692,36 @@ a.badge-alert:hover { color: var(--c); filter: brightness(1.15); }
 .marq-wrap:hover .marq { animation-play-state: paused; }
 @keyframes marq { to { transform: translateX(-50%); } }
 
+/* Partner tecnológico (SentinelOne) */
+.partner-tec {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px 48px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 36px clamp(24px, 4vw, 48px);
+}
+.partner-tec-copy { flex: 1 1 420px; display: flex; flex-direction: column; gap: 10px; }
+.partner-tec-copy h2 { margin: 0; }
+.partner-tec-copy p { margin: 0; color: var(--ink-2); max-width: 540px; }
+.partner-tec-logo {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-left: clamp(0px, 3vw, 40px);
+    border-left: 1px solid var(--line);
+}
+.partner-tec-logo img { display: block; height: 32px; width: auto; opacity: .95; }
+@media (max-width: 760px) {
+    .partner-tec-logo { border-left: 0; padding-left: 0; }
+}
+
 /* Pasos con pestañas */
 .steps { display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch; }
 .steps-tabs {
