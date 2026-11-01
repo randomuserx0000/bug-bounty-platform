@@ -907,14 +907,8 @@ async fn upload_attachment(
     mut multipart: Multipart,
 ) -> AppResult<Response> {
     let ctx = load_report_ctx(&state, &current, &public_id).await?;
-
-    // Tope de adjuntos por report (anti-abuso de almacenamiento).
-    let existing = db::attachments::count_for_report(&state.db, ctx.report.id).await?;
-    if existing >= MAX_ATTACHMENTS_PER_REPORT {
-        return Ok(error_fragment(&format!(
-            "este report ya alcanzó el máximo de {MAX_ATTACHMENTS_PER_REPORT} adjuntos"
-        )));
-    }
+    // El tope de adjuntos por report se impone de forma atómica al insertar
+    // (ver `db::attachments::create_within_cap`), a prueba de uploads concurrentes.
 
     let mut file_bytes: Option<bytes::Bytes> = None;
     let mut filename = String::new();
@@ -994,7 +988,7 @@ async fn upload_attachment(
         .await
         .map_err(|e| anyhow::anyhow!("storage put: {e}"))?;
 
-    let id = db::attachments::create(
+    let id = match db::attachments::create_within_cap(
         &state.db,
         NewAttachment {
             report_id: ctx.report.id,
@@ -1006,8 +1000,19 @@ async fn upload_attachment(
             storage_key: &storage_key,
             kind: &kind,
         },
+        MAX_ATTACHMENTS_PER_REPORT,
     )
-    .await?;
+    .await?
+    {
+        Some(id) => id,
+        None => {
+            // Tope alcanzado (posible carrera): limpiamos el objeto ya subido.
+            let _ = state.storage.delete(&storage_key).await;
+            return Ok(error_fragment(&format!(
+                "este report ya alcanzó el máximo de {MAX_ATTACHMENTS_PER_REPORT} adjuntos"
+            )));
+        }
+    };
     audit::log(&state.db, audit::AuditEntry::new(audit::ATTACHMENT_UPLOAD)
         .actor(current.user.id).target("attachment", id)
         .metadata(serde_json::json!({
