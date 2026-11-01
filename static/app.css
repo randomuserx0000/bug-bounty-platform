@@ -17,7 +17,7 @@
     color-scheme: dark;
 
     /* Superficies */
-    --bg:          #05070c;
+    --bg:          #060810;
     --surface:     #0b0f17;   /* surface-1: tarjetas, nav, campos */
     --surface-2:   #121826;   /* elevada: hover, bandas, menús */
     --surface-3:   #182033;
@@ -30,12 +30,12 @@
     --muted:  #7d879b;        /* ink-subtle */
 
     /* Marca */
-    --signal:      #6e9bff;   /* signal-ink: texto y bordes azules */
-    --brand-solid: #1f5eff;   /* signal: rellenos */
-    --brand-hover: #3a72ff;
+    --signal:      #4c7dff;   /* signal-ink: texto y bordes azules (refinado, más eléctrico) */
+    --brand-solid: #2f66f5;   /* signal: rellenos */
+    --brand-hover: #4c7dff;
     --on-signal:   #ffffff;
-    --signal-soft: #0d1630;
-    --signal-hi:   #9dbcff;
+    --signal-soft: #0c1836;
+    --signal-hi:   #8fb0ff;
 
     /* Severidades (texto / fondo suave) */
     --sev-critical: #ff6b5e;  --sev-critical-soft: #2a1110;
@@ -53,6 +53,8 @@
     /* Tipografía */
     --font-sans: 'Geist', 'Helvetica Neue', Arial, sans-serif;
     --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    /* Display editorial: titulares grandes y contundentes. Distinto del cuerpo. */
+    --font-display: 'Space Grotesk', 'Geist', 'Helvetica Neue', Arial, sans-serif;
 
     /* Radios */
     --r-xs: 6px;      /* badges, chips mono */
@@ -149,11 +151,11 @@ img { max-width: 100%; }
    TIPOGRAFÍA
    ============================================================================= */
 
-h1, h2, h3, h4 { color: var(--ink); text-wrap: balance; }
-h1 { font-size: 40px; line-height: 44px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 10px; }
-h2 { font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -0.02em; margin: 40px 0 16px; }
-h3 { font-size: 20px; line-height: 28px; font-weight: 500; letter-spacing: -0.01em; margin: 16px 0 8px; }
-h4 { font-size: 16px; font-weight: 600; margin: 14px 0 6px; }
+h1, h2, h3, h4 { color: var(--ink); text-wrap: balance; font-family: var(--font-display); }
+h1 { font-size: clamp(30px, 3.4vw, 42px); line-height: 1.06; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 12px; }
+h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; margin: 40px 0 16px; }
+h3 { font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 16px 0 8px; }
+h4 { font-size: 15px; font-weight: 600; margin: 14px 0 6px; letter-spacing: -0.01em; }
 p { margin: 0 0 12px; }
 strong { font-weight: 600; color: var(--ink); }
 
@@ -176,10 +178,7 @@ strong { font-weight: 600; color: var(--ink); }
 
 .accent { color: inherit; }
 
-@media (max-width: 640px) {
-    h1 { font-size: 32px; line-height: 36px; }
-    h2 { font-size: 24px; line-height: 30px; }
-}
+/* h1/h2 responsivos vía clamp() arriba; sin overrides fijos aquí. */
 
 /* =============================================================================
    TEXTURAS (hero y cabeceras)
@@ -270,21 +269,13 @@ strong { font-weight: 600; color: var(--ink); }
 }
 .dot--sm { width: 6px; height: 6px; }
 
-.glitch { display: inline-block; animation: glitch 5s steps(1) infinite; }
-@keyframes glitch {
-    0%, 90%, 100% { text-shadow: none; transform: none; }
-    91% { text-shadow: -3px 0 #ff2bd6, 3px 0 #3dd6c6; transform: translateX(2px); }
-    93% { text-shadow: 2px 0 #ff2bd6, -2px 0 #3dd6c6; transform: translateX(-1px); }
-    95% { text-shadow: none; transform: none; }
-}
+/* .glitch: conservado como hook neutro (el efecto glitch se eliminó por
+   genérico). El titular completo es la voz, no una frase coloreada aparte. */
+.glitch { display: inline; }
 
-/* Aparición al hacer scroll (solo donde el navegador lo soporta) */
-@supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-        .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 22%; }
-    }
-}
-@keyframes reveal { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+/* .reveal: hook neutro. Las apariciones fade-slide-up en cada sección leían
+   como página generada; el contenido aparece sin coreografía de scroll. El
+   único momento de movimiento deliberado es la consola del hero. */
 
 /* =============================================================================
    NAVEGACIÓN
@@ -449,7 +440,7 @@ main { min-height: calc(100vh - 300px); }
 /* Bloque de título de sección: eyebrow + h2 + bajada */
 .section { padding-top: 128px; }
 .section-head { display: flex; flex-direction: column; gap: 12px; max-width: 680px; margin-bottom: 40px; }
-.section-head h2 { margin: 0; font-size: 40px; line-height: 44px; letter-spacing: -0.03em; }
+.section-head h2 { margin: 0; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; }
 .section-head p { margin: 0; font-size: 18px; line-height: 28px; color: var(--ink-2); }
 .section-head--row {
     max-width: none;
@@ -462,7 +453,6 @@ main { min-height: calc(100vh - 300px); }
 .section-head--row > div { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
 @media (max-width: 760px) {
     .section { padding-top: 96px; }
-    .section-head h2 { font-size: 32px; line-height: 36px; }
 }
 
 /* Footer */
@@ -1012,9 +1002,10 @@ a.badge-alert:hover { color: var(--c); filter: brightness(1.15); }
     flex: 1 1 auto;
 }
 .stat-grid .v {
-    font-size: 28px;
+    font-family: var(--font-display);
+    font-size: 32px;
     line-height: 1.1;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
 }
@@ -1540,13 +1531,33 @@ a.badge-alert:hover { color: var(--c); filter: brightness(1.15); }
 .hero-text { display: flex; flex-direction: column; gap: 20px; }
 .hero-text h1 {
     margin: 0;
-    font-size: clamp(46px, 6vw, 84px);
-    line-height: .96;
-    font-weight: 600;
-    letter-spacing: -0.045em;
+    font-size: clamp(44px, 6vw, 78px);
+    line-height: .99;
+    font-weight: 700;
+    letter-spacing: -0.04em;
 }
-.hero-text h1 .glitch { color: var(--signal); }
 .hero-text p { margin: 0; font-size: 18px; line-height: 28px; color: var(--ink-2); max-width: 560px; }
+
+/* Recurso de data antes → después (en la línea del "151 → 9" de Immunefi):
+   la cifra importante es la memorable, no un eyebrow decorativo. */
+.hero-figure {
+    margin: 2px 0 0;
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+.hero-figure-a {
+    color: var(--muted);
+    font-size: 20px;
+    text-decoration: line-through;
+    text-decoration-color: var(--line-strong);
+}
+.hero-figure-arrow { color: var(--signal); font-size: 22px; font-weight: 700; }
+.hero-figure-b { color: var(--ink); font-size: clamp(22px, 2.6vw, 30px); }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-proof { display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
 .hero-proof span { display: inline-flex; gap: 8px; align-items: center; }
@@ -1638,7 +1649,7 @@ a.badge-alert:hover { color: var(--c); filter: brightness(1.15); }
     overflow: hidden;
 }
 .home-stats-grid > div { background: var(--surface); padding: 32px; display: flex; flex-direction: column; gap: 12px; }
-.home-stats-grid .v { font-size: 48px; line-height: 1; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.home-stats-grid .v { font-family: var(--font-display); font-size: clamp(44px, 5vw, 64px); line-height: 1; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 
 /* Aliados: marquee de nombres */
 .allies { padding: 72px 0 0; display: flex; flex-direction: column; gap: 24px; align-items: center; }

@@ -10,10 +10,7 @@
    ============================================================ #}
 <section class="home-hero bleed bg-grid bg-grid--lg">
     <div class="glow" aria-hidden="true" style="width: 900px; height: 900px; left: -260px; top: -380px"></div>
-    <div class="glow" aria-hidden="true" style="width: 700px; height: 700px; right: -240px; top: 120px; opacity: .6"></div>
-    <div class="floor" aria-hidden="true"></div>
-    <div class="scan" aria-hidden="true"></div>
-    <div class="beam" aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true" style="width: 700px; height: 700px; right: -240px; top: 120px; opacity: .5"></div>
 
     <div class="home-hero-inner">
         <div class="home-hero-copy">
@@ -24,13 +21,16 @@
 
             <div data-aud-panel="empresa">
                 <div class="hero-text">
-                    <span class="lbl lbl--signal">// Bug bounty para Venezuela y LATAM</span>
-                    <h1>Tu pentest dura tres semanas. <span class="glitch">Los atacantes tienen todo el año.</span></h1>
+                    <h1>Tu pentest dura tres semanas. Los atacantes tienen todo el año.</h1>
                     <p>Publica un programa de bug bounty y pon a cientos de hackers éticos verificados a revisar tu web, tus apps y tu infraestructura. Pagas solo cuando encuentran un fallo real, al monto que tú decides.</p>
+                    <p class="hero-figure">
+                        <span class="hero-figure-a">3 semanas</span>
+                        <span class="hero-figure-arrow" aria-hidden="true">→</span>
+                        <span class="hero-figure-b">365 días de cobertura</span>
+                    </p>
                 </div>
                 <div class="hero-actions" style="margin-top: 28px">
-                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear mi programa
-                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/companies/new{% endif %}">Crear mi programa</a>
                     <a class="btn-ghost btn-lg" href="#empresas">Ver cómo funciona</a>
                 </div>
                 <div class="hero-proof" style="margin-top: 28px">
@@ -41,13 +41,16 @@
 
             <div data-aud-panel="investigador" hidden>
                 <div class="hero-text">
-                    <span class="lbl lbl--signal">// Para hackers éticos de LATAM</span>
-                    <h1>Encuentra fallos. <span class="glitch">Cobra en USDT, dólares o bolívares.</span></h1>
+                    <h1>Encuentra fallos. Cobra en USDT, dólares o bolívares.</h1>
                     <p>Elige un programa, reporta vulnerabilidades reales y cobra por cada hallazgo confirmado. Sin horario, sin jefe y sin pedir permiso.</p>
+                    <p class="hero-figure">
+                        <span class="hero-figure-a">$0 de entrada</span>
+                        <span class="hero-figure-arrow" aria-hidden="true">→</span>
+                        <span class="hero-figure-b">pago por cada hallazgo</span>
+                    </p>
                 </div>
                 <div class="hero-actions" style="margin-top: 28px">
-                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/dashboard{% endif %}">{% if handle.is_empty() %}Crear mi perfil{% else %}Ir a mi panel{% endif %}
-                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+                    <a class="btn-primary btn-lg" href="{% if handle.is_empty() %}/signup{% else %}/dashboard{% endif %}">{% if handle.is_empty() %}Crear mi perfil{% else %}Ir a mi panel{% endif %}</a>
                     <a class="btn-ghost btn-lg" href="/programs">Explorar programas</a>
                 </div>
                 <div class="hero-proof" style="margin-top: 28px">
@@ -117,7 +120,6 @@
 <section class="section reveal">
     <div class="section-head section-head--row">
         <div>
-            <span class="lbl lbl--signal">// 01 — Programas</span>
             <h2>Programas activos.</h2>
             <p>Revisa el alcance, mira cuánto paga cada severidad y envía tu reporte.</p>
         </div>
@@ -155,7 +157,6 @@
    ============================================================ #}
 <section id="empresas" class="section reveal">
     <div class="section-head">
-        <span class="lbl lbl--signal">// 02 — Para empresas</span>
         <h2>De publicado a pagado en tres pasos.</h2>
     </div>
     <div class="steps autoplay" data-steps>
@@ -206,7 +207,6 @@
    ============================================================ #}
 <section class="section reveal">
     <div class="section-head">
-        <span class="lbl lbl--signal">// 03 — Comparación</span>
         <h2>Pentest o bug bounty: mira en qué pagas.</h2>
         <p>El pentest sirve para cumplimiento y auditorías antes de lanzar. Para encontrar fallos todo el año, el bug bounty cobra solo por resultados.</p>
     </div>
@@ -236,7 +236,6 @@
 <section id="investigadores" class="section reveal">
     <div class="split">
         <div class="split-copy">
-            <span class="lbl lbl--signal">// 04 — Para investigadores</span>
             <h2>Cobra por cada fallo que encuentres.</h2>
             <p>Reporta vulnerabilidades, vende inteligencia OSINT o empieza desde cero con el curso. No necesitas un empleo formal para vivir de esto.</p>
             <div class="pill-row"><span class="pill">USDT</span><span class="pill">Transferencia en USD</span><span class="pill">Transferencia en VES</span><span class="pill">PayPal</span></div>
@@ -274,7 +273,6 @@
 <section class="section reveal">
     <div class="section-head section-head--row">
         <div>
-            <span class="lbl lbl--signal">// 05 — Comunidad</span>
             <h2>Una comunidad en 11 países.</h2>
         </div>
         <p style="max-width: 380px; font-size: 15px; line-height: 22px">Sede en Venezuela y nodos regionales en México, Perú y Brasil.</p>
@@ -297,7 +295,6 @@
 <section id="faq" class="section reveal">
     <div class="faq">
         <div class="faq-head">
-            <span class="lbl lbl--signal">// 06 — Preguntas</span>
             <h2>Lo que preguntan las empresas.</h2>
         </div>
         <div class="faq-list">
