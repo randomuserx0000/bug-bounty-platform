@@ -907,8 +907,16 @@ async fn upload_attachment(
     mut multipart: Multipart,
 ) -> AppResult<Response> {
     let ctx = load_report_ctx(&state, &current, &public_id).await?;
-    // El tope de adjuntos por report se impone de forma atómica al insertar
-    // (ver `db::attachments::create_within_cap`), a prueba de uploads concurrentes.
+
+    // Pre-check barato ANTES de leer/subir el cuerpo: si el report ya está al
+    // tope, rechazamos sin gastar ancho de banda ni memoria. No es autoritativo
+    // (carrera posible); el límite real lo impone `create_within_cap` de forma
+    // atómica al insertar, a prueba de uploads concurrentes.
+    if db::attachments::count_for_report(&state.db, ctx.report.id).await? >= MAX_ATTACHMENTS_PER_REPORT {
+        return Ok(error_fragment(&format!(
+            "este report ya alcanzó el máximo de {MAX_ATTACHMENTS_PER_REPORT} adjuntos"
+        )));
+    }
 
     let mut file_bytes: Option<bytes::Bytes> = None;
     let mut filename = String::new();
@@ -988,7 +996,7 @@ async fn upload_attachment(
         .await
         .map_err(|e| anyhow::anyhow!("storage put: {e}"))?;
 
-    let id = match db::attachments::create_within_cap(
+    let created = db::attachments::create_within_cap(
         &state.db,
         NewAttachment {
             report_id: ctx.report.id,
@@ -1002,15 +1010,20 @@ async fn upload_attachment(
         },
         MAX_ATTACHMENTS_PER_REPORT,
     )
-    .await?
-    {
-        Some(id) => id,
-        None => {
-            // Tope alcanzado (posible carrera): limpiamos el objeto ya subido.
-            let _ = state.storage.delete(&storage_key).await;
+    .await;
+    // Si no se insertó la fila, el objeto que ya subimos quedaría huérfano:
+    // lo borramos en TODOS los caminos (tope alcanzado y error de DB).
+    let id = match created {
+        Ok(Some(id)) => id,
+        Ok(None) => {
+            cleanup_orphan_object(&state, &storage_key).await;
             return Ok(error_fragment(&format!(
                 "este report ya alcanzó el máximo de {MAX_ATTACHMENTS_PER_REPORT} adjuntos"
             )));
+        }
+        Err(e) => {
+            cleanup_orphan_object(&state, &storage_key).await;
+            return Err(e.into());
         }
     };
     audit::log(&state.db, audit::AuditEntry::new(audit::ATTACHMENT_UPLOAD)
@@ -1121,6 +1134,19 @@ fn sanitize_filename(name: &str) -> String {
         .filter(|c| c.is_alphanumeric() || matches!(*c, '.' | '_' | '-'))
         .take(120)
         .collect()
+}
+
+/// Borra (best-effort) un objeto del object store que quedó huérfano porque la
+/// fila de DB no llegó a crearse. Un fallo de borrado se registra en vez de
+/// ignorarse en silencio, para poder reconciliar objetos huérfanos después.
+async fn cleanup_orphan_object(state: &AppState, storage_key: &str) {
+    if let Err(e) = state.storage.delete(storage_key).await {
+        tracing::warn!(
+            storage_key = %storage_key,
+            error = %e,
+            "no se pudo borrar objeto huérfano tras upload sin fila de DB"
+        );
+    }
 }
 
 /// Devuelve `application/octet-stream` para MIMEs que un navegador podría
